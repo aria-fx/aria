@@ -1,15 +1,26 @@
 {
-  "name": "xebia.com/agents/onboarding-assistant",
+  "name": "aria.dev/agents/onboarding-assistant",
   "version": "2.1.0",
   "schema_version": "1.0.0",
   "description": "HR onboarding agent with policy Q&A, welcome message generation, and checklist management. Built with Microsoft Agent Framework 1.0 and governed by OASF + Purview.",
   "skills": [
-    { "id": 10101, "name": "nlp/nlu/intent_classification" },
-    { "id": 10201, "name": "nlp/nlg/text_completion" },
-    { "id": 30101, "name": "knowledge_retrieval/rag" }
+    {
+      "id": 10101,
+      "name": "nlp/nlu/intent_classification"
+    },
+    {
+      "id": 10201,
+      "name": "nlp/nlg/text_completion"
+    },
+    {
+      "id": 30101,
+      "name": "knowledge_retrieval/rag"
+    }
   ],
   "domains": [
-    { "name": "human_resources/onboarding" }
+    {
+      "name": "human_resources/onboarding"
+    }
   ],
   "modules": [
     {
@@ -18,8 +29,10 @@
     },
     {
       "type": "knowledge_base",
-      "ref": "xebia.com/knowledge/hr-policies",
-      "tools": ["lookup_policy"]
+      "ref": "aria.dev/knowledge/hr-policies",
+      "tools": [
+        "lookup_policy"
+      ]
     },
     {
       "type": "orchestration_config",
@@ -29,13 +42,19 @@
   "locators": [
     {
       "type": "source_code",
-      "urls": ["https://github.com/xebia/aria-onboarding-assistant"]
+      "urls": [
+        "https://github.com/jgarverick/aria-onboarding-assistant"
+      ]
     },
     {
       "type": "docker_image",
-      "urls": ["ghcr.io/xebia/onboarding-assistant:2.1.0"]
+      "urls": [
+        "ghcr.io/jgarverick/onboarding-assistant:2.1.0"
+      ]
     }
   ],
-  "authors": ["Josh Garverick <josh.garverick@xebia.com>"],
+  "authors": [
+    "Josh Garverick <josh.garverick@aria.dev>"
+  ],
   "created_at": "2026-04-30T00:00:00Z"
 }

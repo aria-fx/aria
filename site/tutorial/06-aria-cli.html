@@ -157,14 +157,14 @@ Commands:
           <pre><code>┌──────────────────────────────────────────┬─────────┬───────────────┬──────┬──────────────────────────┐
 │ Name                                     │ Version │ Type          │ Skills│ Description             │
 ├──────────────────────────────────────────┼─────────┼───────────────┼──────┼──────────────────────────┤
-│ xebia.com/agents/onboarding-assistant    │ 2.1.0   │ agent         │ rag  │ HR onboarding agent...  │
-│ xebia.com/skills/policy-lookup           │ 1.0.0   │ mcp_server    │ rag  │ MCP server for HR...    │
-│ xebia.com/knowledge/hr-policies          │ 3.0.0   │ knowledge_base│ rag  │ HR policy knowledge...  │
+│ aria.dev/agents/onboarding-assistant    │ 2.1.0   │ agent         │ rag  │ HR onboarding agent...  │
+│ aria.dev/skills/policy-lookup           │ 1.0.0   │ mcp_server    │ rag  │ MCP server for HR...    │
+│ aria.dev/knowledge/hr-policies          │ 3.0.0   │ knowledge_base│ rag  │ HR policy knowledge...  │
 └──────────────────────────────────────────┴─────────┴───────────────┴──────┴──────────────────────────┘</code></pre>
           <h2 id="step-4-inspect-an-asset">Step 4: Inspect an asset</h2>
           <p>Before installing, inspect the full OASF metadata:</p>
           <div class="sourceCode" id="cb9"><pre
-          class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> inspect ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0</span></code></pre></div>
+          class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> inspect ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0</span></code></pre></div>
           <p>This displays two panels:</p>
           <ul>
           <li><strong>OASF Record</strong> — name, version, skills,
@@ -179,7 +179,7 @@ Commands:
           <p>Check whether you’re authorized to install an asset:</p>
           <div class="sourceCode" id="cb10"><pre
           class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This should PASS (confidential ≤ confidential)</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 <span class="dt">\</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> audit ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 <span class="dt">\</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--ceiling</span> confidential</span></code></pre></div>
           <p>Output:</p>
           <pre><code>✓ All governance checks passed
@@ -190,7 +190,7 @@ Commands:
           <p>Now try with a ceiling that’s too low:</p>
           <div class="sourceCode" id="cb12"><pre
           class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This should FAIL (confidential &gt; public)</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 <span class="dt">\</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> audit ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 <span class="dt">\</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--ceiling</span> public</span></code></pre></div>
           <p>Output:</p>
           <pre><code>✗ Asset sensitivity &#39;confidential&#39; exceeds your ceiling &#39;public&#39;.
@@ -202,28 +202,28 @@ Commands:
           target</h2>
           <p>Install an MCP skill into Claude Desktop:</p>
           <div class="sourceCode" id="cb14"><pre
-          class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> install ghcr.io/xebia/aria-assets/policy-lookup-skill:1.0.0 <span class="dt">\</span></span>
+          class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> install ghcr.io/jgarverick/aria-assets/policy-lookup-skill:1.0.0 <span class="dt">\</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--target</span> claude-desktop</span></code></pre></div>
           <p>The install flow:</p>
-          <pre><code>aria install ghcr.io/xebia/aria-assets/policy-lookup-skill:1.0.0 → claude-desktop
+          <pre><code>aria install ghcr.io/jgarverick/aria-assets/policy-lookup-skill:1.0.0 → claude-desktop
 
 1. Fetching OASF metadata...
-   Asset: xebia.com/skills/policy-lookup v1.0.0
+   Asset: aria.dev/skills/policy-lookup v1.0.0
 2. Validating governance...
    ✓ Sensitivity: internal ≤ confidential
    ✓ Consumer &#39;my-team&#39; is authorized
 3. Pulling OCI artifact...
-   Cached to: ~/.aria/cache/xebia.com-skills-policy-lookup
+   Cached to: ~/.aria/cache/aria.dev-skills-policy-lookup
 4. Installing to claude-desktop...
    Registering MCP server &#39;policy-lookup&#39; in Claude Desktop
      Transport: stdio
      Tools: lookup_policy, list_policies
    Config: ~/Library/Application Support/Claude/claude_desktop_config.json
 
-✓ Successfully installed xebia.com/skills/policy-lookup v1.0.0 → claude-desktop</code></pre>
+✓ Successfully installed aria.dev/skills/policy-lookup v1.0.0 → claude-desktop</code></pre>
           <p>For Agent Framework:</p>
           <div class="sourceCode" id="cb16"><pre
-          class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> install ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 <span class="dt">\</span></span>
+          class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> install ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 <span class="dt">\</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--target</span> agent-framework</span></code></pre></div>
           <p>This registers the agent as a remote A2A endpoint instead
           of modifying a Claude Desktop config file.</p>
@@ -236,7 +236,7 @@ Commands:
           <pre><code>┌─────────────────────────────────┬─────────┬────────────┬─────────────────┬──────────────┬────────────┐
 │ Name                            │ Version │ Type       │ Target          │ Sensitivity  │ Installed  │
 ├─────────────────────────────────┼─────────┼────────────┼─────────────────┼──────────────┼────────────┤
-│ xebia.com/skills/policy-lookup  │ 1.0.0   │ mcp_server │ claude-desktop  │ internal     │ 2026-05-01 │
+│ aria.dev/skills/policy-lookup  │ 1.0.0   │ mcp_server │ claude-desktop  │ internal     │ 2026-05-01 │
 └─────────────────────────────────┴─────────┴────────────┴─────────────────┴──────────────┴────────────┘</code></pre>
           <h2 id="how-the-install-targets-work">How the install targets
           work</h2>
@@ -281,9 +281,9 @@ Commands:
           <p>For teams standardized on <code>gh</code>, the same
           commands are available as:</p>
           <div class="sourceCode" id="cb19"><pre
-          class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> extension install xebia/gh-aria</span>
+          class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> extension install jgarverick/gh-aria</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> aria search <span class="at">--skill</span> <span class="st">&quot;knowledge_retrieval/rag&quot;</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> aria install xebia/aria-policy-lookup-skill <span class="at">--target</span> claude-desktop</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> aria install jgarverick/aria-policy-lookup-skill <span class="at">--target</span> claude-desktop</span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> aria audit <span class="at">--pr</span> 42 <span class="at">--ceiling</span> confidential</span></code></pre></div>
           <p>The <code>--pr</code> flag on audit is particularly useful
           during code review — it validates the governance overlay in a

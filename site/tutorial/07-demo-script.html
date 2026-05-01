@@ -132,13 +132,13 @@
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> search <span class="at">--skill</span> <span class="st">&quot;knowledge_retrieval/rag&quot;</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect an asset before installing</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> inspect ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> inspect ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Audit governance — this one passes</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 <span class="at">--ceiling</span> confidential</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> audit ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 <span class="at">--ceiling</span> confidential</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Audit governance — this one FAILS (ceiling too low)</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 <span class="at">--ceiling</span> public</span></code></pre></div>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> audit ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 <span class="at">--ceiling</span> public</span></code></pre></div>
           <h3 id="act-4-governance-in-action-2-min">Act 4: “Governance
           in action” (2 min)</h3>
           <p><strong>Talking point:</strong> “The governance isn’t just

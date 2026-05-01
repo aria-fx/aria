@@ -41,7 +41,7 @@ cat src/sample-agent/Oasf.Sample.Agent/oasf-record.json | jq .
 
 Key things to notice:
 
-- **name**: `xebia.com/agents/onboarding-assistant`
+- **name**: `aria.dev/agents/onboarding-assistant`
 - **skills**: NLU intent classification, NLG text completion, and RAG
 - **modules**: MCP server, prompt bundle, and knowledge base references
 - **version**: `2.1.0` — semantic versioning for dependency resolution
@@ -73,7 +73,7 @@ info: Oasf.Sample.Agent.Services.OasfGovernanceService
   Loading OASF Record from oasf-record.json
   Loading Governance Overlay from oasf-governance.json
   OASF validation passed
-  OASF governance initialized: Asset=xebia.com/agents/onboarding-assistant v2.1.0,
+  OASF governance initialized: Asset=aria.dev/agents/onboarding-assistant v2.1.0,
     Sensitivity=confidential, Ceiling=confidential, Frameworks=[SOC2, GDPR]
 ```
 
@@ -82,7 +82,7 @@ Then the agent banner:
 ```
 ╔══════════════════════════════════════════════════════════════╗
 ║  OASF-Governed HR Onboarding Agent                         ║
-║  Asset: xebia.com/agents/onboarding-assistant              ║
+║  Asset: aria.dev/agents/onboarding-assistant              ║
 ║  Version: 2.1.0                                            ║
 ║  Sensitivity: confidential                                 ║
 ║  Ceiling: confidential                                     ║
@@ -183,28 +183,28 @@ The tests verify:
 If you have an OpenTelemetry collector running, you'll see traces with
 these ARIA-specific attributes:
 
-| Attribute | Example value |
-|-----------|---------------|
-| `oasf.asset.name` | `xebia.com/agents/onboarding-assistant` |
-| `oasf.asset.version` | `2.1.0` |
-| `oasf.sensitivity_tier` | `confidential` |
-| `oasf.audit_level` | `full` |
-| `oasf.consumer.id` | `hr-team` |
-| `oasf.consumer.allowed` | `true` |
-| `oasf.compliance_frameworks` | `SOC2,GDPR` |
+| Attribute                    | Example value                          |
+| ---------------------------- | -------------------------------------- |
+| `oasf.asset.name`            | `aria.dev/agents/onboarding-assistant` |
+| `oasf.asset.version`         | `2.1.0`                                |
+| `oasf.sensitivity_tier`      | `confidential`                         |
+| `oasf.audit_level`           | `full`                                 |
+| `oasf.consumer.id`           | `hr-team`                              |
+| `oasf.consumer.allowed`      | `true`                                 |
+| `oasf.compliance_frameworks` | `SOC2,GDPR`                            |
 
 These can be queried in your observability platform to answer questions
 like "which agents accessed confidential data in the last 24 hours?"
 
 ## Key code to study
 
-| File | What it does |
-|------|-------------|
-| `Services/OasfGovernanceService.cs` | Loads + validates manifests at startup |
-| `Middleware/OasfGovernanceMiddleware.cs` | Consumer validation + OTEL tags |
-| `Tools/OnboardingTools.cs` | Sensitivity ceiling check in `LookupPolicy` |
-| `Models/OasfModels.cs` | Strongly-typed OASF Record + Governance types |
-| `Program.cs` | Agent construction with dual middleware pipeline |
+| File                                     | What it does                                     |
+| ---------------------------------------- | ------------------------------------------------ |
+| `Services/OasfGovernanceService.cs`      | Loads + validates manifests at startup           |
+| `Middleware/OasfGovernanceMiddleware.cs` | Consumer validation + OTEL tags                  |
+| `Tools/OnboardingTools.cs`               | Sensitivity ceiling check in `LookupPolicy`      |
+| `Models/OasfModels.cs`                   | Strongly-typed OASF Record + Governance types    |
+| `Program.cs`                             | Agent construction with dual middleware pipeline |
 
 ## Next Steps
 

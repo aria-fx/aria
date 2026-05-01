@@ -87,7 +87,7 @@ Inspired by TOGAF's Architecture Content Framework, this metamodel defines the e
 
 Every entity in the metamodel is represented as an OASF Record containing identity, classification metadata, capability annotations, and governance envelope:
 
-- **name**: Unique identifier using domain-based naming (e.g., `xebia.com/agents/onboarding-assistant`)
+- **name**: Unique identifier using domain-based naming (e.g., `aria.dev/agents/onboarding-assistant`)
 - **version**: Semantic version enabling dependency resolution and rollback
 - **schema_version**: OASF schema version for forward compatibility
 - **skills**: Array of OASF skill taxonomy references describing capabilities
@@ -145,7 +145,7 @@ aria-assets/
 
 ```json
 {
-  "name": "xebia.com/agents/onboarding-assistant",
+  "name": "aria.dev/agents/onboarding-assistant",
   "version": "2.1.0",
   "schema_version": "1.0.0",
   "description": "HR onboarding agent with document generation and policy Q&A",
@@ -156,9 +156,9 @@ aria-assets/
   "domains": [{ "name": "human_resources/onboarding" }],
   "modules": [
     { "type": "mcp_server", "transport": "stdio", "tools": ["lookup_policy"] },
-    { "type": "knowledge_base", "ref": "xebia.com/knowledge/hr-policies" }
+    { "type": "knowledge_base", "ref": "aria.dev/knowledge/hr-policies" }
   ],
-  "authors": ["Josh Garverick <josh.garverick@xebia.com>"]
+  "authors": ["Josh Garverick <josh.garverick@aria.dev>"]
 }
 ```
 

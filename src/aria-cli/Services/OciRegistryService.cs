@@ -96,35 +96,35 @@ public sealed class OciRegistryService
         {
             new()
             {
-                Name = "xebia.com/agents/onboarding-assistant",
+                Name = "aria.dev/agents/onboarding-assistant",
                 Version = "2.1.0",
                 SchemaVersion = "1.0.0",
                 Description = "HR onboarding agent with policy Q&A and document generation",
                 Skills = [new(30101, "knowledge_retrieval/rag"), new(10201, "nlp/nlg/text_completion")],
                 Domains = [new("human_resources/onboarding")],
-                Authors = ["Josh Garverick <josh.garverick@xebia.com>"]
+                Authors = ["Josh Garverick <josh.garverick@aria.dev>"]
             },
             new()
             {
-                Name = "xebia.com/skills/policy-lookup",
+                Name = "aria.dev/skills/policy-lookup",
                 Version = "1.0.0",
                 SchemaVersion = "1.0.0",
                 Description = "MCP server for HR policy knowledge base lookup",
                 Skills = [new(30101, "knowledge_retrieval/rag")],
                 Domains = [new("human_resources")],
                 Modules = [new() { Type = "mcp_server", Transport = "stdio" }],
-                Authors = ["Josh Garverick <josh.garverick@xebia.com>"]
+                Authors = ["Josh Garverick <josh.garverick@aria.dev>"]
             },
             new()
             {
-                Name = "xebia.com/knowledge/hr-policies",
+                Name = "aria.dev/knowledge/hr-policies",
                 Version = "3.0.0",
                 SchemaVersion = "1.0.0",
                 Description = "HR policy knowledge base with PTO, benefits, and compensation data",
                 Skills = [new(30101, "knowledge_retrieval/rag")],
                 Domains = [new("human_resources")],
                 Modules = [new() { Type = "knowledge_base" }],
-                Authors = ["HR Team <hr@xebia.com>"]
+                Authors = ["HR Team <hr@aria.dev>"]
             }
         };
 
@@ -150,7 +150,7 @@ public sealed class OciRegistryService
     private static string? ResolveLocalBase(string ociReference)
     {
         // For local testing: map OCI refs to local directories
-        // e.g., ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0
+        // e.g., ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0
         //     → ./demo-assets/onboarding-assistant/
         var parts = ociReference.Split('/');
         var nameAndTag = parts.LastOrDefault()?.Split(':');

@@ -101,9 +101,9 @@ You'll see a table of matching assets:
 ┌──────────────────────────────────────────┬─────────┬───────────────┬──────┬──────────────────────────┐
 │ Name                                     │ Version │ Type          │ Skills│ Description             │
 ├──────────────────────────────────────────┼─────────┼───────────────┼──────┼──────────────────────────┤
-│ xebia.com/agents/onboarding-assistant    │ 2.1.0   │ agent         │ rag  │ HR onboarding agent...  │
-│ xebia.com/skills/policy-lookup           │ 1.0.0   │ mcp_server    │ rag  │ MCP server for HR...    │
-│ xebia.com/knowledge/hr-policies          │ 3.0.0   │ knowledge_base│ rag  │ HR policy knowledge...  │
+│ aria.dev/agents/onboarding-assistant    │ 2.1.0   │ agent         │ rag  │ HR onboarding agent...  │
+│ aria.dev/skills/policy-lookup           │ 1.0.0   │ mcp_server    │ rag  │ MCP server for HR...    │
+│ aria.dev/knowledge/hr-policies          │ 3.0.0   │ knowledge_base│ rag  │ HR policy knowledge...  │
 └──────────────────────────────────────────┴─────────┴───────────────┴──────┴──────────────────────────┘
 ```
 
@@ -112,7 +112,7 @@ You'll see a table of matching assets:
 Before installing, inspect the full OASF metadata:
 
 ```bash
-dotnet run -- inspect ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0
+dotnet run -- inspect ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0
 ```
 
 This displays two panels:
@@ -129,7 +129,7 @@ Check whether you're authorized to install an asset:
 
 ```bash
 # This should PASS (confidential ≤ confidential)
-dotnet run -- audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 \
+dotnet run -- audit ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 \
   --ceiling confidential
 ```
 
@@ -147,7 +147,7 @@ Now try with a ceiling that's too low:
 
 ```bash
 # This should FAIL (confidential > public)
-dotnet run -- audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 \
+dotnet run -- audit ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 \
   --ceiling public
 ```
 
@@ -166,35 +166,35 @@ The CLI shows exactly what approvals you'd need to get access.
 Install an MCP skill into Claude Desktop:
 
 ```bash
-dotnet run -- install ghcr.io/xebia/aria-assets/policy-lookup-skill:1.0.0 \
+dotnet run -- install ghcr.io/jgarverick/aria-assets/policy-lookup-skill:1.0.0 \
   --target claude-desktop
 ```
 
 The install flow:
 
 ```
-aria install ghcr.io/xebia/aria-assets/policy-lookup-skill:1.0.0 → claude-desktop
+aria install ghcr.io/jgarverick/aria-assets/policy-lookup-skill:1.0.0 → claude-desktop
 
 1. Fetching OASF metadata...
-   Asset: xebia.com/skills/policy-lookup v1.0.0
+   Asset: aria.dev/skills/policy-lookup v1.0.0
 2. Validating governance...
    ✓ Sensitivity: internal ≤ confidential
    ✓ Consumer 'my-team' is authorized
 3. Pulling OCI artifact...
-   Cached to: ~/.aria/cache/xebia.com-skills-policy-lookup
+   Cached to: ~/.aria/cache/aria.dev-skills-policy-lookup
 4. Installing to claude-desktop...
    Registering MCP server 'policy-lookup' in Claude Desktop
      Transport: stdio
      Tools: lookup_policy, list_policies
    Config: ~/Library/Application Support/Claude/claude_desktop_config.json
 
-✓ Successfully installed xebia.com/skills/policy-lookup v1.0.0 → claude-desktop
+✓ Successfully installed aria.dev/skills/policy-lookup v1.0.0 → claude-desktop
 ```
 
 For Agent Framework:
 
 ```bash
-dotnet run -- install ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 \
+dotnet run -- install ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 \
   --target agent-framework
 ```
 
@@ -213,7 +213,7 @@ Shows all installed assets with their governance metadata:
 ┌─────────────────────────────────┬─────────┬────────────┬─────────────────┬──────────────┬────────────┐
 │ Name                            │ Version │ Type       │ Target          │ Sensitivity  │ Installed  │
 ├─────────────────────────────────┼─────────┼────────────┼─────────────────┼──────────────┼────────────┤
-│ xebia.com/skills/policy-lookup  │ 1.0.0   │ mcp_server │ claude-desktop  │ internal     │ 2026-05-01 │
+│ aria.dev/skills/policy-lookup  │ 1.0.0   │ mcp_server │ claude-desktop  │ internal     │ 2026-05-01 │
 └─────────────────────────────────┴─────────┴────────────┴─────────────────┴──────────────┴────────────┘
 ```
 
@@ -221,11 +221,11 @@ Shows all installed assets with their governance metadata:
 
 The CLI uses pluggable adapters for different runtimes:
 
-| Target | What it does |
-|--------|-------------|
-| **claude-desktop** | Reads the OASF module descriptor, generates a `claude_desktop_config.json` entry with command, args, and transport, then writes it to the Claude Desktop config path |
-| **vscode** | Similar to Claude Desktop but targets `.vscode/mcp.json` in the workspace |
-| **agent-framework** | For MCP modules, registers as a tool provider. For agent Records, registers as a remote A2A endpoint using the `a2a_endpoint` from config |
+| Target              | What it does                                                                                                                                                         |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **claude-desktop**  | Reads the OASF module descriptor, generates a `claude_desktop_config.json` entry with command, args, and transport, then writes it to the Claude Desktop config path |
+| **vscode**          | Similar to Claude Desktop but targets `.vscode/mcp.json` in the workspace                                                                                            |
+| **agent-framework** | For MCP modules, registers as a tool provider. For agent Records, registers as a remote A2A endpoint using the `a2a_endpoint` from config                            |
 
 Adding a new target is straightforward — implement `IInstallTarget` with
 a `Name` and `InstallAsync` method, then register it in `TargetRegistry`.
@@ -235,9 +235,9 @@ a `Name` and `InstallAsync` method, then register it in `TargetRegistry`.
 For teams standardized on `gh`, the same commands are available as:
 
 ```bash
-gh extension install xebia/gh-aria
+gh extension install jgarverick/gh-aria
 gh aria search --skill "knowledge_retrieval/rag"
-gh aria install xebia/aria-policy-lookup-skill --target claude-desktop
+gh aria install jgarverick/aria-policy-lookup-skill --target claude-desktop
 gh aria audit --pr 42 --ceiling confidential
 ```
 

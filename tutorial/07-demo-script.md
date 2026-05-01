@@ -63,13 +63,13 @@ them. The aria CLI bridges the marketplace to your runtime."
 dotnet run --project src/aria-cli -- search --skill "knowledge_retrieval/rag"
 
 # Inspect an asset before installing
-dotnet run --project src/aria-cli -- inspect ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0
+dotnet run --project src/aria-cli -- inspect ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0
 
 # Audit governance — this one passes
-dotnet run --project src/aria-cli -- audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 --ceiling confidential
+dotnet run --project src/aria-cli -- audit ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 --ceiling confidential
 
 # Audit governance — this one FAILS (ceiling too low)
-dotnet run --project src/aria-cli -- audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 --ceiling public
+dotnet run --project src/aria-cli -- audit ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 --ceiling public
 ```
 
 ### Act 4: "Governance in action" (2 min)

@@ -45,16 +45,16 @@ dotnet run --project src/aria-cli/Aria.Cli.csproj -- init
 dotnet run --project src/aria-cli/Aria.Cli.csproj -- search --skill "knowledge_retrieval/rag" --domain "human_resources"
 
 # Inspect an asset before installing
-dotnet run --project src/aria-cli/Aria.Cli.csproj -- inspect ghcr.io/xebia/aria-assets/policy-lookup-skill:1.0.0
+dotnet run --project src/aria-cli/Aria.Cli.csproj -- inspect ghcr.io/jgarverick/aria-assets/policy-lookup-skill:1.0.0
 
 # Audit governance compliance
-dotnet run --project src/aria-cli/Aria.Cli.csproj -- audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 --ceiling confidential
+dotnet run --project src/aria-cli/Aria.Cli.csproj -- audit ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 --ceiling confidential
 
 # Install an MCP skill into Claude Desktop
-dotnet run --project src/aria-cli/Aria.Cli.csproj -- install ghcr.io/xebia/aria-assets/policy-lookup-skill:1.0.0 --target claude-desktop
+dotnet run --project src/aria-cli/Aria.Cli.csproj -- install ghcr.io/jgarverick/aria-assets/policy-lookup-skill:1.0.0 --target claude-desktop
 
 # Install an agent into Agent Framework via A2A
-dotnet run --project src/aria-cli/Aria.Cli.csproj -- install ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 --target agent-framework
+dotnet run --project src/aria-cli/Aria.Cli.csproj -- install ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 --target agent-framework
 ```
 
 ## Install as Global Tool
@@ -85,14 +85,14 @@ chain is displayed.
 {
   "consumer_id": "hr-team",
   "sensitivity_ceiling": "confidential",
-  "registries": ["ghcr.io/xebia/aria-assets"],
+  "registries": ["ghcr.io/jgarverick/aria-assets"],
   "targets": {
     "claude-desktop": {
       "config_path": "~/Library/Application Support/Claude/claude_desktop_config.json"
     },
     "agent-framework": {
       "project_path": "./src/Oasf.Sample.Agent",
-      "a2a_endpoint": "https://agents.xebia.com"
+      "a2a_endpoint": "https://agents.aria.dev"
     }
   },
   "purview": {
@@ -107,9 +107,9 @@ chain is displayed.
 For `gh` users, the same functionality is available as:
 
 ```bash
-gh extension install xebia/gh-aria
+gh extension install jgarverick/gh-aria
 gh aria search --skill "knowledge_retrieval/rag"
-gh aria install xebia/aria-policy-lookup-skill --target claude-desktop
+gh aria install jgarverick/aria-policy-lookup-skill --target claude-desktop
 ```
 
 ## Architecture

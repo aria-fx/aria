@@ -47,7 +47,7 @@ aria/
 ### With devcontainer (recommended)
 
 ```bash
-git clone https://github.com/xebia/aria.git
+git clone https://github.com/jgarverick/aria-framework
 cd aria
 code .
 # VS Code will prompt: "Reopen in Container" → click yes
