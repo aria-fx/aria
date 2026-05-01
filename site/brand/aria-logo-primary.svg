@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 210" width="150" height="210">
+  <!-- ARIA Primary Mark -->
+  <!-- Connection lines -->
+  <line x1="75" y1="75" x2="6" y2="6" stroke="#0891B2" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="75" y1="75" x2="144" y2="6" stroke="#0D9488" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="75" y1="75" x2="6" y2="144" stroke="#F97316" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="75" y1="75" x2="144" y2="144" stroke="#6B21A8" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+  <!-- Outer ring -->
+  <circle cx="75" cy="75" r="36" fill="none" stroke="#6B21A8" stroke-width="2.5"/>
+  <!-- Inner hexagon -->
+  <polygon points="75,44 101,57 101,93 75,106 49,93 49,57" fill="#6B21A8"/>
+  <!-- A letterform -->
+  <text x="75" y="85" text-anchor="middle" font-family="Inter, Calibri, system-ui, sans-serif" font-size="32" font-weight="500" fill="#FFFFFF" letter-spacing="1">A</text>
+  <!-- Satellite nodes -->
+  <circle cx="6" cy="6" r="9" fill="#0891B2"/>
+  <circle cx="144" cy="6" r="9" fill="#0D9488"/>
+  <circle cx="6" cy="144" r="9" fill="#F97316"/>
+  <circle cx="144" cy="144" r="7" fill="#6B21A8" opacity="0.45"/>
+  <!-- Wordmark -->
+  <text x="75" y="180" text-anchor="middle" font-family="Inter, Calibri, system-ui, sans-serif" font-size="30" font-weight="500" fill="#6B21A8" letter-spacing="8">ARIA</text>
+  <text x="75" y="198" text-anchor="middle" font-family="Inter, Calibri, system-ui, sans-serif" font-size="7" fill="#9CA3AF" letter-spacing="2.5">ASSET REGISTRY FOR INTELLIGENT AGENTS</text>
+</svg>

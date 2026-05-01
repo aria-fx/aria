@@ -8,260 +8,178 @@
   <meta name="description" content="ARIA: Asset Registry for Intelligent Agents.">
   <link rel="icon" type="image/svg+xml" href="../favicon.svg">
   <link rel="stylesheet" href="../styles.css">
-  <style>
-    body {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 0 1.5rem 3rem;
-    }
-
-    nav.breadcrumb {
-      padding: 1rem 0 0;
-      font-size: 0.85rem;
-    }
-
-    nav.breadcrumb a {
-      color: var(--brand);
-      text-decoration: none;
-    }
-
-    nav.breadcrumb a:hover {
-      text-decoration: underline;
-    }
-
-    nav.breadcrumb span {
-      color: #666;
-    }
-
-    article h1 {
-      margin-top: 1.5rem;
-    }
-
-    article h2 {
-      margin-top: 2rem;
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 0.4rem;
-    }
-
-    article h3 {
-      margin-top: 1.5rem;
-    }
-
-    article pre {
-      background: #1e2635;
-      color: #e2e8f0;
-      padding: 1rem 1.25rem;
-      border-radius: 6px;
-      overflow-x: auto;
-      font-size: 0.88rem;
-      line-height: 1.6;
-    }
-
-    article code {
-      background: #f1f5f9;
-      color: #0f4c75;
-      padding: 0.15em 0.4em;
-      border-radius: 3px;
-      font-size: 0.9em;
-    }
-
-    article pre code {
-      background: none;
-      color: inherit;
-      padding: 0;
-    }
-
-    article table {
-      border-collapse: collapse;
-      width: 100%;
-      margin: 1.25rem 0;
-    }
-
-    article th,
-    article td {
-      border: 1px solid #cbd5e1;
-      padding: 0.5rem 0.75rem;
-      text-align: left;
-    }
-
-    article th {
-      background: #f1f5f9;
-      font-weight: 600;
-    }
-
-    article blockquote {
-      border-left: 4px solid var(--brand);
-      margin: 1rem 0;
-      padding: 0.5rem 1rem;
-      background: #f8fafc;
-      color: #334155;
-    }
-
-    article ul,
-    article ol {
-      line-height: 1.8;
-    }
-
-    article a {
-      color: var(--brand);
-    }
-
-    article img {
-      max-width: 100%;
-      height: auto;
-    }
-
-    .page-footer {
-      margin-top: 3rem;
-      padding-top: 1rem;
-      border-top: 1px solid #e2e8f0;
-      font-size: 0.85rem;
-      color: #666;
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-
-    .page-footer a {
-      color: var(--brand);
-      text-decoration: none;
-    }
-  </style>
+  <script defer src="../nav-active.js"></script>
 </head>
 
 <body>
-  <header style="padding: 1rem 0 0.5rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 0;">
-    <a href="../index.html"
-      style="font-weight: 700; color: var(--brand); text-decoration: none; font-size: 1.1rem;">← ARIA Framework</a>
-  </header>
+  <div class="site-shell">
+    <aside class="sidebar" aria-label="Sidebar">
+      <a class="brand-lockup" href="../index.html">
+        <img src="../brand/aria-logo-horizontal.svg" alt="ARIA Framework">
+      </a>
+      <p class="sidebar-tagline">Asset Registry for Intelligent Agents</p>
 
-    <nav id="toc" aria-label="Table of contents"
-    style="margin: 1.5rem 0; padding: 1rem 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
-    <strong style="display:block; margin-bottom: 0.5rem;">Contents</strong>
-    <ul>
-    <li><a href="#aria-concepts">01 — ARIA Concepts</a>
-    <ul>
-    <li><a href="#what-is-aria">What is ARIA?</a></li>
-    <li><a href="#the-three-layers">The Three Layers</a></li>
-    <li><a href="#the-five-entity-types">The Five Entity Types</a></li>
-    <li><a href="#key-relationships">Key Relationships</a></li>
-    <li><a href="#the-sensitivity-inheritance-rule">The Sensitivity
-    Inheritance Rule</a></li>
-    <li><a href="#next-steps">Next Steps</a></li>
-    </ul></li>
-    </ul>
-  </nav>
-  
-  <article>
-    <h1 id="aria-concepts">01 — ARIA Concepts</h1>
-    <h2 id="what-is-aria">What is ARIA?</h2>
-    <p>ARIA (Asset Registry for Intelligent Agents) is a reference
-    architecture for managing the full lifecycle of enterprise AI
-    primitives — agents, skills, instructions, knowledge bases, and
-    orchestration configurations.</p>
-    <p>Think of it as <strong>TOGAF for AI assets</strong>: a metamodel
-    that defines what these things are, how they relate to each other,
-    and how they’re governed.</p>
-    <h2 id="the-three-layers">The Three Layers</h2>
-    <p>ARIA operates across three layers:</p>
-    <ol type="1">
-    <li><strong>Metamodel</strong> — What are these things and how do
-    they relate?
-    <ul>
-    <li>Five entity types classified by OASF</li>
-    <li>Relationship types with governance implications</li>
-    <li>Lifecycle states with gated transitions</li>
-    </ul></li>
-    <li><strong>Marketplace</strong> — How do you publish, discover, and
-    compose them?
-    <ul>
-    <li>GitHub repos with OASF manifest sidecars</li>
-    <li>OCI registry for content-addressed artifact storage</li>
-    <li>CI/CD pipelines for validation and publishing</li>
-    </ul></li>
-    <li><strong>Governance</strong> — How do you classify, control, and
-    audit them?
-    <ul>
-    <li>Microsoft Purview for sensitivity labels and DLP</li>
-    <li>OASF governance overlay for policy-as-code</li>
-    <li>Sensitivity label inheritance through dependency graphs</li>
-    </ul></li>
-    </ol>
-    <h2 id="the-five-entity-types">The Five Entity Types</h2>
-    <table>
-    <colgroup>
-    <col style="width: 21%" />
-    <col style="width: 28%" />
-    <col style="width: 50%" />
-    </colgroup>
-    <thead>
-    <tr class="header">
-    <th>Entity</th>
-    <th>What it is</th>
-    <th>OASF classification</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr class="odd">
-    <td><strong>Agent</strong></td>
-    <td>An autonomous AI unit with identity and lifecycle</td>
-    <td>OASF Record (primary)</td>
-    </tr>
-    <tr class="even">
-    <td><strong>Skill</strong></td>
-    <td>A reusable capability an agent can invoke</td>
-    <td>OASF Skill annotation</td>
-    </tr>
-    <tr class="odd">
-    <td><strong>Instruction</strong></td>
-    <td>Behavioral configuration (prompts, guardrails)</td>
-    <td>OASF Module (prompt_bundle)</td>
-    </tr>
-    <tr class="even">
-    <td><strong>Knowledge</strong></td>
-    <td>Data corpus for grounding and retrieval</td>
-    <td>OASF Module (knowledge_base)</td>
-    </tr>
-    <tr class="odd">
-    <td><strong>Orchestration</strong></td>
-    <td>Routing and composition logic</td>
-    <td>OASF Module (orchestration_config)</td>
-    </tr>
-    </tbody>
-    </table>
-    <h2 id="key-relationships">Key Relationships</h2>
-    <pre><code>Agent ──invokes──────→ Skill        (1:N)
+      <nav class="side-nav" aria-label="Documentation navigation">
+        <p class="side-nav-title">Reference</p>
+        <a href="../index.html">Home</a>
+        <a href="../docs/architecture.html">Architecture</a>
+        <a href="../tutorial/index.html">Tutorial Overview</a>
+
+        <p class="side-nav-title">Tutorial Modules</p>
+        <a href="../tutorial/01-concepts.html">01 Concepts</a>
+        <a href="../tutorial/02-marketplace-setup.html">02 Marketplace Setup</a>
+        <a href="../tutorial/03-first-asset.html">03 First Asset</a>
+        <a href="../tutorial/04-purview-integration.html">04 Purview Integration</a>
+        <a href="../tutorial/05-sample-agent.html">05 Sample Agent</a>
+        <a href="../tutorial/06-aria-cli.html">06 ARIA CLI</a>
+        <a href="../tutorial/07-demo-script.html">07 Demo Script</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <img src="../brand/aria-logo-mark.svg" alt="ARIA mark">
+        <a href="https://github.com/jgarverick/aria-framework">GitHub Repository</a>
+      </div>
+    </aside>
+
+    <div class="main-shell">
+      <header class="top-header compact">
+        <a class="crumb" href="../index.html">ARIA Framework</a>
+        <a class="repo-link" href="https://github.com/jgarverick/aria-framework">View Source</a>
+      </header>
+
+      <main class="content docs-content">
+                <nav id="toc" class="toc-panel" aria-label="Table of contents">
+          <h2>On This Page</h2>
+          <ul>
+          <li><a href="#aria-concepts">01 — ARIA Concepts</a>
+          <ul>
+          <li><a href="#what-is-aria">What is ARIA?</a></li>
+          <li><a href="#the-three-layers">The Three Layers</a></li>
+          <li><a href="#the-five-entity-types">The Five Entity
+          Types</a></li>
+          <li><a href="#key-relationships">Key Relationships</a></li>
+          <li><a href="#the-sensitivity-inheritance-rule">The
+          Sensitivity Inheritance Rule</a></li>
+          <li><a href="#next-steps">Next Steps</a></li>
+          </ul></li>
+          </ul>
+        </nav>
+        
+        <article class="doc-article">
+          <h1 id="aria-concepts">01 — ARIA Concepts</h1>
+          <h2 id="what-is-aria">What is ARIA?</h2>
+          <p>ARIA (Asset Registry for Intelligent Agents) is a reference
+          architecture for managing the full lifecycle of enterprise AI
+          primitives — agents, skills, instructions, knowledge bases,
+          and orchestration configurations.</p>
+          <p>Think of it as <strong>TOGAF for AI assets</strong>: a
+          metamodel that defines what these things are, how they relate
+          to each other, and how they’re governed.</p>
+          <h2 id="the-three-layers">The Three Layers</h2>
+          <p>ARIA operates across three layers:</p>
+          <ol type="1">
+          <li><strong>Metamodel</strong> — What are these things and how
+          do they relate?
+          <ul>
+          <li>Five entity types classified by OASF</li>
+          <li>Relationship types with governance implications</li>
+          <li>Lifecycle states with gated transitions</li>
+          </ul></li>
+          <li><strong>Marketplace</strong> — How do you publish,
+          discover, and compose them?
+          <ul>
+          <li>GitHub repos with OASF manifest sidecars</li>
+          <li>OCI registry for content-addressed artifact storage</li>
+          <li>CI/CD pipelines for validation and publishing</li>
+          </ul></li>
+          <li><strong>Governance</strong> — How do you classify,
+          control, and audit them?
+          <ul>
+          <li>Microsoft Purview for sensitivity labels and DLP</li>
+          <li>OASF governance overlay for policy-as-code</li>
+          <li>Sensitivity label inheritance through dependency
+          graphs</li>
+          </ul></li>
+          </ol>
+          <h2 id="the-five-entity-types">The Five Entity Types</h2>
+          <table>
+          <colgroup>
+          <col style="width: 21%" />
+          <col style="width: 28%" />
+          <col style="width: 50%" />
+          </colgroup>
+          <thead>
+          <tr class="header">
+          <th>Entity</th>
+          <th>What it is</th>
+          <th>OASF classification</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr class="odd">
+          <td><strong>Agent</strong></td>
+          <td>An autonomous AI unit with identity and lifecycle</td>
+          <td>OASF Record (primary)</td>
+          </tr>
+          <tr class="even">
+          <td><strong>Skill</strong></td>
+          <td>A reusable capability an agent can invoke</td>
+          <td>OASF Skill annotation</td>
+          </tr>
+          <tr class="odd">
+          <td><strong>Instruction</strong></td>
+          <td>Behavioral configuration (prompts, guardrails)</td>
+          <td>OASF Module (prompt_bundle)</td>
+          </tr>
+          <tr class="even">
+          <td><strong>Knowledge</strong></td>
+          <td>Data corpus for grounding and retrieval</td>
+          <td>OASF Module (knowledge_base)</td>
+          </tr>
+          <tr class="odd">
+          <td><strong>Orchestration</strong></td>
+          <td>Routing and composition logic</td>
+          <td>OASF Module (orchestration_config)</td>
+          </tr>
+          </tbody>
+          </table>
+          <h2 id="key-relationships">Key Relationships</h2>
+          <pre><code>Agent ──invokes──────→ Skill        (1:N)
 Agent ──governed_by──→ Instruction  (1:N)
 Agent ──grounded_in──→ Knowledge    (1:N)
 Orchestration ──composed_by──→ Agent (1:N)</code></pre>
-    <p>Each relationship carries a governance implication. For example,
-    when an agent invokes a skill, it inherits the sensitivity ceiling
-    of that skill.</p>
-    <h2 id="the-sensitivity-inheritance-rule">The Sensitivity
-    Inheritance Rule</h2>
-    <blockquote>
-    <p>An AI asset inherits the highest sensitivity classification of
-    any asset it depends on.</p>
-    </blockquote>
-    <p>If your agent accesses a “Public” skill and a “Confidential”
-    knowledge base, the agent itself is classified as
-    “Confidential.”</p>
-    <p>This is enforced: - <strong>At CI time</strong> — the
-    <code>oasf-validate</code> GitHub Action checks that the agent’s
-    declared <code>sensitivity_tier</code> ≥ max(dependency tiers) -
-    <strong>At runtime</strong> — Purview DLP policies prevent
-    under-classified agents from accessing sensitive knowledge -
-    <strong>At install time</strong> — the <code>aria audit</code>
-    command validates governance before pulling artifacts</p>
-    <h2 id="next-steps">Next Steps</h2>
-    <p>→ <a href="./02-marketplace-setup.html">02 — Marketplace
-    Setup</a></p>
-  </article>
+          <p>Each relationship carries a governance implication. For
+          example, when an agent invokes a skill, it inherits the
+          sensitivity ceiling of that skill.</p>
+          <h2 id="the-sensitivity-inheritance-rule">The Sensitivity
+          Inheritance Rule</h2>
+          <blockquote>
+          <p>An AI asset inherits the highest sensitivity classification
+          of any asset it depends on.</p>
+          </blockquote>
+          <p>If your agent accesses a “Public” skill and a
+          “Confidential” knowledge base, the agent itself is classified
+          as “Confidential.”</p>
+          <p>This is enforced: - <strong>At CI time</strong> — the
+          <code>oasf-validate</code> GitHub Action checks that the
+          agent’s declared <code>sensitivity_tier</code> ≥
+          max(dependency tiers) - <strong>At runtime</strong> — Purview
+          DLP policies prevent under-classified agents from accessing
+          sensitive knowledge - <strong>At install time</strong> — the
+          <code>aria audit</code> command validates governance before
+          pulling artifacts</p>
+          <h2 id="next-steps">Next Steps</h2>
+          <p>→ <a href="./02-marketplace-setup.html">02 — Marketplace
+          Setup</a></p>
+        </article>
+      </main>
 
-  <footer class="page-footer">
-    <span>ARIA Framework — Asset Registry for Intelligent Agents</span>
-    <a href="../index.html">Back to home</a>
-  </footer>
+      <footer class="site-footer">
+        <span>ARIA Framework — Asset Registry for Intelligent Agents</span>
+        <a href="../index.html">Back to home</a>
+      </footer>
+    </div>
+  </div>
 </body>
 
 </html>

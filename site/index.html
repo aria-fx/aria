@@ -9,92 +9,108 @@
     content="ARIA: Asset Registry for Intelligent Agents. OASF classification, GitHub marketplace, and Purview governance.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="styles.css">
+  <script defer src="nav-active.js"></script>
 </head>
 
 <body>
-  <header class="hero">
-    <p class="eyebrow">Asset Registry for Intelligent Agents</p>
-    <h1>ARIA Framework</h1>
-    <p class="lead">A practical reference architecture for classifying, governing, and operationalizing enterprise AI
-      assets.</p>
-    <div class="cta-row">
-      <a class="btn btn-primary" href="https://github.com/jgarverick/aria-framework">View Repository</a>
-      <a class="btn" href="docs/architecture.html">Reference Architecture</a>
-      <a class="btn" href="tutorial/index.html">Tutorial</a>
+  <div class="site-shell">
+    <aside class="sidebar" aria-label="Sidebar">
+      <a class="brand-lockup" href="index.html">
+        <img src="brand/aria-logo-horizontal.svg" alt="ARIA Framework">
+      </a>
+      <p class="sidebar-tagline">Asset Registry for Intelligent Agents</p>
+
+      <nav class="side-nav" aria-label="Primary navigation">
+        <p class="side-nav-title">Reference</p>
+        <a href="index.html">Home</a>
+        <a href="docs/architecture.html">Architecture</a>
+        <a href="tutorial/index.html">Tutorial Overview</a>
+
+        <p class="side-nav-title">Tutorial Modules</p>
+        <a href="tutorial/01-concepts.html">01 Concepts</a>
+        <a href="tutorial/02-marketplace-setup.html">02 Marketplace Setup</a>
+        <a href="tutorial/03-first-asset.html">03 First Asset</a>
+        <a href="tutorial/04-purview-integration.html">04 Purview Integration</a>
+        <a href="tutorial/05-sample-agent.html">05 Sample Agent</a>
+        <a href="tutorial/06-aria-cli.html">06 ARIA CLI</a>
+        <a href="tutorial/07-demo-script.html">07 Demo Script</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <img src="brand/aria-avatar.svg" alt="ARIA avatar">
+        <a href="https://github.com/jgarverick/aria-framework">GitHub Repository</a>
+      </div>
+    </aside>
+
+    <div class="main-shell">
+      <header class="top-header">
+        <p class="eyebrow">Asset Registry for Intelligent Agents</p>
+        <h1>ARIA Framework Documentation</h1>
+        <p class="lead">A practical reference architecture for classifying, governing, and operationalizing enterprise
+          AI assets.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="docs/architecture.html">Read Architecture</a>
+          <a class="btn" href="tutorial/index.html">Start Tutorial</a>
+          <a class="btn" href="https://github.com/jgarverick/aria-framework">View Repository</a>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="panel">
+          <h2>What ARIA Solves</h2>
+          <ul>
+            <li>Standardize AI asset metadata using OASF records and governance overlays.</li>
+            <li>Publish and discover assets through a GitHub and OCI-based marketplace model.</li>
+            <li>Enforce compliance with Purview-integrated policy controls and auditability.</li>
+          </ul>
+        </section>
+
+        <section class="panel">
+          <h2>Architecture Layers</h2>
+          <div class="cards">
+            <article class="card">
+              <h3>Metamodel</h3>
+              <p>OASF entities, skills, domains, and modules define a shared language for AI assets.</p>
+            </article>
+            <article class="card">
+              <h3>Marketplace</h3>
+              <p>GitHub repositories + OCI artifacts make assets versionable, composable, and discoverable.</p>
+            </article>
+            <article class="card">
+              <h3>Governance</h3>
+              <p>Purview and OASF overlays provide policy enforcement, lineage context, and controls.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Get Started</h2>
+          <div class="cards">
+            <article class="card">
+              <h3>Reference Architecture</h3>
+              <p>Full architectural overview: metamodel, marketplace, governance layers, and capability model.</p>
+              <a class="btn btn-sm" href="docs/architecture.html">Open document</a>
+            </article>
+            <article class="card">
+              <h3>Hands-on Tutorial</h3>
+              <p>Seven-module guide from core concepts through live demo, deployment, and governance.</p>
+              <a class="btn btn-sm" href="tutorial/index.html">Open tutorial</a>
+            </article>
+            <article class="card">
+              <h3>Implementation Assets</h3>
+              <p>Sample agent, ARIA CLI, and Terraform modules for practical implementation patterns.</p>
+              <a class="btn btn-sm" href="https://github.com/jgarverick/aria-framework/tree/main/src">Browse source</a>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <span>Built for enterprise AI architecture and implementation reference patterns.</span>
+        <a href="https://github.com/jgarverick/aria-framework">GitHub</a>
+      </footer>
     </div>
-  </header>
-
-  <main>
-    <section>
-      <h2>What ARIA Solves</h2>
-      <ul>
-        <li>Standardize AI asset metadata using OASF records and governance overlays.</li>
-        <li>Publish and discover assets through a GitHub and OCI-based marketplace model.</li>
-        <li>Enforce compliance with Purview-integrated policy controls and auditability.</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>Architecture Layers</h2>
-      <div class="cards">
-        <article class="card">
-          <h3>Metamodel</h3>
-          <p>OASF entities, skills, domains, and modules define a shared language for AI assets.</p>
-        </article>
-        <article class="card">
-          <h3>Marketplace</h3>
-          <p>GitHub repositories + OCI artifacts make assets versionable, composable, and discoverable.</p>
-        </article>
-        <article class="card">
-          <h3>Governance</h3>
-          <p>Purview and OASF overlays provide policy enforcement, lineage context, and controls.</p>
-        </article>
-      </div>
-    </section>
-
-    <section>
-      <h2>Documentation</h2>
-      <div class="cards">
-        <article class="card">
-          <h3>Reference Architecture</h3>
-          <p>Full architectural overview: metamodel, marketplace, governance layers, and capability model.</p>
-          <a class="btn btn-sm" href="docs/architecture.html">Read document</a>
-        </article>
-        <article class="card">
-          <h3>Hands-on Tutorial</h3>
-          <p>Seven-module guide from core concepts through live demo — deploy, govern, and use ARIA end-to-end.</p>
-          <a class="btn btn-sm" href="tutorial/index.html">Start tutorial</a>
-        </article>
-      </div>
-    </section>
-
-    <section>
-      <h2>Tutorial Modules</h2>
-      <ol class="links">
-        <li><a href="tutorial/01-concepts.html">Concepts — ARIA metamodel and OASF classification</a></li>
-        <li><a href="tutorial/02-marketplace-setup.html">Marketplace setup — Terraform infrastructure</a></li>
-        <li><a href="tutorial/03-first-asset.html">Your first asset — create, govern, and publish</a></li>
-        <li><a href="tutorial/04-purview-integration.html">Purview integration — sensitivity labels and DLP</a></li>
-        <li><a href="tutorial/05-sample-agent.html">Sample agent — onboarding assistant with governance</a></li>
-        <li><a href="tutorial/06-aria-cli.html">ARIA CLI — discover, audit, and install assets</a></li>
-        <li><a href="tutorial/07-demo-script.html">Conference demo script</a></li>
-      </ol>
-    </section>
-
-    <section>
-      <h2>Source Code</h2>
-      <ul class="links">
-        <li><a href="https://github.com/jgarverick/aria-framework/tree/main/src/sample-agent">Sample agent
-            implementation</a></li>
-        <li><a href="https://github.com/jgarverick/aria-framework/tree/main/src/aria-cli">ARIA CLI prototype</a></li>
-        <li><a href="https://github.com/jgarverick/aria-framework/tree/main/src/terraform">Terraform modules</a></li>
-      </ul>
-    </section>
-  </main>
-
-  <footer>
-    <p>Built for enterprise AI architecture and implementation reference patterns.</p>
-  </footer>
+  </div>
 </body>
 
 </html>

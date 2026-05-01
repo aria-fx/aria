@@ -13,6 +13,8 @@ SLIDES_OUT := $(OUT_DIR)/slides
 # Site sources and outputs
 SITE_TEMPLATE := site/template.html
 SITE_LINK_FILTER := scripts/pandoc-md-links-to-html.lua
+SITE_BRAND_SRC := $(wildcard docs/brand/*.svg)
+SITE_BRAND_OUT := $(patsubst docs/brand/%,site/brand/%,$(SITE_BRAND_SRC))
 SITE_FAVICON_SRC := docs/brand/aria-favicon.svg
 SITE_FAVICON_OUT := site/favicon.svg
 SITE_TUTORIAL_SRC := $(filter-out tutorial/README.md,$(wildcard tutorial/*.md))
@@ -131,8 +133,13 @@ $(SLIDES_OUT)/aria-deck.html: $(SLIDES_MD) | $(SLIDES_OUT)
 
 # ── GitHub Pages Site ──────────────────────────────────────
 
-site: $(SITE_FAVICON_OUT) $(SITE_DOCS_HTML) site/tutorial/index.html $(SITE_TUTORIAL_HTML)
+site: $(SITE_BRAND_OUT) $(SITE_FAVICON_OUT) $(SITE_DOCS_HTML) site/tutorial/index.html $(SITE_TUTORIAL_HTML)
 	@echo "Site build complete (site/docs/ and site/tutorial/)"
+
+# Brand assets for logos/avatars used by site pages
+site/brand/%: docs/brand/% | site/brand
+	@echo "  [site] $< → $@"
+	@cp $< $@
 
 # Favicon asset for site pages
 $(SITE_FAVICON_OUT): $(SITE_FAVICON_SRC)
@@ -178,7 +185,7 @@ site/tutorial/%.html: tutorial/%.md $(SITE_TEMPLATE) $(SITE_LINK_FILTER) | site/
 		--output $@
 
 # Create site output dirs on demand
-site/docs site/tutorial:
+site/docs site/tutorial site/brand:
 	@mkdir -p $@
 
 # Watch markdown sources and rebuild site on any change (requires inotify-tools)

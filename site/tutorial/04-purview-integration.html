@@ -8,249 +8,169 @@
   <meta name="description" content="ARIA: Asset Registry for Intelligent Agents.">
   <link rel="icon" type="image/svg+xml" href="../favicon.svg">
   <link rel="stylesheet" href="../styles.css">
-  <style>
-    body {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 0 1.5rem 3rem;
-    }
-
-    nav.breadcrumb {
-      padding: 1rem 0 0;
-      font-size: 0.85rem;
-    }
-
-    nav.breadcrumb a {
-      color: var(--brand);
-      text-decoration: none;
-    }
-
-    nav.breadcrumb a:hover {
-      text-decoration: underline;
-    }
-
-    nav.breadcrumb span {
-      color: #666;
-    }
-
-    article h1 {
-      margin-top: 1.5rem;
-    }
-
-    article h2 {
-      margin-top: 2rem;
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 0.4rem;
-    }
-
-    article h3 {
-      margin-top: 1.5rem;
-    }
-
-    article pre {
-      background: #1e2635;
-      color: #e2e8f0;
-      padding: 1rem 1.25rem;
-      border-radius: 6px;
-      overflow-x: auto;
-      font-size: 0.88rem;
-      line-height: 1.6;
-    }
-
-    article code {
-      background: #f1f5f9;
-      color: #0f4c75;
-      padding: 0.15em 0.4em;
-      border-radius: 3px;
-      font-size: 0.9em;
-    }
-
-    article pre code {
-      background: none;
-      color: inherit;
-      padding: 0;
-    }
-
-    article table {
-      border-collapse: collapse;
-      width: 100%;
-      margin: 1.25rem 0;
-    }
-
-    article th,
-    article td {
-      border: 1px solid #cbd5e1;
-      padding: 0.5rem 0.75rem;
-      text-align: left;
-    }
-
-    article th {
-      background: #f1f5f9;
-      font-weight: 600;
-    }
-
-    article blockquote {
-      border-left: 4px solid var(--brand);
-      margin: 1rem 0;
-      padding: 0.5rem 1rem;
-      background: #f8fafc;
-      color: #334155;
-    }
-
-    article ul,
-    article ol {
-      line-height: 1.8;
-    }
-
-    article a {
-      color: var(--brand);
-    }
-
-    article img {
-      max-width: 100%;
-      height: auto;
-    }
-
-    .page-footer {
-      margin-top: 3rem;
-      padding-top: 1rem;
-      border-top: 1px solid #e2e8f0;
-      font-size: 0.85rem;
-      color: #666;
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-
-    .page-footer a {
-      color: var(--brand);
-      text-decoration: none;
-    }
-  </style>
+  <script defer src="../nav-active.js"></script>
 </head>
 
 <body>
-  <header style="padding: 1rem 0 0.5rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 0;">
-    <a href="../index.html"
-      style="font-weight: 700; color: var(--brand); text-decoration: none; font-size: 1.1rem;">← ARIA Framework</a>
-  </header>
+  <div class="site-shell">
+    <aside class="sidebar" aria-label="Sidebar">
+      <a class="brand-lockup" href="../index.html">
+        <img src="../brand/aria-logo-horizontal.svg" alt="ARIA Framework">
+      </a>
+      <p class="sidebar-tagline">Asset Registry for Intelligent Agents</p>
 
-    <nav id="toc" aria-label="Table of contents"
-    style="margin: 1.5rem 0; padding: 1rem 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
-    <strong style="display:block; margin-bottom: 0.5rem;">Contents</strong>
-    <ul>
-    <li><a href="#purview-integration">04 — Purview Integration</a>
-    <ul>
-    <li><a href="#what-youll-configure">What you’ll configure</a></li>
-    <li><a href="#prerequisites">Prerequisites</a></li>
-    <li><a href="#step-1-map-sensitivity-tiers-to-purview-labels">Step
-    1: Map sensitivity tiers to Purview labels</a></li>
-    <li><a href="#step-2-register-ai-asset-entity-type-in-data-map">Step
-    2: Register AI asset entity type in Data Map</a></li>
-    <li><a href="#step-3-register-relationship-types">Step 3: Register
-    relationship types</a></li>
-    <li><a href="#step-4-configure-dlp-policies">Step 4: Configure DLP
-    policies</a></li>
-    <li><a href="#step-5-update-governance-overlays-with-label-ids">Step
-    5: Update governance overlays with label IDs</a></li>
-    <li><a href="#step-6-verify-lineage-in-purview">Step 6: Verify
-    lineage in Purview</a></li>
-    <li><a href="#ongoing-governance">Ongoing governance</a></li>
-    <li><a href="#next-steps">Next Steps</a></li>
-    </ul></li>
-    </ul>
-  </nav>
-  
-  <article>
-    <h1 id="purview-integration">04 — Purview Integration</h1>
-    <p>Configure Microsoft Purview to govern your ARIA assets with
-    sensitivity labels, DLP enforcement, and lineage tracking.</p>
-    <h2 id="what-youll-configure">What you’ll configure</h2>
-    <ul>
-    <li>Purview sensitivity labels mapped to ARIA governance tiers</li>
-    <li>A custom entity type for AI assets in the Purview Data Map</li>
-    <li>DLP policies that prevent under-classified agents from accessing
-    sensitive data</li>
-    <li>Lineage edges tracking which agents consume which skills and
-    knowledge</li>
-    </ul>
-    <h2 id="prerequisites">Prerequisites</h2>
-    <ul>
-    <li>Completed <a href="./02-marketplace-setup.html">02 — Marketplace
-    Setup</a></li>
-    <li>Microsoft 365 E5 license (for Purview compliance features)</li>
-    <li>Purview Account provisioned by Terraform</li>
-    <li>Global Admin or Compliance Admin role for label
-    configuration</li>
-    </ul>
-    <h2 id="step-1-map-sensitivity-tiers-to-purview-labels">Step 1: Map
-    sensitivity tiers to Purview labels</h2>
-    <p>ARIA uses five sensitivity tiers. Each maps to a Purview
-    sensitivity label:</p>
-    <table>
-    <colgroup>
-    <col style="width: 27%" />
-    <col style="width: 37%" />
-    <col style="width: 17%" />
-    <col style="width: 17%" />
-    </colgroup>
-    <thead>
-    <tr class="header">
-    <th>ARIA Tier</th>
-    <th>Purview Label</th>
-    <th>Color</th>
-    <th>Scope</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr class="odd">
-    <td><code>public</code></td>
-    <td>Public</td>
-    <td>Green</td>
-    <td>Open data, no restrictions</td>
-    </tr>
-    <tr class="even">
-    <td><code>internal</code></td>
-    <td>Internal</td>
-    <td>Blue</td>
-    <td>Internal use, not for external sharing</td>
-    </tr>
-    <tr class="odd">
-    <td><code>confidential</code></td>
-    <td>Confidential</td>
-    <td>Orange</td>
-    <td>Business-sensitive, need-to-know</td>
-    </tr>
-    <tr class="even">
-    <td><code>highly_confidential</code></td>
-    <td>Highly Confidential</td>
-    <td>Red</td>
-    <td>Restricted access, regulated data</td>
-    </tr>
-    <tr class="odd">
-    <td><code>restricted</code></td>
-    <td>Restricted</td>
-    <td>Dark Red</td>
-    <td>Maximum protection, minimal access</td>
-    </tr>
-    </tbody>
-    </table>
-    <p>In the Purview compliance portal
-    (<code>compliance.microsoft.com</code>):</p>
-    <ol type="1">
-    <li>Navigate to <strong>Information protection</strong> →
-    <strong>Labels</strong></li>
-    <li>Create or verify that labels matching each tier exist</li>
-    <li>Note the label GUIDs — you’ll use these in governance
-    overlays</li>
-    </ol>
-    <h2 id="step-2-register-ai-asset-entity-type-in-data-map">Step 2:
-    Register AI asset entity type in Data Map</h2>
-    <p>Purview’s Data Map needs a custom entity type to represent ARIA
-    assets. This extends the Apache Atlas type system that Purview uses
-    internally.</p>
-    <div class="sourceCode" id="cb1"><pre
-    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the custom type definition</span></span>
+      <nav class="side-nav" aria-label="Documentation navigation">
+        <p class="side-nav-title">Reference</p>
+        <a href="../index.html">Home</a>
+        <a href="../docs/architecture.html">Architecture</a>
+        <a href="../tutorial/index.html">Tutorial Overview</a>
+
+        <p class="side-nav-title">Tutorial Modules</p>
+        <a href="../tutorial/01-concepts.html">01 Concepts</a>
+        <a href="../tutorial/02-marketplace-setup.html">02 Marketplace Setup</a>
+        <a href="../tutorial/03-first-asset.html">03 First Asset</a>
+        <a href="../tutorial/04-purview-integration.html">04 Purview Integration</a>
+        <a href="../tutorial/05-sample-agent.html">05 Sample Agent</a>
+        <a href="../tutorial/06-aria-cli.html">06 ARIA CLI</a>
+        <a href="../tutorial/07-demo-script.html">07 Demo Script</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <img src="../brand/aria-logo-mark.svg" alt="ARIA mark">
+        <a href="https://github.com/jgarverick/aria-framework">GitHub Repository</a>
+      </div>
+    </aside>
+
+    <div class="main-shell">
+      <header class="top-header compact">
+        <a class="crumb" href="../index.html">ARIA Framework</a>
+        <a class="repo-link" href="https://github.com/jgarverick/aria-framework">View Source</a>
+      </header>
+
+      <main class="content docs-content">
+                <nav id="toc" class="toc-panel" aria-label="Table of contents">
+          <h2>On This Page</h2>
+          <ul>
+          <li><a href="#purview-integration">04 — Purview
+          Integration</a>
+          <ul>
+          <li><a href="#what-youll-configure">What you’ll
+          configure</a></li>
+          <li><a href="#prerequisites">Prerequisites</a></li>
+          <li><a
+          href="#step-1-map-sensitivity-tiers-to-purview-labels">Step 1:
+          Map sensitivity tiers to Purview labels</a></li>
+          <li><a
+          href="#step-2-register-ai-asset-entity-type-in-data-map">Step
+          2: Register AI asset entity type in Data Map</a></li>
+          <li><a href="#step-3-register-relationship-types">Step 3:
+          Register relationship types</a></li>
+          <li><a href="#step-4-configure-dlp-policies">Step 4: Configure
+          DLP policies</a></li>
+          <li><a
+          href="#step-5-update-governance-overlays-with-label-ids">Step
+          5: Update governance overlays with label IDs</a></li>
+          <li><a href="#step-6-verify-lineage-in-purview">Step 6: Verify
+          lineage in Purview</a></li>
+          <li><a href="#ongoing-governance">Ongoing governance</a></li>
+          <li><a href="#next-steps">Next Steps</a></li>
+          </ul></li>
+          </ul>
+        </nav>
+        
+        <article class="doc-article">
+          <h1 id="purview-integration">04 — Purview Integration</h1>
+          <p>Configure Microsoft Purview to govern your ARIA assets with
+          sensitivity labels, DLP enforcement, and lineage tracking.</p>
+          <h2 id="what-youll-configure">What you’ll configure</h2>
+          <ul>
+          <li>Purview sensitivity labels mapped to ARIA governance
+          tiers</li>
+          <li>A custom entity type for AI assets in the Purview Data
+          Map</li>
+          <li>DLP policies that prevent under-classified agents from
+          accessing sensitive data</li>
+          <li>Lineage edges tracking which agents consume which skills
+          and knowledge</li>
+          </ul>
+          <h2 id="prerequisites">Prerequisites</h2>
+          <ul>
+          <li>Completed <a href="./02-marketplace-setup.html">02 —
+          Marketplace Setup</a></li>
+          <li>Microsoft 365 E5 license (for Purview compliance
+          features)</li>
+          <li>Purview Account provisioned by Terraform</li>
+          <li>Global Admin or Compliance Admin role for label
+          configuration</li>
+          </ul>
+          <h2 id="step-1-map-sensitivity-tiers-to-purview-labels">Step
+          1: Map sensitivity tiers to Purview labels</h2>
+          <p>ARIA uses five sensitivity tiers. Each maps to a Purview
+          sensitivity label:</p>
+          <table>
+          <colgroup>
+          <col style="width: 27%" />
+          <col style="width: 37%" />
+          <col style="width: 17%" />
+          <col style="width: 17%" />
+          </colgroup>
+          <thead>
+          <tr class="header">
+          <th>ARIA Tier</th>
+          <th>Purview Label</th>
+          <th>Color</th>
+          <th>Scope</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr class="odd">
+          <td><code>public</code></td>
+          <td>Public</td>
+          <td>Green</td>
+          <td>Open data, no restrictions</td>
+          </tr>
+          <tr class="even">
+          <td><code>internal</code></td>
+          <td>Internal</td>
+          <td>Blue</td>
+          <td>Internal use, not for external sharing</td>
+          </tr>
+          <tr class="odd">
+          <td><code>confidential</code></td>
+          <td>Confidential</td>
+          <td>Orange</td>
+          <td>Business-sensitive, need-to-know</td>
+          </tr>
+          <tr class="even">
+          <td><code>highly_confidential</code></td>
+          <td>Highly Confidential</td>
+          <td>Red</td>
+          <td>Restricted access, regulated data</td>
+          </tr>
+          <tr class="odd">
+          <td><code>restricted</code></td>
+          <td>Restricted</td>
+          <td>Dark Red</td>
+          <td>Maximum protection, minimal access</td>
+          </tr>
+          </tbody>
+          </table>
+          <p>In the Purview compliance portal
+          (<code>compliance.microsoft.com</code>):</p>
+          <ol type="1">
+          <li>Navigate to <strong>Information protection</strong> →
+          <strong>Labels</strong></li>
+          <li>Create or verify that labels matching each tier exist</li>
+          <li>Note the label GUIDs — you’ll use these in governance
+          overlays</li>
+          </ol>
+          <h2 id="step-2-register-ai-asset-entity-type-in-data-map">Step
+          2: Register AI asset entity type in Data Map</h2>
+          <p>Purview’s Data Map needs a custom entity type to represent
+          ARIA assets. This extends the Apache Atlas type system that
+          Purview uses internally.</p>
+          <div class="sourceCode" id="cb1"><pre
+          class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the custom type definition</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">az</span> rest <span class="at">--method</span> POST <span class="dt">\</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--uri</span> <span class="st">&quot;https://purview-aria-dev.purview.azure.com/catalog/api/atlas/v2/types/typedefs&quot;</span> <span class="dt">\</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--headers</span> <span class="st">&quot;Content-Type=application/json&quot;</span> <span class="dt">\</span></span>
@@ -289,12 +209,12 @@
 <span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="st">      ]</span></span>
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="st">    }]</span></span>
 <span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="st">  }&#39;</span></span></code></pre></div>
-    <h2 id="step-3-register-relationship-types">Step 3: Register
-    relationship types</h2>
-    <p>Define the ARIA relationship types so lineage edges appear in the
-    Data Map:</p>
-    <div class="sourceCode" id="cb2"><pre
-    class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">az</span> rest <span class="at">--method</span> POST <span class="dt">\</span></span>
+          <h2 id="step-3-register-relationship-types">Step 3: Register
+          relationship types</h2>
+          <p>Define the ARIA relationship types so lineage edges appear
+          in the Data Map:</p>
+          <div class="sourceCode" id="cb2"><pre
+          class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">az</span> rest <span class="at">--method</span> POST <span class="dt">\</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--uri</span> <span class="st">&quot;https://purview-aria-dev.purview.azure.com/catalog/api/atlas/v2/types/typedefs&quot;</span> <span class="dt">\</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--headers</span> <span class="st">&quot;Content-Type=application/json&quot;</span> <span class="dt">\</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--body</span> <span class="st">&#39;{</span></span>
@@ -322,89 +242,95 @@
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="st">      }</span></span>
 <span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="st">    ]</span></span>
 <span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="st">  }&#39;</span></span></code></pre></div>
-    <h2 id="step-4-configure-dlp-policies">Step 4: Configure DLP
-    policies</h2>
-    <p>Create a DLP policy that prevents under-classified agents from
-    accessing data above their sensitivity ceiling. In the Purview
-    compliance portal:</p>
-    <ol type="1">
-    <li>Navigate to <strong>Data loss prevention</strong> →
-    <strong>Policies</strong></li>
-    <li>Create a new policy scoped to the AI asset containers</li>
-    <li>Add a condition: “Content contains sensitivity label
-    <strong>Confidential</strong> or above”</li>
-    <li>Add an action: “Block access when the requesting identity’s
-    <code>sensitivity_tier</code> attribute is below
-    <code>confidential</code>”</li>
-    </ol>
-    <p>In practice, this is enforced through two mechanisms:</p>
-    <ul>
-    <li><strong>CI/CD time</strong>: The <code>oasf-validate</code>
-    workflow checks that the governance overlay’s
-    <code>sensitivity_tier</code> doesn’t exceed its
-    <code>dependency_sensitivity_ceiling</code></li>
-    <li><strong>Runtime</strong>: The
-    <code>PurviewPolicyMiddleware</code> in the Agent Framework
-    evaluates prompts and responses against Purview DLP policies</li>
-    </ul>
-    <h2 id="step-5-update-governance-overlays-with-label-ids">Step 5:
-    Update governance overlays with label IDs</h2>
-    <p>Now that you have Purview labels, update your asset’s governance
-    overlay with the actual label GUID:</p>
-    <div class="sourceCode" id="cb3"><pre
-    class="sourceCode json"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+          <h2 id="step-4-configure-dlp-policies">Step 4: Configure DLP
+          policies</h2>
+          <p>Create a DLP policy that prevents under-classified agents
+          from accessing data above their sensitivity ceiling. In the
+          Purview compliance portal:</p>
+          <ol type="1">
+          <li>Navigate to <strong>Data loss prevention</strong> →
+          <strong>Policies</strong></li>
+          <li>Create a new policy scoped to the AI asset containers</li>
+          <li>Add a condition: “Content contains sensitivity label
+          <strong>Confidential</strong> or above”</li>
+          <li>Add an action: “Block access when the requesting
+          identity’s <code>sensitivity_tier</code> attribute is below
+          <code>confidential</code>”</li>
+          </ol>
+          <p>In practice, this is enforced through two mechanisms:</p>
+          <ul>
+          <li><strong>CI/CD time</strong>: The
+          <code>oasf-validate</code> workflow checks that the governance
+          overlay’s <code>sensitivity_tier</code> doesn’t exceed its
+          <code>dependency_sensitivity_ceiling</code></li>
+          <li><strong>Runtime</strong>: The
+          <code>PurviewPolicyMiddleware</code> in the Agent Framework
+          evaluates prompts and responses against Purview DLP
+          policies</li>
+          </ul>
+          <h2 id="step-5-update-governance-overlays-with-label-ids">Step
+          5: Update governance overlays with label IDs</h2>
+          <p>Now that you have Purview labels, update your asset’s
+          governance overlay with the actual label GUID:</p>
+          <div class="sourceCode" id="cb3"><pre
+          class="sourceCode json"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;governance&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;sensitivity_tier&quot;</span><span class="fu">:</span> <span class="st">&quot;internal&quot;</span><span class="fu">,</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;purview_label_id&quot;</span><span class="fu">:</span> <span class="st">&quot;a1b2c3d4-e5f6-7890-abcd-ef1234567890&quot;</span><span class="fu">,</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="er">...</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
-    <p>The <code>purview-sync.yml</code> workflow reads this label ID
-    and applies it to the OCI artifact metadata in the Purview Data Map
-    after each publish.</p>
-    <h2 id="step-6-verify-lineage-in-purview">Step 6: Verify lineage in
-    Purview</h2>
-    <p>After publishing an asset, open the Purview governance
-    portal:</p>
-    <ol type="1">
-    <li>Navigate to <strong>Data Map</strong> → <strong>Browse
-    assets</strong></li>
-    <li>Filter by type: <code>oasf_ai_asset</code></li>
-    <li>Click on your asset to see its properties</li>
-    <li>Click the <strong>Lineage</strong> tab to see relationship
-    edges</li>
-    </ol>
-    <p>You should see your agent connected to its skills and knowledge
-    bases via the <code>aria_invokes</code> and
-    <code>aria_grounded_in</code> relationships.</p>
-    <h2 id="ongoing-governance">Ongoing governance</h2>
-    <p>Once configured, the Purview integration operates
-    automatically:</p>
-    <ul>
-    <li>Every <code>purview-sync.yml</code> run registers/updates assets
-    in the Data Map</li>
-    <li>Sensitivity labels propagate through the dependency graph</li>
-    <li>DLP policies evaluate AI interactions against declared
-    classifications</li>
-    <li>The Purview audit log captures all lifecycle events</li>
-    <li>DSPM for AI surfaces anomalous usage patterns</li>
-    </ul>
-    <p>The compliance team can now answer questions like:</p>
-    <ul>
-    <li>“Which agents access PHI-classified knowledge?”</li>
-    <li>“If this knowledge base is reclassified, which agents are
-    affected?”</li>
-    <li>“Show me all assets governed under HIPAA with their approval
-    chains”</li>
-    </ul>
-    <h2 id="next-steps">Next Steps</h2>
-    <p>→ <a href="./05-sample-agent.html">05 — Sample Agent</a></p>
-  </article>
+          <p>The <code>purview-sync.yml</code> workflow reads this label
+          ID and applies it to the OCI artifact metadata in the Purview
+          Data Map after each publish.</p>
+          <h2 id="step-6-verify-lineage-in-purview">Step 6: Verify
+          lineage in Purview</h2>
+          <p>After publishing an asset, open the Purview governance
+          portal:</p>
+          <ol type="1">
+          <li>Navigate to <strong>Data Map</strong> → <strong>Browse
+          assets</strong></li>
+          <li>Filter by type: <code>oasf_ai_asset</code></li>
+          <li>Click on your asset to see its properties</li>
+          <li>Click the <strong>Lineage</strong> tab to see relationship
+          edges</li>
+          </ol>
+          <p>You should see your agent connected to its skills and
+          knowledge bases via the <code>aria_invokes</code> and
+          <code>aria_grounded_in</code> relationships.</p>
+          <h2 id="ongoing-governance">Ongoing governance</h2>
+          <p>Once configured, the Purview integration operates
+          automatically:</p>
+          <ul>
+          <li>Every <code>purview-sync.yml</code> run registers/updates
+          assets in the Data Map</li>
+          <li>Sensitivity labels propagate through the dependency
+          graph</li>
+          <li>DLP policies evaluate AI interactions against declared
+          classifications</li>
+          <li>The Purview audit log captures all lifecycle events</li>
+          <li>DSPM for AI surfaces anomalous usage patterns</li>
+          </ul>
+          <p>The compliance team can now answer questions like:</p>
+          <ul>
+          <li>“Which agents access PHI-classified knowledge?”</li>
+          <li>“If this knowledge base is reclassified, which agents are
+          affected?”</li>
+          <li>“Show me all assets governed under HIPAA with their
+          approval chains”</li>
+          </ul>
+          <h2 id="next-steps">Next Steps</h2>
+          <p>→ <a href="./05-sample-agent.html">05 — Sample
+          Agent</a></p>
+        </article>
+      </main>
 
-  <footer class="page-footer">
-    <span>ARIA Framework — Asset Registry for Intelligent Agents</span>
-    <a href="../index.html">Back to home</a>
-  </footer>
+      <footer class="site-footer">
+        <span>ARIA Framework — Asset Registry for Intelligent Agents</span>
+        <a href="../index.html">Back to home</a>
+      </footer>
+    </div>
+  </div>
 </body>
 
 </html>

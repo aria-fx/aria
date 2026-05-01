@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- ARIA GitHub Avatar (circular) -->
+  <defs>
+    <clipPath id="circle">
+      <circle cx="256" cy="256" r="256"/>
+    </clipPath>
+  </defs>
+  <circle cx="256" cy="256" r="256" fill="#6B21A8"/>
+  <g clip-path="url(#circle)">
+    <!-- Connection lines -->
+    <line x1="256" y1="256" x2="56" y2="56" stroke="#0891B2" stroke-width="14" stroke-linecap="round"/>
+    <line x1="256" y1="256" x2="456" y2="56" stroke="#0D9488" stroke-width="14" stroke-linecap="round"/>
+    <line x1="256" y1="256" x2="56" y2="456" stroke="#F97316" stroke-width="14" stroke-linecap="round"/>
+    <line x1="256" y1="256" x2="456" y2="456" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" opacity="0.2"/>
+    <!-- Hexagon -->
+    <polygon points="256,168 336,208 336,304 256,344 176,304 176,208" fill="#FFFFFF" opacity="0.95"/>
+    <!-- A -->
+    <text x="256" y="296" text-anchor="middle" font-family="Inter, Calibri, system-ui, sans-serif" font-size="96" font-weight="500" fill="#6B21A8">A</text>
+    <!-- Satellites -->
+    <circle cx="56" cy="56" r="28" fill="#0891B2"/>
+    <circle cx="456" cy="56" r="28" fill="#0D9488"/>
+    <circle cx="56" cy="456" r="28" fill="#F97316"/>
+    <circle cx="456" cy="456" r="20" fill="#FFFFFF" opacity="0.3"/>
+  </g>
+</svg>

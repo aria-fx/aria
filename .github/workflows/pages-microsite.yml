@@ -32,9 +32,13 @@ jobs:
           test -f site/styles.css
           test -f site/template.html
           test -f docs/brand/aria-favicon.svg
+          test -f docs/brand/aria-logo-horizontal.svg
+          test -f docs/brand/aria-logo-mark.svg
 
-      - name: Copy favicon
+      - name: Copy brand assets
         run: |
+          mkdir -p site/brand
+          cp docs/brand/*.svg site/brand/
           cp docs/brand/aria-favicon.svg site/favicon.svg
 
       - name: Build docs pages

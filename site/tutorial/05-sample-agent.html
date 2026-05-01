@@ -8,246 +8,164 @@
   <meta name="description" content="ARIA: Asset Registry for Intelligent Agents.">
   <link rel="icon" type="image/svg+xml" href="../favicon.svg">
   <link rel="stylesheet" href="../styles.css">
-  <style>
-    body {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 0 1.5rem 3rem;
-    }
-
-    nav.breadcrumb {
-      padding: 1rem 0 0;
-      font-size: 0.85rem;
-    }
-
-    nav.breadcrumb a {
-      color: var(--brand);
-      text-decoration: none;
-    }
-
-    nav.breadcrumb a:hover {
-      text-decoration: underline;
-    }
-
-    nav.breadcrumb span {
-      color: #666;
-    }
-
-    article h1 {
-      margin-top: 1.5rem;
-    }
-
-    article h2 {
-      margin-top: 2rem;
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 0.4rem;
-    }
-
-    article h3 {
-      margin-top: 1.5rem;
-    }
-
-    article pre {
-      background: #1e2635;
-      color: #e2e8f0;
-      padding: 1rem 1.25rem;
-      border-radius: 6px;
-      overflow-x: auto;
-      font-size: 0.88rem;
-      line-height: 1.6;
-    }
-
-    article code {
-      background: #f1f5f9;
-      color: #0f4c75;
-      padding: 0.15em 0.4em;
-      border-radius: 3px;
-      font-size: 0.9em;
-    }
-
-    article pre code {
-      background: none;
-      color: inherit;
-      padding: 0;
-    }
-
-    article table {
-      border-collapse: collapse;
-      width: 100%;
-      margin: 1.25rem 0;
-    }
-
-    article th,
-    article td {
-      border: 1px solid #cbd5e1;
-      padding: 0.5rem 0.75rem;
-      text-align: left;
-    }
-
-    article th {
-      background: #f1f5f9;
-      font-weight: 600;
-    }
-
-    article blockquote {
-      border-left: 4px solid var(--brand);
-      margin: 1rem 0;
-      padding: 0.5rem 1rem;
-      background: #f8fafc;
-      color: #334155;
-    }
-
-    article ul,
-    article ol {
-      line-height: 1.8;
-    }
-
-    article a {
-      color: var(--brand);
-    }
-
-    article img {
-      max-width: 100%;
-      height: auto;
-    }
-
-    .page-footer {
-      margin-top: 3rem;
-      padding-top: 1rem;
-      border-top: 1px solid #e2e8f0;
-      font-size: 0.85rem;
-      color: #666;
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-
-    .page-footer a {
-      color: var(--brand);
-      text-decoration: none;
-    }
-  </style>
+  <script defer src="../nav-active.js"></script>
 </head>
 
 <body>
-  <header style="padding: 1rem 0 0.5rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 0;">
-    <a href="../index.html"
-      style="font-weight: 700; color: var(--brand); text-decoration: none; font-size: 1.1rem;">← ARIA Framework</a>
-  </header>
+  <div class="site-shell">
+    <aside class="sidebar" aria-label="Sidebar">
+      <a class="brand-lockup" href="../index.html">
+        <img src="../brand/aria-logo-horizontal.svg" alt="ARIA Framework">
+      </a>
+      <p class="sidebar-tagline">Asset Registry for Intelligent Agents</p>
 
-    <nav id="toc" aria-label="Table of contents"
-    style="margin: 1.5rem 0; padding: 1rem 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
-    <strong style="display:block; margin-bottom: 0.5rem;">Contents</strong>
-    <ul>
-    <li><a href="#sample-agent">05 — Sample Agent</a>
-    <ul>
-    <li><a href="#what-youll-see">What you’ll see</a></li>
-    <li><a href="#prerequisites">Prerequisites</a></li>
-    <li><a href="#step-1-configure-environment">Step 1: Configure
-    environment</a></li>
-    <li><a href="#step-2-inspect-the-oasf-manifests">Step 2: Inspect the
-    OASF manifests</a></li>
-    <li><a href="#step-3-build-and-run">Step 3: Build and run</a></li>
-    <li><a href="#step-4-test-governance-enforcement">Step 4: Test
-    governance enforcement</a>
-    <ul>
-    <li><a href="#allowed-internal-data-below-ceiling">Allowed: internal
-    data (below ceiling)</a></li>
-    <li><a href="#allowed-confidential-data-at-ceiling">Allowed:
-    confidential data (at ceiling)</a></li>
-    <li><a href="#blocked-restricted-data-above-ceiling">Blocked:
-    restricted data (above ceiling)</a></li>
-    <li><a href="#other-prompts-to-try">Other prompts to try</a></li>
-    </ul></li>
-    <li><a href="#step-5-understand-the-middleware-pipeline">Step 5:
-    Understand the middleware pipeline</a></li>
-    <li><a href="#step-6-run-the-tests">Step 6: Run the tests</a></li>
-    <li><a href="#step-7-inspect-the-telemetry">Step 7: Inspect the
-    telemetry</a></li>
-    <li><a href="#key-code-to-study">Key code to study</a></li>
-    <li><a href="#next-steps">Next Steps</a></li>
-    </ul></li>
-    </ul>
-  </nav>
-  
-  <article>
-    <h1 id="sample-agent">05 — Sample Agent</h1>
-    <p>Run the OASF-governed HR onboarding assistant and see governance
-    enforcement in action.</p>
-    <h2 id="what-youll-see">What you’ll see</h2>
-    <ul>
-    <li>OASF Record and governance overlay validated at startup</li>
-    <li>Purview middleware evaluating DLP policies on every
-    interaction</li>
-    <li>OASF governance middleware checking consumer identity</li>
-    <li>Sensitivity ceiling enforcement blocking access to restricted
-    data</li>
-    <li>OpenTelemetry traces tagged with ARIA governance metadata</li>
-    </ul>
-    <h2 id="prerequisites">Prerequisites</h2>
-    <ul>
-    <li>.NET 9 SDK (installed by devcontainer)</li>
-    <li>Azure OpenAI resource with a deployed model (or modify for
-    OpenAI API)</li>
-    <li>Completed <a href="./04-purview-integration.html">04 — Purview
-    Integration</a> (recommended)</li>
-    </ul>
-    <h2 id="step-1-configure-environment">Step 1: Configure
-    environment</h2>
-    <p>Set the required environment variables:</p>
-    <div class="sourceCode" id="cb1"><pre
-    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">AZURE_OPENAI_ENDPOINT</span><span class="op">=</span><span class="st">&quot;https://your-resource.openai.azure.com&quot;</span></span>
+      <nav class="side-nav" aria-label="Documentation navigation">
+        <p class="side-nav-title">Reference</p>
+        <a href="../index.html">Home</a>
+        <a href="../docs/architecture.html">Architecture</a>
+        <a href="../tutorial/index.html">Tutorial Overview</a>
+
+        <p class="side-nav-title">Tutorial Modules</p>
+        <a href="../tutorial/01-concepts.html">01 Concepts</a>
+        <a href="../tutorial/02-marketplace-setup.html">02 Marketplace Setup</a>
+        <a href="../tutorial/03-first-asset.html">03 First Asset</a>
+        <a href="../tutorial/04-purview-integration.html">04 Purview Integration</a>
+        <a href="../tutorial/05-sample-agent.html">05 Sample Agent</a>
+        <a href="../tutorial/06-aria-cli.html">06 ARIA CLI</a>
+        <a href="../tutorial/07-demo-script.html">07 Demo Script</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <img src="../brand/aria-logo-mark.svg" alt="ARIA mark">
+        <a href="https://github.com/jgarverick/aria-framework">GitHub Repository</a>
+      </div>
+    </aside>
+
+    <div class="main-shell">
+      <header class="top-header compact">
+        <a class="crumb" href="../index.html">ARIA Framework</a>
+        <a class="repo-link" href="https://github.com/jgarverick/aria-framework">View Source</a>
+      </header>
+
+      <main class="content docs-content">
+                <nav id="toc" class="toc-panel" aria-label="Table of contents">
+          <h2>On This Page</h2>
+          <ul>
+          <li><a href="#sample-agent">05 — Sample Agent</a>
+          <ul>
+          <li><a href="#what-youll-see">What you’ll see</a></li>
+          <li><a href="#prerequisites">Prerequisites</a></li>
+          <li><a href="#step-1-configure-environment">Step 1: Configure
+          environment</a></li>
+          <li><a href="#step-2-inspect-the-oasf-manifests">Step 2:
+          Inspect the OASF manifests</a></li>
+          <li><a href="#step-3-build-and-run">Step 3: Build and
+          run</a></li>
+          <li><a href="#step-4-test-governance-enforcement">Step 4: Test
+          governance enforcement</a>
+          <ul>
+          <li><a href="#allowed-internal-data-below-ceiling">Allowed:
+          internal data (below ceiling)</a></li>
+          <li><a href="#allowed-confidential-data-at-ceiling">Allowed:
+          confidential data (at ceiling)</a></li>
+          <li><a href="#blocked-restricted-data-above-ceiling">Blocked:
+          restricted data (above ceiling)</a></li>
+          <li><a href="#other-prompts-to-try">Other prompts to
+          try</a></li>
+          </ul></li>
+          <li><a href="#step-5-understand-the-middleware-pipeline">Step
+          5: Understand the middleware pipeline</a></li>
+          <li><a href="#step-6-run-the-tests">Step 6: Run the
+          tests</a></li>
+          <li><a href="#step-7-inspect-the-telemetry">Step 7: Inspect
+          the telemetry</a></li>
+          <li><a href="#key-code-to-study">Key code to study</a></li>
+          <li><a href="#next-steps">Next Steps</a></li>
+          </ul></li>
+          </ul>
+        </nav>
+        
+        <article class="doc-article">
+          <h1 id="sample-agent">05 — Sample Agent</h1>
+          <p>Run the OASF-governed HR onboarding assistant and see
+          governance enforcement in action.</p>
+          <h2 id="what-youll-see">What you’ll see</h2>
+          <ul>
+          <li>OASF Record and governance overlay validated at
+          startup</li>
+          <li>Purview middleware evaluating DLP policies on every
+          interaction</li>
+          <li>OASF governance middleware checking consumer identity</li>
+          <li>Sensitivity ceiling enforcement blocking access to
+          restricted data</li>
+          <li>OpenTelemetry traces tagged with ARIA governance
+          metadata</li>
+          </ul>
+          <h2 id="prerequisites">Prerequisites</h2>
+          <ul>
+          <li>.NET 9 SDK (installed by devcontainer)</li>
+          <li>Azure OpenAI resource with a deployed model (or modify for
+          OpenAI API)</li>
+          <li>Completed <a href="./04-purview-integration.html">04 —
+          Purview Integration</a> (recommended)</li>
+          </ul>
+          <h2 id="step-1-configure-environment">Step 1: Configure
+          environment</h2>
+          <p>Set the required environment variables:</p>
+          <div class="sourceCode" id="cb1"><pre
+          class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">AZURE_OPENAI_ENDPOINT</span><span class="op">=</span><span class="st">&quot;https://your-resource.openai.azure.com&quot;</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">AZURE_OPENAI_DEPLOYMENT_NAME</span><span class="op">=</span><span class="st">&quot;gpt-4o-mini&quot;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PURVIEW_CLIENT_APP_ID</span><span class="op">=</span><span class="st">&quot;your-entra-app-id&quot;</span></span></code></pre></div>
-    <p>If you don’t have Azure OpenAI access yet, you can still explore
-    the governance code — the startup validation and tool-level
-    sensitivity checks work independently of the LLM.</p>
-    <h2 id="step-2-inspect-the-oasf-manifests">Step 2: Inspect the OASF
-    manifests</h2>
-    <p>Before running, look at the two manifest files that govern this
-    agent:</p>
-    <div class="sourceCode" id="cb2"><pre
-    class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> src/sample-agent/Oasf.Sample.Agent/oasf-record.json <span class="kw">|</span> <span class="ex">jq</span> .</span></code></pre></div>
-    <p>Key things to notice:</p>
-    <ul>
-    <li><strong>name</strong>:
-    <code>xebia.com/agents/onboarding-assistant</code></li>
-    <li><strong>skills</strong>: NLU intent classification, NLG text
-    completion, and RAG</li>
-    <li><strong>modules</strong>: MCP server, prompt bundle, and
-    knowledge base references</li>
-    <li><strong>version</strong>: <code>2.1.0</code> — semantic
-    versioning for dependency resolution</li>
-    </ul>
-    <div class="sourceCode" id="cb3"><pre
-    class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> src/sample-agent/Oasf.Sample.Agent/oasf-governance.json <span class="kw">|</span> <span class="ex">jq</span> .</span></code></pre></div>
-    <p>Key things to notice:</p>
-    <ul>
-    <li><strong>sensitivity_tier</strong>: <code>confidential</code> —
-    this agent handles PII</li>
-    <li><strong>dependency_sensitivity_ceiling</strong>:
-    <code>confidential</code> — it can’t access anything above
-    confidential</li>
-    <li><strong>allowed_consumers</strong>: <code>hr-team</code>,
-    <code>onboarding-automation</code>,
-    <code>hiring-managers</code></li>
-    <li><strong>audit_level</strong>: <code>full</code> — every
-    interaction is logged</li>
-    </ul>
-    <h2 id="step-3-build-and-run">Step 3: Build and run</h2>
-    <div class="sourceCode" id="cb4"><pre
-    class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> src/sample-agent</span>
+          <p>If you don’t have Azure OpenAI access yet, you can still
+          explore the governance code — the startup validation and
+          tool-level sensitivity checks work independently of the
+          LLM.</p>
+          <h2 id="step-2-inspect-the-oasf-manifests">Step 2: Inspect the
+          OASF manifests</h2>
+          <p>Before running, look at the two manifest files that govern
+          this agent:</p>
+          <div class="sourceCode" id="cb2"><pre
+          class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> src/sample-agent/Oasf.Sample.Agent/oasf-record.json <span class="kw">|</span> <span class="ex">jq</span> .</span></code></pre></div>
+          <p>Key things to notice:</p>
+          <ul>
+          <li><strong>name</strong>:
+          <code>xebia.com/agents/onboarding-assistant</code></li>
+          <li><strong>skills</strong>: NLU intent classification, NLG
+          text completion, and RAG</li>
+          <li><strong>modules</strong>: MCP server, prompt bundle, and
+          knowledge base references</li>
+          <li><strong>version</strong>: <code>2.1.0</code> — semantic
+          versioning for dependency resolution</li>
+          </ul>
+          <div class="sourceCode" id="cb3"><pre
+          class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> src/sample-agent/Oasf.Sample.Agent/oasf-governance.json <span class="kw">|</span> <span class="ex">jq</span> .</span></code></pre></div>
+          <p>Key things to notice:</p>
+          <ul>
+          <li><strong>sensitivity_tier</strong>:
+          <code>confidential</code> — this agent handles PII</li>
+          <li><strong>dependency_sensitivity_ceiling</strong>:
+          <code>confidential</code> — it can’t access anything above
+          confidential</li>
+          <li><strong>allowed_consumers</strong>: <code>hr-team</code>,
+          <code>onboarding-automation</code>,
+          <code>hiring-managers</code></li>
+          <li><strong>audit_level</strong>: <code>full</code> — every
+          interaction is logged</li>
+          </ul>
+          <h2 id="step-3-build-and-run">Step 3: Build and run</h2>
+          <div class="sourceCode" id="cb4"><pre
+          class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> src/sample-agent</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> build</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> Oasf.Sample.Agent</span></code></pre></div>
-    <p>Watch the startup logs. You should see:</p>
-    <pre><code>info: Oasf.Sample.Agent.Services.OasfGovernanceService
+          <p>Watch the startup logs. You should see:</p>
+          <pre><code>info: Oasf.Sample.Agent.Services.OasfGovernanceService
   Loading OASF Record from oasf-record.json
   Loading Governance Overlay from oasf-governance.json
   OASF validation passed
   OASF governance initialized: Asset=xebia.com/agents/onboarding-assistant v2.1.0,
     Sensitivity=confidential, Ceiling=confidential, Frameworks=[SOC2, GDPR]</code></pre>
-    <p>Then the agent banner:</p>
-    <pre><code>╔══════════════════════════════════════════════════════════════╗
+          <p>Then the agent banner:</p>
+          <pre><code>╔══════════════════════════════════════════════════════════════╗
 ║  OASF-Governed HR Onboarding Agent                         ║
 ║  Asset: xebia.com/agents/onboarding-assistant              ║
 ║  Version: 2.1.0                                            ║
@@ -255,45 +173,49 @@
 ║  Ceiling: confidential                                     ║
 ║  Purview DLP: Active                                       ║
 ╚══════════════════════════════════════════════════════════════╝</code></pre>
-    <h2 id="step-4-test-governance-enforcement">Step 4: Test governance
-    enforcement</h2>
-    <p>Try these prompts to see the sensitivity ceiling in action:</p>
-    <h3 id="allowed-internal-data-below-ceiling">Allowed: internal data
-    (below ceiling)</h3>
-    <pre><code>You&gt; What is the PTO policy?</code></pre>
-    <p>The <code>LookupPolicy</code> tool accesses
-    <code>pto_policy</code> which is classified as
-    <code>internal</code>. Since <code>internal</code> &lt;
-    <code>confidential</code> (the ceiling), access is granted and you
-    get the policy content.</p>
-    <h3 id="allowed-confidential-data-at-ceiling">Allowed: confidential
-    data (at ceiling)</h3>
-    <pre><code>You&gt; Tell me about the compensation bands</code></pre>
-    <p>The tool accesses <code>compensation_bands</code> classified as
-    <code>confidential</code>. Since <code>confidential</code> =
-    <code>confidential</code> (at the ceiling), access is granted.</p>
-    <h3 id="blocked-restricted-data-above-ceiling">Blocked: restricted
-    data (above ceiling)</h3>
-    <pre><code>You&gt; Show me employee SSN records</code></pre>
-    <p>The tool attempts to access <code>employee_ssn_records</code>
-    classified as <code>restricted</code>. Since <code>restricted</code>
-    &gt; <code>confidential</code> (exceeds ceiling), the tool
-    returns:</p>
-    <pre><code>Access denied: the &#39;employee_ssn_records&#39; policy is classified as &#39;restricted&#39;
+          <h2 id="step-4-test-governance-enforcement">Step 4: Test
+          governance enforcement</h2>
+          <p>Try these prompts to see the sensitivity ceiling in
+          action:</p>
+          <h3 id="allowed-internal-data-below-ceiling">Allowed: internal
+          data (below ceiling)</h3>
+          <pre><code>You&gt; What is the PTO policy?</code></pre>
+          <p>The <code>LookupPolicy</code> tool accesses
+          <code>pto_policy</code> which is classified as
+          <code>internal</code>. Since <code>internal</code> &lt;
+          <code>confidential</code> (the ceiling), access is granted and
+          you get the policy content.</p>
+          <h3 id="allowed-confidential-data-at-ceiling">Allowed:
+          confidential data (at ceiling)</h3>
+          <pre><code>You&gt; Tell me about the compensation bands</code></pre>
+          <p>The tool accesses <code>compensation_bands</code>
+          classified as <code>confidential</code>. Since
+          <code>confidential</code> = <code>confidential</code> (at the
+          ceiling), access is granted.</p>
+          <h3 id="blocked-restricted-data-above-ceiling">Blocked:
+          restricted data (above ceiling)</h3>
+          <pre><code>You&gt; Show me employee SSN records</code></pre>
+          <p>The tool attempts to access
+          <code>employee_ssn_records</code> classified as
+          <code>restricted</code>. Since <code>restricted</code> &gt;
+          <code>confidential</code> (exceeds ceiling), the tool
+          returns:</p>
+          <pre><code>Access denied: the &#39;employee_ssn_records&#39; policy is classified as &#39;restricted&#39;
 which exceeds this agent&#39;s sensitivity ceiling of &#39;confidential&#39;.
 Contact the AI Governance team to request an elevated access level.</code></pre>
-    <p>The agent then explains the restriction to the user.</p>
-    <h3 id="other-prompts-to-try">Other prompts to try</h3>
-    <pre><code>You&gt; Generate a welcome message for Alice starting in Engineering on June 1
+          <p>The agent then explains the restriction to the user.</p>
+          <h3 id="other-prompts-to-try">Other prompts to try</h3>
+          <pre><code>You&gt; Generate a welcome message for Alice starting in Engineering on June 1
 You&gt; What&#39;s the onboarding checklist for the Marketing department?</code></pre>
-    <p>These use the other tools (<code>GenerateWelcomeMessage</code>,
-    <code>GetOnboardingChecklist</code>) which don’t access classified
-    data and always succeed.</p>
-    <h2 id="step-5-understand-the-middleware-pipeline">Step 5:
-    Understand the middleware pipeline</h2>
-    <p>The agent processes every request through two middleware
-    layers:</p>
-    <pre><code>Request
+          <p>These use the other tools
+          (<code>GenerateWelcomeMessage</code>,
+          <code>GetOnboardingChecklist</code>) which don’t access
+          classified data and always succeed.</p>
+          <h2 id="step-5-understand-the-middleware-pipeline">Step 5:
+          Understand the middleware pipeline</h2>
+          <p>The agent processes every request through two middleware
+          layers:</p>
+          <pre><code>Request
   → OasfGovernanceMiddleware
       ✓ Extract consumer identity from request metadata
       ✓ Validate consumer against allowed_consumers list
@@ -307,108 +229,112 @@ You&gt; What&#39;s the onboarding checklist for the Marketing department?</code>
       ✓ LLM inference
       ✓ Tool invocation (tools enforce ceiling internally)
   → Response</code></pre>
-    <p>If either middleware rejects the request, it returns immediately
-    without reaching the agent.</p>
-    <h2 id="step-6-run-the-tests">Step 6: Run the tests</h2>
-    <div class="sourceCode" id="cb13"><pre
-    class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> test</span></code></pre></div>
-    <p>The tests verify:</p>
-    <ul>
-    <li>Sensitivity tier ordering (public &lt; internal &lt; … &lt;
-    restricted)</li>
-    <li>Ceiling comparison logic (exceeds vs. within)</li>
-    <li>OASF Record deserialization</li>
-    <li>Governance overlay deserialization</li>
-    <li>Consumer allow-list semantics (empty = open access)</li>
-    </ul>
-    <h2 id="step-7-inspect-the-telemetry">Step 7: Inspect the
-    telemetry</h2>
-    <p>If you have an OpenTelemetry collector running, you’ll see traces
-    with these ARIA-specific attributes:</p>
-    <table>
-    <thead>
-    <tr class="header">
-    <th>Attribute</th>
-    <th>Example value</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr class="odd">
-    <td><code>oasf.asset.name</code></td>
-    <td><code>xebia.com/agents/onboarding-assistant</code></td>
-    </tr>
-    <tr class="even">
-    <td><code>oasf.asset.version</code></td>
-    <td><code>2.1.0</code></td>
-    </tr>
-    <tr class="odd">
-    <td><code>oasf.sensitivity_tier</code></td>
-    <td><code>confidential</code></td>
-    </tr>
-    <tr class="even">
-    <td><code>oasf.audit_level</code></td>
-    <td><code>full</code></td>
-    </tr>
-    <tr class="odd">
-    <td><code>oasf.consumer.id</code></td>
-    <td><code>hr-team</code></td>
-    </tr>
-    <tr class="even">
-    <td><code>oasf.consumer.allowed</code></td>
-    <td><code>true</code></td>
-    </tr>
-    <tr class="odd">
-    <td><code>oasf.compliance_frameworks</code></td>
-    <td><code>SOC2,GDPR</code></td>
-    </tr>
-    </tbody>
-    </table>
-    <p>These can be queried in your observability platform to answer
-    questions like “which agents accessed confidential data in the last
-    24 hours?”</p>
-    <h2 id="key-code-to-study">Key code to study</h2>
-    <table>
-    <colgroup>
-    <col style="width: 31%" />
-    <col style="width: 68%" />
-    </colgroup>
-    <thead>
-    <tr class="header">
-    <th>File</th>
-    <th>What it does</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr class="odd">
-    <td><code>Services/OasfGovernanceService.cs</code></td>
-    <td>Loads + validates manifests at startup</td>
-    </tr>
-    <tr class="even">
-    <td><code>Middleware/OasfGovernanceMiddleware.cs</code></td>
-    <td>Consumer validation + OTEL tags</td>
-    </tr>
-    <tr class="odd">
-    <td><code>Tools/OnboardingTools.cs</code></td>
-    <td>Sensitivity ceiling check in <code>LookupPolicy</code></td>
-    </tr>
-    <tr class="even">
-    <td><code>Models/OasfModels.cs</code></td>
-    <td>Strongly-typed OASF Record + Governance types</td>
-    </tr>
-    <tr class="odd">
-    <td><code>Program.cs</code></td>
-    <td>Agent construction with dual middleware pipeline</td>
-    </tr>
-    </tbody>
-    </table>
-    <h2 id="next-steps">Next Steps</h2>
-    <p>→ <a href="./06-aria-cli.html">06 — ARIA CLI</a></p>
-  </article>
+          <p>If either middleware rejects the request, it returns
+          immediately without reaching the agent.</p>
+          <h2 id="step-6-run-the-tests">Step 6: Run the tests</h2>
+          <div class="sourceCode" id="cb13"><pre
+          class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> test</span></code></pre></div>
+          <p>The tests verify:</p>
+          <ul>
+          <li>Sensitivity tier ordering (public &lt; internal &lt; …
+          &lt; restricted)</li>
+          <li>Ceiling comparison logic (exceeds vs. within)</li>
+          <li>OASF Record deserialization</li>
+          <li>Governance overlay deserialization</li>
+          <li>Consumer allow-list semantics (empty = open access)</li>
+          </ul>
+          <h2 id="step-7-inspect-the-telemetry">Step 7: Inspect the
+          telemetry</h2>
+          <p>If you have an OpenTelemetry collector running, you’ll see
+          traces with these ARIA-specific attributes:</p>
+          <table>
+          <thead>
+          <tr class="header">
+          <th>Attribute</th>
+          <th>Example value</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr class="odd">
+          <td><code>oasf.asset.name</code></td>
+          <td><code>xebia.com/agents/onboarding-assistant</code></td>
+          </tr>
+          <tr class="even">
+          <td><code>oasf.asset.version</code></td>
+          <td><code>2.1.0</code></td>
+          </tr>
+          <tr class="odd">
+          <td><code>oasf.sensitivity_tier</code></td>
+          <td><code>confidential</code></td>
+          </tr>
+          <tr class="even">
+          <td><code>oasf.audit_level</code></td>
+          <td><code>full</code></td>
+          </tr>
+          <tr class="odd">
+          <td><code>oasf.consumer.id</code></td>
+          <td><code>hr-team</code></td>
+          </tr>
+          <tr class="even">
+          <td><code>oasf.consumer.allowed</code></td>
+          <td><code>true</code></td>
+          </tr>
+          <tr class="odd">
+          <td><code>oasf.compliance_frameworks</code></td>
+          <td><code>SOC2,GDPR</code></td>
+          </tr>
+          </tbody>
+          </table>
+          <p>These can be queried in your observability platform to
+          answer questions like “which agents accessed confidential data
+          in the last 24 hours?”</p>
+          <h2 id="key-code-to-study">Key code to study</h2>
+          <table>
+          <colgroup>
+          <col style="width: 31%" />
+          <col style="width: 68%" />
+          </colgroup>
+          <thead>
+          <tr class="header">
+          <th>File</th>
+          <th>What it does</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr class="odd">
+          <td><code>Services/OasfGovernanceService.cs</code></td>
+          <td>Loads + validates manifests at startup</td>
+          </tr>
+          <tr class="even">
+          <td><code>Middleware/OasfGovernanceMiddleware.cs</code></td>
+          <td>Consumer validation + OTEL tags</td>
+          </tr>
+          <tr class="odd">
+          <td><code>Tools/OnboardingTools.cs</code></td>
+          <td>Sensitivity ceiling check in
+          <code>LookupPolicy</code></td>
+          </tr>
+          <tr class="even">
+          <td><code>Models/OasfModels.cs</code></td>
+          <td>Strongly-typed OASF Record + Governance types</td>
+          </tr>
+          <tr class="odd">
+          <td><code>Program.cs</code></td>
+          <td>Agent construction with dual middleware pipeline</td>
+          </tr>
+          </tbody>
+          </table>
+          <h2 id="next-steps">Next Steps</h2>
+          <p>→ <a href="./06-aria-cli.html">06 — ARIA CLI</a></p>
+        </article>
+      </main>
 
-  <footer class="page-footer">
-    <span>ARIA Framework — Asset Registry for Intelligent Agents</span>
-    <a href="../index.html">Back to home</a>
-  </footer>
+      <footer class="site-footer">
+        <span>ARIA Framework — Asset Registry for Intelligent Agents</span>
+        <a href="../index.html">Back to home</a>
+      </footer>
+    </div>
+  </div>
 </body>
 
 </html>
