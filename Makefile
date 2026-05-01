@@ -12,7 +12,10 @@ SLIDES_OUT := $(OUT_DIR)/slides
 
 # Site sources and outputs
 SITE_TEMPLATE := site/template.html
-SITE_TUTORIAL_SRC := $(wildcard tutorial/*.md)
+SITE_LINK_FILTER := scripts/pandoc-md-links-to-html.lua
+SITE_FAVICON_SRC := docs/brand/aria-favicon.svg
+SITE_FAVICON_OUT := site/favicon.svg
+SITE_TUTORIAL_SRC := $(filter-out tutorial/README.md,$(wildcard tutorial/*.md))
 SITE_TUTORIAL_HTML := $(patsubst tutorial/%.md,site/tutorial/%.html,$(SITE_TUTORIAL_SRC))
 SITE_DOCS_HTML := site/docs/architecture.html
 
@@ -128,39 +131,47 @@ $(SLIDES_OUT)/aria-deck.html: $(SLIDES_MD) | $(SLIDES_OUT)
 
 # ── GitHub Pages Site ──────────────────────────────────────
 
-site: $(SITE_DOCS_HTML) $(SITE_TUTORIAL_HTML)
+site: $(SITE_FAVICON_OUT) $(SITE_DOCS_HTML) site/tutorial/index.html $(SITE_TUTORIAL_HTML)
 	@echo "Site build complete (site/docs/ and site/tutorial/)"
 
+# Favicon asset for site pages
+$(SITE_FAVICON_OUT): $(SITE_FAVICON_SRC)
+	@echo "  [site] $< → $@"
+	@cp $< $@
+
 # Architecture doc → HTML page
-$(SITE_DOCS_HTML): docs/architecture/aria-reference-architecture.md $(SITE_TEMPLATE) | site/docs
+$(SITE_DOCS_HTML): docs/architecture/aria-reference-architecture.md $(SITE_TEMPLATE) $(SITE_LINK_FILTER) | site/docs
 	@echo "  [site] $< → $@"
 	@pandoc $< \
 		--from markdown --to html5 \
 		--standalone \
 		--template $(SITE_TEMPLATE) \
+		--lua-filter $(SITE_LINK_FILTER) \
 		--variable root=../ \
 		--toc --toc-depth=3 \
 		--output $@
 
 # Tutorial README → index
-site/tutorial/index.html: tutorial/README.md $(SITE_TEMPLATE) | site/tutorial
+site/tutorial/index.html: tutorial/README.md $(SITE_TEMPLATE) $(SITE_LINK_FILTER) | site/tutorial
 	@echo "  [site] $< → $@"
 	@pandoc $< \
 		--from markdown --to html5 \
 		--standalone \
 		--template $(SITE_TEMPLATE) \
+		--lua-filter $(SITE_LINK_FILTER) \
 		--variable root=../ \
 		--metadata title="Tutorial" \
 		--output $@
 
 # Tutorial modules (pattern rule — all non-README tutorial pages)
-site/tutorial/%.html: tutorial/%.md $(SITE_TEMPLATE) | site/tutorial
+site/tutorial/%.html: tutorial/%.md $(SITE_TEMPLATE) $(SITE_LINK_FILTER) | site/tutorial
 	@echo "  [site] $< → $@"
 	$(eval TITLE := $(shell echo '$*' | sed 's/^[0-9]*-//' | sed 's/-/ /g'))
 	@pandoc $< \
 		--from markdown --to html5 \
 		--standalone \
 		--template $(SITE_TEMPLATE) \
+		--lua-filter $(SITE_LINK_FILTER) \
 		--variable root=../ \
 		--metadata title="$(TITLE)" \
 		--toc \

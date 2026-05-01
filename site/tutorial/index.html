@@ -1,37 +1,138 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ARIA Framework</title>
+  <title>Tutorial — ARIA Framework</title>
   <meta name="description" content="ARIA: Asset Registry for Intelligent Agents.">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
   <link rel="stylesheet" href="../styles.css">
   <style>
-    body { max-width: 860px; margin: 0 auto; padding: 0 1.5rem 3rem; }
-    nav.breadcrumb { padding: 1rem 0 0; font-size: 0.85rem; }
-    nav.breadcrumb a { color: var(--brand); text-decoration: none; }
-    nav.breadcrumb a:hover { text-decoration: underline; }
-    nav.breadcrumb span { color: #666; }
-    article h1 { margin-top: 1.5rem; }
-    article h2 { margin-top: 2rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.4rem; }
-    article h3 { margin-top: 1.5rem; }
-    article pre { background: #1e2635; color: #e2e8f0; padding: 1rem 1.25rem; border-radius: 6px; overflow-x: auto; font-size: 0.88rem; line-height: 1.6; }
-    article code { background: #f1f5f9; color: #0f4c75; padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.9em; }
-    article pre code { background: none; color: inherit; padding: 0; }
-    article table { border-collapse: collapse; width: 100%; margin: 1.25rem 0; }
-    article th, article td { border: 1px solid #cbd5e1; padding: 0.5rem 0.75rem; text-align: left; }
-    article th { background: #f1f5f9; font-weight: 600; }
-    article blockquote { border-left: 4px solid var(--brand); margin: 1rem 0; padding: 0.5rem 1rem; background: #f8fafc; color: #334155; }
-    article ul, article ol { line-height: 1.8; }
-    article a { color: var(--brand); }
-    article img { max-width: 100%; height: auto; }
-    .page-footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: #666; display: flex; justify-content: space-between; gap: 1rem; }
-    .page-footer a { color: var(--brand); text-decoration: none; }
+    body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 1.5rem 3rem;
+    }
+
+    nav.breadcrumb {
+      padding: 1rem 0 0;
+      font-size: 0.85rem;
+    }
+
+    nav.breadcrumb a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    nav.breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    nav.breadcrumb span {
+      color: #666;
+    }
+
+    article h1 {
+      margin-top: 1.5rem;
+    }
+
+    article h2 {
+      margin-top: 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 0.4rem;
+    }
+
+    article h3 {
+      margin-top: 1.5rem;
+    }
+
+    article pre {
+      background: #1e2635;
+      color: #e2e8f0;
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    article code {
+      background: #f1f5f9;
+      color: #0f4c75;
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+
+    article pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+    }
+
+    article table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1.25rem 0;
+    }
+
+    article th,
+    article td {
+      border: 1px solid #cbd5e1;
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+
+    article th {
+      background: #f1f5f9;
+      font-weight: 600;
+    }
+
+    article blockquote {
+      border-left: 4px solid var(--brand);
+      margin: 1rem 0;
+      padding: 0.5rem 1rem;
+      background: #f8fafc;
+      color: #334155;
+    }
+
+    article ul,
+    article ol {
+      line-height: 1.8;
+    }
+
+    article a {
+      color: var(--brand);
+    }
+
+    article img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .page-footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+      font-size: 0.85rem;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .page-footer a {
+      color: var(--brand);
+      text-decoration: none;
+    }
   </style>
 </head>
+
 <body>
   <header style="padding: 1rem 0 0.5rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 0;">
-    <a href="../index.html" style="font-weight: 700; color: var(--brand); text-decoration: none; font-size: 1.1rem;">← ARIA Framework</a>
+    <a href="../index.html"
+      style="font-weight: 700; color: var(--brand); text-decoration: none; font-size: 1.1rem;">← ARIA Framework</a>
   </header>
 
   
@@ -55,39 +156,39 @@
     </thead>
     <tbody>
     <tr class="odd">
-    <td><a href="./01-concepts.md">01 — Concepts</a></td>
+    <td><a href="./01-concepts.html">01 — Concepts</a></td>
     <td>ARIA metamodel, entity types, OASF classification</td>
     <td>15 min</td>
     </tr>
     <tr class="even">
-    <td><a href="./02-marketplace-setup.md">02 — Marketplace
+    <td><a href="./02-marketplace-setup.html">02 — Marketplace
     setup</a></td>
     <td>Deploy Terraform infrastructure (GitHub + Azure)</td>
     <td>30 min</td>
     </tr>
     <tr class="odd">
-    <td><a href="./03-first-asset.md">03 — Your first asset</a></td>
+    <td><a href="./03-first-asset.html">03 — Your first asset</a></td>
     <td>Create, govern, and publish an OASF-governed skill</td>
     <td>20 min</td>
     </tr>
     <tr class="even">
-    <td><a href="./04-purview-integration.md">04 — Purview
+    <td><a href="./04-purview-integration.html">04 — Purview
     integration</a></td>
     <td>Configure sensitivity labels and DLP enforcement</td>
     <td>20 min</td>
     </tr>
     <tr class="odd">
-    <td><a href="./05-sample-agent.md">05 — Sample agent</a></td>
+    <td><a href="./05-sample-agent.html">05 — Sample agent</a></td>
     <td>Run the onboarding assistant with governance middleware</td>
     <td>15 min</td>
     </tr>
     <tr class="even">
-    <td><a href="./06-aria-cli.md">06 — ARIA CLI</a></td>
+    <td><a href="./06-aria-cli.html">06 — ARIA CLI</a></td>
     <td>Discover, audit, and install assets into runtimes</td>
     <td>15 min</td>
     </tr>
     <tr class="odd">
-    <td><a href="./07-demo-script.md">07 — Conference demo</a></td>
+    <td><a href="./07-demo-script.html">07 — Conference demo</a></td>
     <td>Live demo script for conference presentation</td>
     <td>10 min</td>
     </tr>
@@ -124,4 +225,5 @@
     <a href="../index.html">Back to home</a>
   </footer>
 </body>
+
 </html>

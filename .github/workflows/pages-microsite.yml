@@ -31,6 +31,11 @@ jobs:
           test -f site/index.html
           test -f site/styles.css
           test -f site/template.html
+          test -f docs/brand/aria-favicon.svg
+
+      - name: Copy favicon
+        run: |
+          cp docs/brand/aria-favicon.svg site/favicon.svg
 
       - name: Build docs pages
         run: |
@@ -39,6 +44,7 @@ jobs:
             --from markdown --to html5 \
             --standalone \
             --template site/template.html \
+            --lua-filter scripts/pandoc-md-links-to-html.lua \
             --variable root=../ \
             --toc --toc-depth=3 \
             --output site/docs/architecture.html
@@ -51,6 +57,7 @@ jobs:
             --from markdown --to html5 \
             --standalone \
             --template site/template.html \
+            --lua-filter scripts/pandoc-md-links-to-html.lua \
             --variable root=../ \
             --metadata title="Tutorial" \
             --output site/tutorial/index.html
@@ -65,6 +72,7 @@ jobs:
               --from markdown --to html5 \
               --standalone \
               --template site/template.html \
+              --lua-filter scripts/pandoc-md-links-to-html.lua \
               --variable root=../ \
               --metadata title="$title" \
               --toc \
