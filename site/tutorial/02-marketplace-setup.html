@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>marketplace setup — ARIA Framework</title>
+  <meta name="description" content="ARIA: Asset Registry for Intelligent Agents.">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 1.5rem 3rem;
+    }
+
+    nav.breadcrumb {
+      padding: 1rem 0 0;
+      font-size: 0.85rem;
+    }
+
+    nav.breadcrumb a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    nav.breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    nav.breadcrumb span {
+      color: #666;
+    }
+
+    article h1 {
+      margin-top: 1.5rem;
+    }
+
+    article h2 {
+      margin-top: 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 0.4rem;
+    }
+
+    article h3 {
+      margin-top: 1.5rem;
+    }
+
+    article pre {
+      background: #1e2635;
+      color: #e2e8f0;
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    article code {
+      background: #f1f5f9;
+      color: #0f4c75;
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+
+    article pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+    }
+
+    article table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1.25rem 0;
+    }
+
+    article th,
+    article td {
+      border: 1px solid #cbd5e1;
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+
+    article th {
+      background: #f1f5f9;
+      font-weight: 600;
+    }
+
+    article blockquote {
+      border-left: 4px solid var(--brand);
+      margin: 1rem 0;
+      padding: 0.5rem 1rem;
+      background: #f8fafc;
+      color: #334155;
+    }
+
+    article ul,
+    article ol {
+      line-height: 1.8;
+    }
+
+    article a {
+      color: var(--brand);
+    }
+
+    article img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .page-footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+      font-size: 0.85rem;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .page-footer a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <header style="padding: 1rem 0 0.5rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 0;">
+    <a href="../index.html"
+      style="font-weight: 700; color: var(--brand); text-decoration: none; font-size: 1.1rem;">← ARIA Framework</a>
+  </header>
+
+    <nav id="toc" aria-label="Table of contents"
+    style="margin: 1.5rem 0; padding: 1rem 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+    <strong style="display:block; margin-bottom: 0.5rem;">Contents</strong>
+    <ul>
+    <li><a href="#marketplace-setup">02 — Marketplace Setup</a>
+    <ul>
+    <li><a href="#what-youll-build">What you’ll build</a></li>
+    <li><a href="#prerequisites">Prerequisites</a></li>
+    <li><a href="#step-1-configure-your-environment">Step 1: Configure
+    your environment</a></li>
+    <li><a href="#step-2-initialize-terraform">Step 2: Initialize
+    Terraform</a></li>
+    <li><a href="#step-3-review-the-plan">Step 3: Review the
+    plan</a></li>
+    <li><a href="#step-4-apply">Step 4: Apply</a></li>
+    <li><a href="#step-5-verify-the-deployment">Step 5: Verify the
+    deployment</a></li>
+    <li><a href="#step-6-inspect-the-template-repository">Step 6:
+    Inspect the template repository</a></li>
+    <li><a href="#understanding-the-modules">Understanding the
+    modules</a>
+    <ul>
+    <li><a href="#azure-governance">azure-governance</a></li>
+    <li><a href="#github-marketplace">github-marketplace</a></li>
+    <li><a href="#oasf-validation">oasf-validation</a></li>
+    </ul></li>
+    <li><a href="#cleanup">Cleanup</a></li>
+    <li><a href="#next-steps">Next Steps</a></li>
+    </ul></li>
+    </ul>
+  </nav>
+  
+  <article>
+    <h1 id="marketplace-setup">02 — Marketplace Setup</h1>
+    <p>Deploy the ARIA infrastructure on Azure and GitHub using
+    Terraform.</p>
+    <h2 id="what-youll-build">What you’ll build</h2>
+    <p>By the end of this module you’ll have:</p>
+    <ul>
+    <li>A <strong>Microsoft Purview Account</strong> with
+    system-assigned managed identity</li>
+    <li>An <strong>Azure Key Vault</strong> storing sensitivity tier
+    configuration</li>
+    <li>A <strong>Storage Account</strong> for OASF lineage metadata and
+    governance overlays</li>
+    <li>An <strong>Azure Container Registry</strong> for OCI artifact
+    storage</li>
+    <li>A <strong>GitHub template repository</strong> with OASF
+    manifests, CODEOWNERS, and three Actions workflows</li>
+    <li>A <strong>sample agent repository</strong> bootstrapped from the
+    template</li>
+    <li>Three <strong>GitHub teams</strong> (AI Platform, AI Governance,
+    AI Consumers) with scoped permissions</li>
+    <li><strong>Branch protection</strong> requiring OASF validation to
+    pass before merge</li>
+    </ul>
+    <h2 id="prerequisites">Prerequisites</h2>
+    <ul>
+    <li>Azure subscription with Owner or Contributor + User Access
+    Administrator</li>
+    <li>GitHub organization with admin access</li>
+    <li>Terraform &gt;= 1.5.0 (installed by devcontainer)</li>
+    <li>Azure CLI authenticated (<code>az login</code>)</li>
+    <li>GitHub Personal Access Token with <code>admin:org</code>,
+    <code>repo</code>, <code>workflow</code> scopes</li>
+    </ul>
+    <h2 id="step-1-configure-your-environment">Step 1: Configure your
+    environment</h2>
+    <p>Copy the example tfvars and fill in your values:</p>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> src/terraform/environments/dev</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> terraform.tfvars terraform.tfvars.local</span></code></pre></div>
+    <p>Edit <code>terraform.tfvars.local</code>:</p>
+    <pre class="hcl"><code>azure_subscription_id = &quot;your-subscription-id-here&quot;
+azure_location        = &quot;eastus2&quot;
+environment           = &quot;dev&quot;
+project_prefix        = &quot;aria&quot;
+
+github_org            = &quot;your-github-org&quot;
+github_default_branch = &quot;main&quot;</code></pre>
+    <p>Set your GitHub token as an environment variable (never commit
+    this):</p>
+    <div class="sourceCode" id="cb3"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">TF_VAR_github_token</span><span class="op">=</span><span class="st">&quot;ghp_your_token_here&quot;</span></span></code></pre></div>
+    <h2 id="step-2-initialize-terraform">Step 2: Initialize
+    Terraform</h2>
+    <div class="sourceCode" id="cb4"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> src/terraform/environments/dev</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">terraform</span> init</span></code></pre></div>
+    <p>You should see providers downloading: <code>azurerm</code>,
+    <code>github</code>, <code>azuread</code>.</p>
+    <h2 id="step-3-review-the-plan">Step 3: Review the plan</h2>
+    <div class="sourceCode" id="cb5"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">terraform</span> plan <span class="at">-var-file</span><span class="op">=</span>terraform.tfvars.local <span class="at">-out</span><span class="op">=</span>plan.tfplan</span></code></pre></div>
+    <p>Review the output. You should see approximately 30 resources
+    being created across three modules:</p>
+    <table>
+    <colgroup>
+    <col style="width: 30%" />
+    <col style="width: 42%" />
+    <col style="width: 26%" />
+    </colgroup>
+    <thead>
+    <tr class="header">
+    <th>Module</th>
+    <th>Resources</th>
+    <th>Count</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr class="odd">
+    <td>azure-governance</td>
+    <td>Resource group, Purview, Key Vault, Storage, RBAC</td>
+    <td>~10</td>
+    </tr>
+    <tr class="even">
+    <td>github-marketplace</td>
+    <td>Repos, teams, branch protection, workflows, secrets</td>
+    <td>~15</td>
+    </tr>
+    <tr class="odd">
+    <td>oasf-validation</td>
+    <td>Container Registry, schema storage, RBAC</td>
+    <td>~5</td>
+    </tr>
+    </tbody>
+    </table>
+    <h2 id="step-4-apply">Step 4: Apply</h2>
+    <div class="sourceCode" id="cb6"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">terraform</span> apply plan.tfplan</span></code></pre></div>
+    <p>This takes 5–10 minutes. The longest resource is the Purview
+    Account (typically 3–5 minutes to provision).</p>
+    <h2 id="step-5-verify-the-deployment">Step 5: Verify the
+    deployment</h2>
+    <p>Check the outputs:</p>
+    <div class="sourceCode" id="cb7"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">terraform</span> output</span></code></pre></div>
+    <p>You should see:</p>
+    <pre><code>acr_login_server       = &quot;acrariadevaoasf.azurecr.io&quot;
+purview_endpoint       = &quot;https://purview-aria-dev.purview.azure.com&quot;
+template_repo          = &quot;https://github.com/your-org/aria-asset-template&quot;
+sample_repo            = &quot;https://github.com/your-org/aria-onboarding-assistant&quot;</code></pre>
+    <p>Verify each component:</p>
+    <div class="sourceCode" id="cb9"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Azure resources</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">az</span> group show <span class="at">-n</span> rg-aria-dev-governance <span class="at">-o</span> table</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">az</span> purview account show <span class="at">-n</span> purview-aria-dev <span class="at">-g</span> rg-aria-dev-governance <span class="at">-o</span> table</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># GitHub repos</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> repo view your-org/aria-asset-template <span class="at">--json</span> name,description</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> repo view your-org/aria-onboarding-assistant <span class="at">--json</span> name,description</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># GitHub teams</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> api orgs/your-org/teams <span class="at">--jq</span> <span class="st">&#39;.[].name&#39;</span></span></code></pre></div>
+    <h2 id="step-6-inspect-the-template-repository">Step 6: Inspect the
+    template repository</h2>
+    <p>Open the template repo in your browser. You should see:</p>
+    <pre><code>aria-asset-template/
+├── oasf-record.json          ← OASF Record stub (needs customization)
+├── oasf-governance.json      ← Governance overlay stub
+├── src/README.md
+├── tests/README.md
+├── docs/README.md
+├── Dockerfile                ← OCI packaging
+└── .github/
+    ├── CODEOWNERS            ← Routes to ai-governance and ai-platform teams
+    └── workflows/
+        ├── oasf-validate.yml ← Runs on PR: schema + governance + ceiling check
+        ├── publish.yml       ← Runs on merge: build + push OCI artifact
+        └── purview-sync.yml  ← Runs post-publish: apply Purview labels + lineage</code></pre>
+    <p>The branch protection on <code>main</code> requires:</p>
+    <ul>
+    <li>The <code>validate</code> status check to pass (OASF schema
+    validation)</li>
+    <li>At least one CODEOWNERS approval</li>
+    <li>Stale reviews dismissed on new pushes</li>
+    </ul>
+    <h2 id="understanding-the-modules">Understanding the modules</h2>
+    <h3 id="azure-governance">azure-governance</h3>
+    <p>This module provisions the governance backbone. The Purview
+    Account gets a system-assigned managed identity that’s granted
+    <code>Storage Blob Data Reader</code> on the lineage storage account
+    and <code>Key Vault Secrets User</code> on the Key Vault. This
+    allows Purview to scan data sources and read governance
+    configuration without any stored credentials.</p>
+    <p>The Key Vault stores two secrets:</p>
+    <ul>
+    <li><code>oasf-sensitivity-tiers</code> — JSON array of the ordered
+    sensitivity tiers</li>
+    <li><code>purview-catalog-endpoint</code> — the Purview API endpoint
+    URL</li>
+    </ul>
+    <h3 id="github-marketplace">github-marketplace</h3>
+    <p>This module creates the template repository with all OASF
+    manifest stubs and workflows pre-configured. The CODEOWNERS file
+    routes governance overlay changes to the <code>ai-governance</code>
+    team and workflow changes to <code>ai-platform</code>.</p>
+    <p>Organization-level Actions secrets
+    (<code>ACR_LOGIN_SERVER</code>, <code>PURVIEW_ACCOUNT</code>,
+    <code>AZURE_SUBSCRIPTION_ID</code>) are created and scoped to the
+    template and sample repos so the CI/CD workflows can authenticate to
+    Azure.</p>
+    <h3 id="oasf-validation">oasf-validation</h3>
+    <p>This module provisions the Azure Container Registry where
+    published AI assets land as OCI artifacts. Purview is granted
+    <code>AcrPull</code> access so it can scan the registry and catalog
+    AI assets in the Data Map.</p>
+    <p>A schema version reference blob is seeded into the schema storage
+    account, defining required fields for both the OASF Record and
+    governance overlay.</p>
+    <h2 id="cleanup">Cleanup</h2>
+    <p>To tear down the entire environment:</p>
+    <div class="sourceCode" id="cb11"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">terraform</span> destroy <span class="at">-var-file</span><span class="op">=</span>terraform.tfvars.local</span></code></pre></div>
+    <p>This removes all Azure resources and GitHub repos/teams. Use with
+    caution in shared environments.</p>
+    <h2 id="next-steps">Next Steps</h2>
+    <p>→ <a href="./03-first-asset.md">03 — Your First Asset</a></p>
+  </article>
+
+  <footer class="page-footer">
+    <span>ARIA Framework — Asset Registry for Intelligent Agents</span>
+    <a href="../index.html">Back to home</a>
+  </footer>
+</body>
+
+</html>

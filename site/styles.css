@@ -73,6 +73,16 @@ h1 {
   color: white;
 }
 
+.btn-sm {
+  padding: .35rem .65rem;
+  font-size: .85rem;
+}
+
+ol.links,
+ul.links {
+  line-height: 2;
+}
+
 main {
   max-width: 72rem;
   margin: 0 auto;

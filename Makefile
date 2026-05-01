@@ -3,12 +3,18 @@
 # Build documents, slides, and .NET projects
 # ─────────────────────────────────────────────────────────────
 
-.PHONY: all docs slides architecture build test clean help
+.PHONY: all docs slides architecture build test clean help site watch-site
 
 # Output directories
 OUT_DIR := out
 DOCS_OUT := $(OUT_DIR)/docs
 SLIDES_OUT := $(OUT_DIR)/slides
+
+# Site sources and outputs
+SITE_TEMPLATE := site/template.html
+SITE_TUTORIAL_SRC := $(wildcard tutorial/*.md)
+SITE_TUTORIAL_HTML := $(patsubst tutorial/%.md,site/tutorial/%.html,$(SITE_TUTORIAL_SRC))
+SITE_DOCS_HTML := site/docs/architecture.html
 
 # Source files
 ARCH_MD := docs/architecture/aria-reference-architecture.md
@@ -19,7 +25,7 @@ PANDOC_REF := docs/architecture/pandoc-reference.yaml
 PANDOC_PDF_ENGINE := $(shell if command -v xelatex >/dev/null 2>&1; then echo xelatex; elif command -v lualatex >/dev/null 2>&1; then echo lualatex; elif command -v pdflatex >/dev/null 2>&1; then echo pdflatex; else echo; fi)
 
 # ── Default target ─────────────────────────────────────────
-all: docs slides build
+all: docs slides build site
 
 # ── Help ───────────────────────────────────────────────────
 help:
@@ -31,6 +37,8 @@ help:
 	@echo "  make architecture  Build reference architecture doc only"
 	@echo "  make build         Build .NET projects"
 	@echo "  make test          Run .NET tests"
+	@echo "  make site          Build GitHub Pages HTML from markdown sources"
+	@echo "  make watch-site    Rebuild site on markdown changes (requires inotify-tools)"
 	@echo "  make clean         Remove build artifacts"
 	@echo ""
 	@echo "Individual targets:"
@@ -118,6 +126,63 @@ $(SLIDES_OUT)/aria-deck.html: $(SLIDES_MD) | $(SLIDES_OUT)
 		-o $@
 	@echo "  → $@"
 
+# ── GitHub Pages Site ──────────────────────────────────────
+
+site: $(SITE_DOCS_HTML) $(SITE_TUTORIAL_HTML)
+	@echo "Site build complete (site/docs/ and site/tutorial/)"
+
+# Architecture doc → HTML page
+$(SITE_DOCS_HTML): docs/architecture/aria-reference-architecture.md $(SITE_TEMPLATE) | site/docs
+	@echo "  [site] $< → $@"
+	@pandoc $< \
+		--from markdown --to html5 \
+		--standalone \
+		--template $(SITE_TEMPLATE) \
+		--variable root=../ \
+		--toc --toc-depth=3 \
+		--output $@
+
+# Tutorial README → index
+site/tutorial/index.html: tutorial/README.md $(SITE_TEMPLATE) | site/tutorial
+	@echo "  [site] $< → $@"
+	@pandoc $< \
+		--from markdown --to html5 \
+		--standalone \
+		--template $(SITE_TEMPLATE) \
+		--variable root=../ \
+		--metadata title="Tutorial" \
+		--output $@
+
+# Tutorial modules (pattern rule — all non-README tutorial pages)
+site/tutorial/%.html: tutorial/%.md $(SITE_TEMPLATE) | site/tutorial
+	@echo "  [site] $< → $@"
+	$(eval TITLE := $(shell echo '$*' | sed 's/^[0-9]*-//' | sed 's/-/ /g'))
+	@pandoc $< \
+		--from markdown --to html5 \
+		--standalone \
+		--template $(SITE_TEMPLATE) \
+		--variable root=../ \
+		--metadata title="$(TITLE)" \
+		--toc \
+		--output $@
+
+# Create site output dirs on demand
+site/docs site/tutorial:
+	@mkdir -p $@
+
+# Watch markdown sources and rebuild site on any change (requires inotify-tools)
+watch-site:
+	@command -v inotifywait >/dev/null 2>&1 || { \
+		echo "inotifywait not found. Install with: sudo apt-get install inotify-tools"; \
+		exit 1; \
+	}
+	@echo "Watching docs/ and tutorial/ for changes (Ctrl-C to stop)..."
+	@while true; do \
+		inotifywait -q -e close_write,create,delete,moved_to \
+			docs/architecture/ tutorial/ site/template.html && \
+		$(MAKE) site; \
+	done
+
 # ── .NET Build ─────────────────────────────────────────────
 
 build:
@@ -137,6 +202,7 @@ test:
 clean:
 	@echo "Cleaning build artifacts..."
 	rm -rf $(OUT_DIR)
+	rm -rf site/docs site/tutorial
 	find src -name bin -type d -exec rm -rf {} + 2>/dev/null || true
 	find src -name obj -type d -exec rm -rf {} + 2>/dev/null || true
 	@echo "Clean complete"

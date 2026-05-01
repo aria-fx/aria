@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>aria cli — ARIA Framework</title>
+  <meta name="description" content="ARIA: Asset Registry for Intelligent Agents.">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 1.5rem 3rem;
+    }
+
+    nav.breadcrumb {
+      padding: 1rem 0 0;
+      font-size: 0.85rem;
+    }
+
+    nav.breadcrumb a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    nav.breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    nav.breadcrumb span {
+      color: #666;
+    }
+
+    article h1 {
+      margin-top: 1.5rem;
+    }
+
+    article h2 {
+      margin-top: 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 0.4rem;
+    }
+
+    article h3 {
+      margin-top: 1.5rem;
+    }
+
+    article pre {
+      background: #1e2635;
+      color: #e2e8f0;
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    article code {
+      background: #f1f5f9;
+      color: #0f4c75;
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+
+    article pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+    }
+
+    article table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1.25rem 0;
+    }
+
+    article th,
+    article td {
+      border: 1px solid #cbd5e1;
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+
+    article th {
+      background: #f1f5f9;
+      font-weight: 600;
+    }
+
+    article blockquote {
+      border-left: 4px solid var(--brand);
+      margin: 1rem 0;
+      padding: 0.5rem 1rem;
+      background: #f8fafc;
+      color: #334155;
+    }
+
+    article ul,
+    article ol {
+      line-height: 1.8;
+    }
+
+    article a {
+      color: var(--brand);
+    }
+
+    article img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .page-footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+      font-size: 0.85rem;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .page-footer a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <header style="padding: 1rem 0 0.5rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 0;">
+    <a href="../index.html"
+      style="font-weight: 700; color: var(--brand); text-decoration: none; font-size: 1.1rem;">← ARIA Framework</a>
+  </header>
+
+    <nav id="toc" aria-label="Table of contents"
+    style="margin: 1.5rem 0; padding: 1rem 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+    <strong style="display:block; margin-bottom: 0.5rem;">Contents</strong>
+    <ul>
+    <li><a href="#aria-cli">06 — ARIA CLI</a>
+    <ul>
+    <li><a href="#what-youll-do">What you’ll do</a></li>
+    <li><a href="#step-1-build-the-cli">Step 1: Build the CLI</a></li>
+    <li><a href="#step-2-initialize-configuration">Step 2: Initialize
+    configuration</a></li>
+    <li><a href="#step-3-search-for-assets">Step 3: Search for
+    assets</a></li>
+    <li><a href="#step-4-inspect-an-asset">Step 4: Inspect an
+    asset</a></li>
+    <li><a href="#step-5-audit-governance">Step 5: Audit
+    governance</a></li>
+    <li><a href="#step-6-install-to-a-target">Step 6: Install to a
+    target</a></li>
+    <li><a href="#step-7-list-installed-assets">Step 7: List installed
+    assets</a></li>
+    <li><a href="#how-the-install-targets-work">How the install targets
+    work</a></li>
+    <li><a href="#github-cli-extension">GitHub CLI extension</a></li>
+    <li><a href="#next-steps">Next Steps</a></li>
+    </ul></li>
+    </ul>
+  </nav>
+  
+  <article>
+    <h1 id="aria-cli">06 — ARIA CLI</h1>
+    <p>Discover, audit, and install ARIA-governed AI assets into your
+    development runtimes using the ARIA Package Manager.</p>
+    <h2 id="what-youll-do">What you’ll do</h2>
+    <ul>
+    <li>Initialize the aria CLI with your consumer identity and
+    registry</li>
+    <li>Search for assets by OASF skill taxonomy</li>
+    <li>Inspect an asset’s OASF Record and governance overlay</li>
+    <li>Audit governance compliance before installing</li>
+    <li>Install an MCP skill into Claude Desktop</li>
+    <li>See governance blocking an over-classified install</li>
+    </ul>
+    <h2 id="step-1-build-the-cli">Step 1: Build the CLI</h2>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> src/aria-cli</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> build</span></code></pre></div>
+    <p>Run it to see the command tree:</p>
+    <div class="sourceCode" id="cb2"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> <span class="at">--help</span></span></code></pre></div>
+    <p>Output:</p>
+    <pre><code>Description:
+  aria — ARIA Package Manager for OASF-governed AI assets
+
+Usage:
+  aria [command] [options]
+
+Commands:
+  init       Initialize aria configuration in ~/.aria/config.json
+  search     Discover AI assets by OASF skill, domain, or keyword
+  inspect    Display OASF Record and governance overlay for an asset
+  audit      Validate governance compliance before install
+  install    Pull and install an AI asset into a target runtime
+  list       List installed AI assets</code></pre>
+    <h2 id="step-2-initialize-configuration">Step 2: Initialize
+    configuration</h2>
+    <div class="sourceCode" id="cb4"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> init</span></code></pre></div>
+    <p>This creates <code>~/.aria/config.json</code> with default
+    values. Edit it to match your environment:</p>
+    <div class="sourceCode" id="cb5"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> ~/.aria/config.json <span class="kw">|</span> <span class="ex">jq</span> .</span></code></pre></div>
+    <p>The key fields:</p>
+    <div class="sourceCode" id="cb6"><pre
+    class="sourceCode json"><code class="sourceCode json"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;consumer_id&quot;</span><span class="fu">:</span> <span class="st">&quot;my-team&quot;</span><span class="fu">,</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;sensitivity_ceiling&quot;</span><span class="fu">:</span> <span class="st">&quot;confidential&quot;</span><span class="fu">,</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;registries&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;ghcr.io/my-org/aria-assets&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;targets&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;claude-desktop&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;config_path&quot;</span><span class="fu">:</span> <span class="st">&quot;~/Library/Application Support/Claude/claude_desktop_config.json&quot;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;agent-framework&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;project_path&quot;</span><span class="fu">:</span> <span class="st">&quot;./src&quot;</span><span class="fu">,</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;a2a_endpoint&quot;</span><span class="fu">:</span> <span class="st">&quot;https://agents.myorg.com&quot;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;vscode&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;workspace_path&quot;</span><span class="fu">:</span> <span class="st">&quot;./.vscode/mcp.json&quot;</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+    <p>The <code>consumer_id</code> identifies your team for allow-list
+    checks. The <code>sensitivity_ceiling</code> sets the maximum
+    classification you’re authorized to install.</p>
+    <h2 id="step-3-search-for-assets">Step 3: Search for assets</h2>
+    <div class="sourceCode" id="cb7"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Search by skill taxonomy</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> search <span class="at">--skill</span> <span class="st">&quot;knowledge_retrieval/rag&quot;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Search by domain</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> search <span class="at">--domain</span> <span class="st">&quot;human_resources&quot;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine filters</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> search <span class="at">--skill</span> <span class="st">&quot;rag&quot;</span> <span class="at">--domain</span> <span class="st">&quot;human_resources&quot;</span></span></code></pre></div>
+    <p>You’ll see a table of matching assets:</p>
+    <pre><code>┌──────────────────────────────────────────┬─────────┬───────────────┬──────┬──────────────────────────┐
+│ Name                                     │ Version │ Type          │ Skills│ Description             │
+├──────────────────────────────────────────┼─────────┼───────────────┼──────┼──────────────────────────┤
+│ xebia.com/agents/onboarding-assistant    │ 2.1.0   │ agent         │ rag  │ HR onboarding agent...  │
+│ xebia.com/skills/policy-lookup           │ 1.0.0   │ mcp_server    │ rag  │ MCP server for HR...    │
+│ xebia.com/knowledge/hr-policies          │ 3.0.0   │ knowledge_base│ rag  │ HR policy knowledge...  │
+└──────────────────────────────────────────┴─────────┴───────────────┴──────┴──────────────────────────┘</code></pre>
+    <h2 id="step-4-inspect-an-asset">Step 4: Inspect an asset</h2>
+    <p>Before installing, inspect the full OASF metadata:</p>
+    <div class="sourceCode" id="cb9"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> inspect ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0</span></code></pre></div>
+    <p>This displays two panels:</p>
+    <ul>
+    <li><strong>OASF Record</strong> — name, version, skills, domains,
+    modules, authors</li>
+    <li><strong>Governance Overlay</strong> — sensitivity tier,
+    classifications, ceiling, approval chain, allowed consumers,
+    compliance frameworks</li>
+    </ul>
+    <p>This is the governance-aware equivalent of <code>npm info</code>
+    or <code>docker inspect</code>.</p>
+    <h2 id="step-5-audit-governance">Step 5: Audit governance</h2>
+    <p>Check whether you’re authorized to install an asset:</p>
+    <div class="sourceCode" id="cb10"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This should PASS (confidential ≤ confidential)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 <span class="dt">\</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--ceiling</span> confidential</span></code></pre></div>
+    <p>Output:</p>
+    <pre><code>✓ All governance checks passed
+  Asset tier: confidential
+  Your ceiling: confidential
+  Consumer: my-team
+  Frameworks: SOC2, GDPR</code></pre>
+    <p>Now try with a ceiling that’s too low:</p>
+    <div class="sourceCode" id="cb12"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This should FAIL (confidential &gt; public)</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 <span class="dt">\</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--ceiling</span> public</span></code></pre></div>
+    <p>Output:</p>
+    <pre><code>✗ Asset sensitivity &#39;confidential&#39; exceeds your ceiling &#39;public&#39;.
+  Request elevated access from the AI Governance team.
+  Required approvals: ai-governance → hr-data-steward</code></pre>
+    <p>The CLI shows exactly what approvals you’d need to get
+    access.</p>
+    <h2 id="step-6-install-to-a-target">Step 6: Install to a target</h2>
+    <p>Install an MCP skill into Claude Desktop:</p>
+    <div class="sourceCode" id="cb14"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> install ghcr.io/xebia/aria-assets/policy-lookup-skill:1.0.0 <span class="dt">\</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--target</span> claude-desktop</span></code></pre></div>
+    <p>The install flow:</p>
+    <pre><code>aria install ghcr.io/xebia/aria-assets/policy-lookup-skill:1.0.0 → claude-desktop
+
+1. Fetching OASF metadata...
+   Asset: xebia.com/skills/policy-lookup v1.0.0
+2. Validating governance...
+   ✓ Sensitivity: internal ≤ confidential
+   ✓ Consumer &#39;my-team&#39; is authorized
+3. Pulling OCI artifact...
+   Cached to: ~/.aria/cache/xebia.com-skills-policy-lookup
+4. Installing to claude-desktop...
+   Registering MCP server &#39;policy-lookup&#39; in Claude Desktop
+     Transport: stdio
+     Tools: lookup_policy, list_policies
+   Config: ~/Library/Application Support/Claude/claude_desktop_config.json
+
+✓ Successfully installed xebia.com/skills/policy-lookup v1.0.0 → claude-desktop</code></pre>
+    <p>For Agent Framework:</p>
+    <div class="sourceCode" id="cb16"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> install ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 <span class="dt">\</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--target</span> agent-framework</span></code></pre></div>
+    <p>This registers the agent as a remote A2A endpoint instead of
+    modifying a Claude Desktop config file.</p>
+    <h2 id="step-7-list-installed-assets">Step 7: List installed
+    assets</h2>
+    <div class="sourceCode" id="cb17"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> list</span></code></pre></div>
+    <p>Shows all installed assets with their governance metadata:</p>
+    <pre><code>┌─────────────────────────────────┬─────────┬────────────┬─────────────────┬──────────────┬────────────┐
+│ Name                            │ Version │ Type       │ Target          │ Sensitivity  │ Installed  │
+├─────────────────────────────────┼─────────┼────────────┼─────────────────┼──────────────┼────────────┤
+│ xebia.com/skills/policy-lookup  │ 1.0.0   │ mcp_server │ claude-desktop  │ internal     │ 2026-05-01 │
+└─────────────────────────────────┴─────────┴────────────┴─────────────────┴──────────────┴────────────┘</code></pre>
+    <h2 id="how-the-install-targets-work">How the install targets
+    work</h2>
+    <p>The CLI uses pluggable adapters for different runtimes:</p>
+    <table>
+    <colgroup>
+    <col style="width: 38%" />
+    <col style="width: 61%" />
+    </colgroup>
+    <thead>
+    <tr class="header">
+    <th>Target</th>
+    <th>What it does</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr class="odd">
+    <td><strong>claude-desktop</strong></td>
+    <td>Reads the OASF module descriptor, generates a
+    <code>claude_desktop_config.json</code> entry with command, args,
+    and transport, then writes it to the Claude Desktop config path</td>
+    </tr>
+    <tr class="even">
+    <td><strong>vscode</strong></td>
+    <td>Similar to Claude Desktop but targets
+    <code>.vscode/mcp.json</code> in the workspace</td>
+    </tr>
+    <tr class="odd">
+    <td><strong>agent-framework</strong></td>
+    <td>For MCP modules, registers as a tool provider. For agent
+    Records, registers as a remote A2A endpoint using the
+    <code>a2a_endpoint</code> from config</td>
+    </tr>
+    </tbody>
+    </table>
+    <p>Adding a new target is straightforward — implement
+    <code>IInstallTarget</code> with a <code>Name</code> and
+    <code>InstallAsync</code> method, then register it in
+    <code>TargetRegistry</code>.</p>
+    <h2 id="github-cli-extension">GitHub CLI extension</h2>
+    <p>For teams standardized on <code>gh</code>, the same commands are
+    available as:</p>
+    <div class="sourceCode" id="cb19"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> extension install xebia/gh-aria</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> aria search <span class="at">--skill</span> <span class="st">&quot;knowledge_retrieval/rag&quot;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> aria install xebia/aria-policy-lookup-skill <span class="at">--target</span> claude-desktop</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> aria audit <span class="at">--pr</span> 42 <span class="at">--ceiling</span> confidential</span></code></pre></div>
+    <p>The <code>--pr</code> flag on audit is particularly useful during
+    code review — it validates the governance overlay in a pull request
+    before approval.</p>
+    <h2 id="next-steps">Next Steps</h2>
+    <p>→ <a href="./07-demo-script.md">07 — Conference Demo
+    Script</a></p>
+  </article>
+
+  <footer class="page-footer">
+    <span>ARIA Framework — Asset Registry for Intelligent Agents</span>
+    <a href="../index.html">Back to home</a>
+  </footer>
+</body>
+
+</html>

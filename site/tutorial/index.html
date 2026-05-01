@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ARIA Framework</title>
+  <meta name="description" content="ARIA: Asset Registry for Intelligent Agents.">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    body { max-width: 860px; margin: 0 auto; padding: 0 1.5rem 3rem; }
+    nav.breadcrumb { padding: 1rem 0 0; font-size: 0.85rem; }
+    nav.breadcrumb a { color: var(--brand); text-decoration: none; }
+    nav.breadcrumb a:hover { text-decoration: underline; }
+    nav.breadcrumb span { color: #666; }
+    article h1 { margin-top: 1.5rem; }
+    article h2 { margin-top: 2rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.4rem; }
+    article h3 { margin-top: 1.5rem; }
+    article pre { background: #1e2635; color: #e2e8f0; padding: 1rem 1.25rem; border-radius: 6px; overflow-x: auto; font-size: 0.88rem; line-height: 1.6; }
+    article code { background: #f1f5f9; color: #0f4c75; padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.9em; }
+    article pre code { background: none; color: inherit; padding: 0; }
+    article table { border-collapse: collapse; width: 100%; margin: 1.25rem 0; }
+    article th, article td { border: 1px solid #cbd5e1; padding: 0.5rem 0.75rem; text-align: left; }
+    article th { background: #f1f5f9; font-weight: 600; }
+    article blockquote { border-left: 4px solid var(--brand); margin: 1rem 0; padding: 0.5rem 1rem; background: #f8fafc; color: #334155; }
+    article ul, article ol { line-height: 1.8; }
+    article a { color: var(--brand); }
+    article img { max-width: 100%; height: auto; }
+    .page-footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: #666; display: flex; justify-content: space-between; gap: 1rem; }
+    .page-footer a { color: var(--brand); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <header style="padding: 1rem 0 0.5rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 0;">
+    <a href="../index.html" style="font-weight: 700; color: var(--brand); text-decoration: none; font-size: 1.1rem;">← ARIA Framework</a>
+  </header>
+
+  
+  <article>
+    <h1 id="aria-tutorial">ARIA Tutorial</h1>
+    <p>Step-by-step guide to understanding, deploying, and using the
+    ARIA framework.</p>
+    <h2 id="contents">Contents</h2>
+    <table style="width:100%;">
+    <colgroup>
+    <col style="width: 29%" />
+    <col style="width: 48%" />
+    <col style="width: 22%" />
+    </colgroup>
+    <thead>
+    <tr class="header">
+    <th>Module</th>
+    <th>Description</th>
+    <th>Time</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr class="odd">
+    <td><a href="./01-concepts.md">01 — Concepts</a></td>
+    <td>ARIA metamodel, entity types, OASF classification</td>
+    <td>15 min</td>
+    </tr>
+    <tr class="even">
+    <td><a href="./02-marketplace-setup.md">02 — Marketplace
+    setup</a></td>
+    <td>Deploy Terraform infrastructure (GitHub + Azure)</td>
+    <td>30 min</td>
+    </tr>
+    <tr class="odd">
+    <td><a href="./03-first-asset.md">03 — Your first asset</a></td>
+    <td>Create, govern, and publish an OASF-governed skill</td>
+    <td>20 min</td>
+    </tr>
+    <tr class="even">
+    <td><a href="./04-purview-integration.md">04 — Purview
+    integration</a></td>
+    <td>Configure sensitivity labels and DLP enforcement</td>
+    <td>20 min</td>
+    </tr>
+    <tr class="odd">
+    <td><a href="./05-sample-agent.md">05 — Sample agent</a></td>
+    <td>Run the onboarding assistant with governance middleware</td>
+    <td>15 min</td>
+    </tr>
+    <tr class="even">
+    <td><a href="./06-aria-cli.md">06 — ARIA CLI</a></td>
+    <td>Discover, audit, and install assets into runtimes</td>
+    <td>15 min</td>
+    </tr>
+    <tr class="odd">
+    <td><a href="./07-demo-script.md">07 — Conference demo</a></td>
+    <td>Live demo script for conference presentation</td>
+    <td>10 min</td>
+    </tr>
+    </tbody>
+    </table>
+    <h2 id="prerequisites">Prerequisites</h2>
+    <ul>
+    <li>Docker Desktop (for devcontainer) or manual install of Pandoc,
+    Marp, .NET 9, Terraform</li>
+    <li>Azure subscription with Contributor access</li>
+    <li>GitHub organization with admin access</li>
+    <li>GitHub PAT with <code>admin:org</code>, <code>repo</code>,
+    <code>workflow</code> scopes</li>
+    </ul>
+    <h2 id="quick-start">Quick Start</h2>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone and open in VS Code with devcontainer</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/xebia/aria.git</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> aria</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">code</span> .</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># VS Code will prompt to reopen in devcontainer</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Build everything</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> all</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Or build individually</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> docs      <span class="co"># PDF + DOCX reference architecture</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> slides    <span class="co"># PPTX + PDF + HTML slide deck</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> build     <span class="co"># .NET sample agent + ARIA CLI</span></span></code></pre></div>
+  </article>
+
+  <footer class="page-footer">
+    <span>ARIA Framework — Asset Registry for Intelligent Agents</span>
+    <a href="../index.html">Back to home</a>
+  </footer>
+</body>
+</html>

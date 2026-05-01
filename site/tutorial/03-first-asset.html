@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>first asset — ARIA Framework</title>
+  <meta name="description" content="ARIA: Asset Registry for Intelligent Agents.">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 1.5rem 3rem;
+    }
+
+    nav.breadcrumb {
+      padding: 1rem 0 0;
+      font-size: 0.85rem;
+    }
+
+    nav.breadcrumb a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    nav.breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    nav.breadcrumb span {
+      color: #666;
+    }
+
+    article h1 {
+      margin-top: 1.5rem;
+    }
+
+    article h2 {
+      margin-top: 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 0.4rem;
+    }
+
+    article h3 {
+      margin-top: 1.5rem;
+    }
+
+    article pre {
+      background: #1e2635;
+      color: #e2e8f0;
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    article code {
+      background: #f1f5f9;
+      color: #0f4c75;
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+
+    article pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+    }
+
+    article table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1.25rem 0;
+    }
+
+    article th,
+    article td {
+      border: 1px solid #cbd5e1;
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+
+    article th {
+      background: #f1f5f9;
+      font-weight: 600;
+    }
+
+    article blockquote {
+      border-left: 4px solid var(--brand);
+      margin: 1rem 0;
+      padding: 0.5rem 1rem;
+      background: #f8fafc;
+      color: #334155;
+    }
+
+    article ul,
+    article ol {
+      line-height: 1.8;
+    }
+
+    article a {
+      color: var(--brand);
+    }
+
+    article img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .page-footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+      font-size: 0.85rem;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .page-footer a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <header style="padding: 1rem 0 0.5rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 0;">
+    <a href="../index.html"
+      style="font-weight: 700; color: var(--brand); text-decoration: none; font-size: 1.1rem;">← ARIA Framework</a>
+  </header>
+
+    <nav id="toc" aria-label="Table of contents"
+    style="margin: 1.5rem 0; padding: 1rem 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+    <strong style="display:block; margin-bottom: 0.5rem;">Contents</strong>
+    <ul>
+    <li><a href="#your-first-asset">03 — Your First Asset</a>
+    <ul>
+    <li><a href="#what-youll-build">What you’ll build</a></li>
+    <li><a href="#step-1-create-a-new-repo-from-the-template">Step 1:
+    Create a new repo from the template</a></li>
+    <li><a href="#step-2-define-the-oasf-record">Step 2: Define the OASF
+    Record</a></li>
+    <li><a href="#step-3-define-the-governance-overlay">Step 3: Define
+    the governance overlay</a></li>
+    <li><a href="#step-4-implement-the-skill">Step 4: Implement the
+    skill</a></li>
+    <li><a href="#step-5-submit-a-pr">Step 5: Submit a PR</a></li>
+    <li><a href="#step-6-watch-the-validation-workflow">Step 6: Watch
+    the validation workflow</a></li>
+    <li><a href="#step-7-merge-and-publish">Step 7: Merge and
+    publish</a></li>
+    <li><a href="#step-8-verify-publication">Step 8: Verify
+    publication</a></li>
+    <li><a href="#what-just-happened">What just happened</a></li>
+    <li><a href="#next-steps">Next Steps</a></li>
+    </ul></li>
+    </ul>
+  </nav>
+  
+  <article>
+    <h1 id="your-first-asset">03 — Your First Asset</h1>
+    <p>Create, govern, and publish an OASF-governed MCP skill from
+    scratch.</p>
+    <h2 id="what-youll-build">What you’ll build</h2>
+    <p>An MCP server skill called <code>policy-lookup</code> that
+    provides HR policy Q&amp;A capabilities. You’ll write the OASF
+    Record, governance overlay, submit a PR, watch the validation
+    workflow pass, and see it published as an OCI artifact.</p>
+    <h2 id="step-1-create-a-new-repo-from-the-template">Step 1: Create a
+    new repo from the template</h2>
+    <p>In your GitHub org, click “Use this template” on
+    <code>aria-asset-template</code>, or use the CLI:</p>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> repo create your-org/aria-policy-lookup-skill <span class="dt">\</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--template</span> your-org/aria-asset-template <span class="dt">\</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--private</span> <span class="dt">\</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--clone</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> aria-policy-lookup-skill</span></code></pre></div>
+    <h2 id="step-2-define-the-oasf-record">Step 2: Define the OASF
+    Record</h2>
+    <p>Edit <code>oasf-record.json</code> to describe your skill:</p>
+    <div class="sourceCode" id="cb2"><pre
+    class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;your-org.com/skills/policy-lookup&quot;</span><span class="fu">,</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;version&quot;</span><span class="fu">:</span> <span class="st">&quot;1.0.0&quot;</span><span class="fu">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;schema_version&quot;</span><span class="fu">:</span> <span class="st">&quot;1.0.0&quot;</span><span class="fu">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;MCP server providing HR policy knowledge base lookup&quot;</span><span class="fu">,</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;skills&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span> <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="dv">30101</span><span class="fu">,</span> <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;knowledge_retrieval/rag&quot;</span> <span class="fu">}</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;domains&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span> <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;human_resources&quot;</span> <span class="fu">}</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;modules&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;mcp_server&quot;</span><span class="fu">,</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;transport&quot;</span><span class="fu">:</span> <span class="st">&quot;stdio&quot;</span><span class="fu">,</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;tools&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;lookup_policy&quot;</span><span class="ot">,</span> <span class="st">&quot;list_policies&quot;</span><span class="ot">]</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;locators&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;source_code&quot;</span><span class="fu">,</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;urls&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;https://github.com/your-org/aria-policy-lookup-skill&quot;</span><span class="ot">]</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;authors&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;Your Name &lt;you@your-org.com&gt;&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;created_at&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-05-01T00:00:00Z&quot;</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+    <p>Key decisions:</p>
+    <ul>
+    <li><strong>skills</strong>: We declare
+    <code>knowledge_retrieval/rag</code> (ID 30101) from the OASF skill
+    taxonomy. This makes the skill discoverable via
+    <code>aria search --skill rag</code>.</li>
+    <li><strong>modules</strong>: The <code>mcp_server</code> type with
+    <code>transport: "stdio"</code> tells the <code>aria install</code>
+    command how to wire this into Claude Desktop or VS Code.</li>
+    <li><strong>tools</strong>: Listing the tool names allows consumers
+    to understand what capabilities they’re getting before
+    installing.</li>
+    </ul>
+    <h2 id="step-3-define-the-governance-overlay">Step 3: Define the
+    governance overlay</h2>
+    <p>Edit <code>oasf-governance.json</code>:</p>
+    <div class="sourceCode" id="cb3"><pre
+    class="sourceCode json"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;governance&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;sensitivity_tier&quot;</span><span class="fu">:</span> <span class="st">&quot;internal&quot;</span><span class="fu">,</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;data_classifications&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;purview_label_id&quot;</span><span class="fu">:</span> <span class="st">&quot;&quot;</span><span class="fu">,</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;approval_chain&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;ai-governance&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;allowed_consumers&quot;</span><span class="fu">:</span> <span class="ot">[]</span><span class="fu">,</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;max_data_retention_days&quot;</span><span class="fu">:</span> <span class="dv">90</span><span class="fu">,</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;audit_level&quot;</span><span class="fu">:</span> <span class="st">&quot;standard&quot;</span><span class="fu">,</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;dependency_sensitivity_ceiling&quot;</span><span class="fu">:</span> <span class="st">&quot;confidential&quot;</span><span class="fu">,</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;compliance_frameworks&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;SOC2&quot;</span><span class="ot">]</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+    <p>Key decisions:</p>
+    <ul>
+    <li><strong>sensitivity_tier</strong>: <code>"internal"</code> —
+    this skill accesses non-public but non-sensitive policy documents.
+    No PII, no PHI.</li>
+    <li><strong>allowed_consumers</strong>: Empty array means open
+    access — any team can use it.</li>
+    <li><strong>dependency_sensitivity_ceiling</strong>:
+    <code>"confidential"</code> — this skill is allowed to be consumed
+    by agents up to confidential classification.</li>
+    <li><strong>compliance_frameworks</strong>: <code>["SOC2"]</code> —
+    tags this asset for SOC 2 audit scope.</li>
+    </ul>
+    <h2 id="step-4-implement-the-skill">Step 4: Implement the skill</h2>
+    <p>Add your MCP server implementation in <code>src/</code>. For this
+    tutorial, create a minimal Node.js MCP server:</p>
+    <div class="sourceCode" id="cb4"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> src</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&gt;</span> src/server.js <span class="op">&lt;&lt; &#39;EOF&#39;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">#!/usr/bin/env node</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="st">// Minimal MCP server for policy lookup</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="st">// In production, this would connect to a real knowledge base</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="st">const policies = {</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="st">  pto_policy: &quot;Employees accrue 15 days PTO per year.&quot;,</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="st">  benefits_overview: &quot;Full-time employees are eligible for medical, dental, and vision.&quot;,</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="st">  remote_work: &quot;Hybrid work requires 3 days in-office per week.&quot;</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="st">};</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="st">process.stdin.setEncoding(&#39;utf8&#39;);</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="st">process.stdin.on(&#39;data&#39;, (data) =&gt; {</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="st">  const request = JSON.parse(data);</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="st">  if (request.method === &#39;tools/call&#39; &amp;&amp; request.params.name === &#39;lookup_policy&#39;) {</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="st">    const topic = request.params.arguments.topic;</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="st">    const content = policies[topic] || `No policy found for &quot;${topic}&quot;`;</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="st">    process.stdout.write(JSON.stringify({</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="st">      jsonrpc: &quot;2.0&quot;,</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="st">      id: request.id,</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="st">      result: { content: [{ type: &quot;text&quot;, text: content }] }</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="st">    }) + &#39;\n&#39;);</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="st">});</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x src/server.js</span></code></pre></div>
+    <h2 id="step-5-submit-a-pr">Step 5: Submit a PR</h2>
+    <div class="sourceCode" id="cb5"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout <span class="at">-b</span> feature/initial-asset</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add .</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;feat: initial OASF-governed policy lookup skill&quot;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push <span class="at">-u</span> origin feature/initial-asset</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> pr create <span class="at">--title</span> <span class="st">&quot;feat: policy-lookup skill v1.0.0&quot;</span> <span class="dt">\</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--body</span> <span class="st">&quot;Initial OASF-governed MCP server for HR policy Q&amp;A&quot;</span></span></code></pre></div>
+    <h2 id="step-6-watch-the-validation-workflow">Step 6: Watch the
+    validation workflow</h2>
+    <p>Open the PR in GitHub. The <code>OASF Validate</code> workflow
+    will trigger automatically. It runs three checks:</p>
+    <ol type="1">
+    <li><p><strong>Schema validation</strong> — verifies
+    <code>oasf-record.json</code> has all required fields
+    (<code>name</code>, <code>version</code>,
+    <code>schema_version</code>, <code>skills</code>,
+    <code>locators</code>, <code>authors</code>)</p></li>
+    <li><p><strong>Governance overlay validation</strong> — verifies
+    <code>oasf-governance.json</code> has required governance fields and
+    the <code>sensitivity_tier</code> is a valid value</p></li>
+    <li><p><strong>Sensitivity ceiling check</strong> — verifies the
+    asset’s sensitivity tier doesn’t exceed its own declared
+    ceiling</p></li>
+    </ol>
+    <p>If all checks pass, you’ll see a green checkmark. The PR now
+    requires CODEOWNERS review from the <code>ai-governance</code> team
+    (for the governance overlay) and
+    <code>ai-platform-engineering</code> (for the OASF record).</p>
+    <h2 id="step-7-merge-and-publish">Step 7: Merge and publish</h2>
+    <p>Once approved, merge the PR. This triggers two more
+    workflows:</p>
+    <ol type="1">
+    <li><p><strong>Publish OCI Artifact</strong> — builds a Docker image
+    containing the OASF record, governance overlay, and source code,
+    then pushes it to your Azure Container Registry with a version tag
+    and <code>latest</code>.</p></li>
+    <li><p><strong>Purview Sync</strong> — reads the governance overlay,
+    applies the Purview sensitivity label, updates the Data Map with a
+    new AI asset entity, and creates lineage edges for any module
+    refs.</p></li>
+    </ol>
+    <h2 id="step-8-verify-publication">Step 8: Verify publication</h2>
+    <div class="sourceCode" id="cb6"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check ACR for the artifact</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">az</span> acr repository list <span class="at">--name</span> acrariadevaoasf <span class="at">-o</span> table</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the specific tag</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">az</span> acr repository show-tags <span class="at">--name</span> acrariadevaoasf <span class="dt">\</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--repository</span> aria-assets/your-org.com-skills-policy-lookup <span class="at">-o</span> table</span></code></pre></div>
+    <p>You should see tag <code>1.0.0</code> and
+    <code>latest</code>.</p>
+    <h2 id="what-just-happened">What just happened</h2>
+    <p>You created a governed AI asset that:</p>
+    <ul>
+    <li>Has a machine-readable OASF Record declaring its
+    capabilities</li>
+    <li>Has a governance overlay declaring its sensitivity and
+    compliance posture</li>
+    <li>Was validated against the OASF schema before it could be
+    merged</li>
+    <li>Required approval from the governance team</li>
+    <li>Was published as a content-addressed OCI artifact</li>
+    <li>Was registered in Microsoft Purview’s Data Map</li>
+    <li>Can be discovered via
+    <code>aria search --skill "knowledge_retrieval/rag"</code></li>
+    <li>Can be installed into Claude Desktop via
+    <code>aria install ... --target claude-desktop</code></li>
+    </ul>
+    <p>This is one asset. The power of ARIA is that every AI asset in
+    the enterprise follows this same pattern — creating a governed,
+    discoverable, composable ecosystem.</p>
+    <h2 id="next-steps">Next Steps</h2>
+    <p>→ <a href="./04-purview-integration.md">04 — Purview
+    Integration</a></p>
+  </article>
+
+  <footer class="page-footer">
+    <span>ARIA Framework — Asset Registry for Intelligent Agents</span>
+    <a href="../index.html">Back to home</a>
+  </footer>
+</body>
+
+</html>

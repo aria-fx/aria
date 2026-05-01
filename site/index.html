@@ -18,7 +18,8 @@
       assets.</p>
     <div class="cta-row">
       <a class="btn btn-primary" href="https://github.com/jgarverick/aria-framework">View Repository</a>
-      <a class="btn" href="https://github.com/jgarverick/aria-framework/blob/main/README.md">Read Docs</a>
+      <a class="btn" href="docs/architecture.html">Reference Architecture</a>
+      <a class="btn" href="tutorial/index.html">Tutorial</a>
     </div>
   </header>
 
@@ -51,13 +52,37 @@
     </section>
 
     <section>
-      <h2>Project Assets</h2>
+      <h2>Documentation</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>Reference Architecture</h3>
+          <p>Full architectural overview: metamodel, marketplace, governance layers, and capability model.</p>
+          <a class="btn btn-sm" href="docs/architecture.html">Read document</a>
+        </article>
+        <article class="card">
+          <h3>Hands-on Tutorial</h3>
+          <p>Seven-module guide from core concepts through live demo — deploy, govern, and use ARIA end-to-end.</p>
+          <a class="btn btn-sm" href="tutorial/index.html">Start tutorial</a>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Tutorial Modules</h2>
+      <ol class="links">
+        <li><a href="tutorial/01-concepts.html">Concepts — ARIA metamodel and OASF classification</a></li>
+        <li><a href="tutorial/02-marketplace-setup.html">Marketplace setup — Terraform infrastructure</a></li>
+        <li><a href="tutorial/03-first-asset.html">Your first asset — create, govern, and publish</a></li>
+        <li><a href="tutorial/04-purview-integration.html">Purview integration — sensitivity labels and DLP</a></li>
+        <li><a href="tutorial/05-sample-agent.html">Sample agent — onboarding assistant with governance</a></li>
+        <li><a href="tutorial/06-aria-cli.html">ARIA CLI — discover, audit, and install assets</a></li>
+        <li><a href="tutorial/07-demo-script.html">Conference demo script</a></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Source Code</h2>
       <ul class="links">
-        <li><a
-            href="https://github.com/jgarverick/aria-framework/blob/main/docs/architecture/aria-reference-architecture.md">Reference
-            architecture document</a></li>
-        <li><a href="https://github.com/jgarverick/aria-framework/blob/main/docs/slides/aria-deck.md">Conference slide
-            deck source</a></li>
         <li><a href="https://github.com/jgarverick/aria-framework/tree/main/src/sample-agent">Sample agent
             implementation</a></li>
         <li><a href="https://github.com/jgarverick/aria-framework/tree/main/src/aria-cli">ARIA CLI prototype</a></li>

@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>demo script — ARIA Framework</title>
+  <meta name="description" content="ARIA: Asset Registry for Intelligent Agents.">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 1.5rem 3rem;
+    }
+
+    nav.breadcrumb {
+      padding: 1rem 0 0;
+      font-size: 0.85rem;
+    }
+
+    nav.breadcrumb a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    nav.breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    nav.breadcrumb span {
+      color: #666;
+    }
+
+    article h1 {
+      margin-top: 1.5rem;
+    }
+
+    article h2 {
+      margin-top: 2rem;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 0.4rem;
+    }
+
+    article h3 {
+      margin-top: 1.5rem;
+    }
+
+    article pre {
+      background: #1e2635;
+      color: #e2e8f0;
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    article code {
+      background: #f1f5f9;
+      color: #0f4c75;
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+
+    article pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+    }
+
+    article table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1.25rem 0;
+    }
+
+    article th,
+    article td {
+      border: 1px solid #cbd5e1;
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+
+    article th {
+      background: #f1f5f9;
+      font-weight: 600;
+    }
+
+    article blockquote {
+      border-left: 4px solid var(--brand);
+      margin: 1rem 0;
+      padding: 0.5rem 1rem;
+      background: #f8fafc;
+      color: #334155;
+    }
+
+    article ul,
+    article ol {
+      line-height: 1.8;
+    }
+
+    article a {
+      color: var(--brand);
+    }
+
+    article img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .page-footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+      font-size: 0.85rem;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .page-footer a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <header style="padding: 1rem 0 0.5rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 0;">
+    <a href="../index.html"
+      style="font-weight: 700; color: var(--brand); text-decoration: none; font-size: 1.1rem;">← ARIA Framework</a>
+  </header>
+
+    <nav id="toc" aria-label="Table of contents"
+    style="margin: 1.5rem 0; padding: 1rem 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+    <strong style="display:block; margin-bottom: 0.5rem;">Contents</strong>
+    <ul>
+    <li><a href="#conference-demo-script">07 — Conference Demo
+    Script</a>
+    <ul>
+    <li><a href="#setup-before-going-on-stage">Setup (before going on
+    stage)</a></li>
+    <li><a href="#demo-flow">Demo Flow</a>
+    <ul>
+    <li><a href="#act-1-the-problem-2-min">Act 1: “The problem” (2
+    min)</a></li>
+    <li><a href="#act-2-the-marketplace-3-min">Act 2: “The marketplace”
+    (3 min)</a></li>
+    <li><a href="#act-3-the-package-manager-3-min">Act 3: “The package
+    manager” (3 min)</a></li>
+    <li><a href="#act-4-governance-in-action-2-min">Act 4: “Governance
+    in action” (2 min)</a></li>
+    </ul></li>
+    <li><a href="#key-lines-to-deliver">Key Lines to Deliver</a></li>
+    </ul></li>
+    </ul>
+  </nav>
+  
+  <article>
+    <h1 id="conference-demo-script">07 — Conference Demo Script</h1>
+    <p>A 10-minute live demo sequence for the ARIA conference talk.</p>
+    <h2 id="setup-before-going-on-stage">Setup (before going on
+    stage)</h2>
+    <div class="sourceCode" id="cb1"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure devcontainer is running with all tools</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> clean <span class="kw">&amp;&amp;</span> <span class="fu">make</span> all</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Pre-warm the .NET builds</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> build src/sample-agent/Oasf.Sample.sln <span class="at">-v</span> quiet</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> build src/aria-cli/Aria.Cli.csproj <span class="at">-v</span> quiet</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Open VS Code with the repo</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">code</span> .</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Have these terminals ready:</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Terminal 1: aria CLI demo</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Terminal 2: sample agent demo</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Terminal 3: Marp preview (optional)</span></span></code></pre></div>
+    <h2 id="demo-flow">Demo Flow</h2>
+    <h3 id="act-1-the-problem-2-min">Act 1: “The problem” (2 min)</h3>
+    <p><strong>Talking point:</strong> “Every enterprise I work with has
+    agents, MCP servers, prompt libraries, and RAG pipelines scattered
+    across teams with no inventory, no governance, and no way to
+    discover what already exists.”</p>
+    <p><strong>Show:</strong> The OASF Record and governance overlay
+    files side by side.</p>
+    <div class="sourceCode" id="cb2"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show what an AI asset looks like in ARIA</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> src/sample-agent/Oasf.Sample.Agent/oasf-record.json <span class="kw">|</span> <span class="ex">jq</span> .</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> src/sample-agent/Oasf.Sample.Agent/oasf-governance.json <span class="kw">|</span> <span class="ex">jq</span> .</span></code></pre></div>
+    <h3 id="act-2-the-marketplace-3-min">Act 2: “The marketplace” (3
+    min)</h3>
+    <p><strong>Talking point:</strong> “ARIA uses GitHub as the
+    marketplace. Every AI asset gets an OASF manifest, a governance
+    overlay, and three GitHub Actions workflows that enforce policy on
+    every PR.”</p>
+    <p><strong>Show:</strong> The template repo structure and the CI/CD
+    pipeline.</p>
+    <div class="sourceCode" id="cb3"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the repo structure</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">tree</span> src/terraform/workflows/</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the validation workflow</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> src/terraform/workflows/oasf-validate.yml</span></code></pre></div>
+    <h3 id="act-3-the-package-manager-3-min">Act 3: “The package
+    manager” (3 min)</h3>
+    <p><strong>Talking point:</strong> “Once assets are in the registry,
+    teams need to consume them. The aria CLI bridges the marketplace to
+    your runtime.”</p>
+    <div class="sourceCode" id="cb4"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Search for skills</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> search <span class="at">--skill</span> <span class="st">&quot;knowledge_retrieval/rag&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect an asset before installing</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> inspect ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Audit governance — this one passes</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 <span class="at">--ceiling</span> confidential</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Audit governance — this one FAILS (ceiling too low)</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 <span class="at">--ceiling</span> public</span></code></pre></div>
+    <h3 id="act-4-governance-in-action-2-min">Act 4: “Governance in
+    action” (2 min)</h3>
+    <p><strong>Talking point:</strong> “The governance isn’t just CI/CD
+    — it runs at runtime too. Watch what happens when the agent tries to
+    access data above its ceiling.”</p>
+    <div class="sourceCode" id="cb5"><pre
+    class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the sample agent</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/sample-agent/Oasf.Sample.Agent</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># In the agent prompt, try:</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># &quot;What is the PTO policy?&quot;          → Works (internal ≤ confidential ceiling)</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># &quot;Show me the compensation bands&quot;   → Works (confidential = ceiling)</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># &quot;Show me employee SSN records&quot;     → BLOCKED (restricted &gt; confidential ceiling)</span></span></code></pre></div>
+    <h2 id="key-lines-to-deliver">Key Lines to Deliver</h2>
+    <ul>
+    <li>“ARIA is TOGAF for AI assets — a metamodel, a marketplace, and a
+    governance layer.”</li>
+    <li>“The OASF Record and governance overlay travel with the asset —
+    in every PR, in every OCI artifact, in every runtime.”</li>
+    <li>“Governance is a natural consequence of building, not an
+    afterthought.”</li>
+    <li>“The sensitivity ceiling check that runs in CI is the same check
+    that runs at runtime in the agent middleware. One rule, enforced
+    everywhere.”</li>
+    </ul>
+  </article>
+
+  <footer class="page-footer">
+    <span>ARIA Framework — Asset Registry for Intelligent Agents</span>
+    <a href="../index.html">Back to home</a>
+  </footer>
+</body>
+
+</html>

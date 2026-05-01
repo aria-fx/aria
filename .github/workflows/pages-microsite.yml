@@ -21,10 +21,55 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install pandoc
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y pandoc
+
       - name: Validate microsite files
         run: |
           test -f site/index.html
           test -f site/styles.css
+          test -f site/template.html
+
+      - name: Build docs pages
+        run: |
+          mkdir -p site/docs
+          pandoc docs/architecture/aria-reference-architecture.md \
+            --from markdown --to html5 \
+            --standalone \
+            --template site/template.html \
+            --variable root=../ \
+            --toc --toc-depth=3 \
+            --output site/docs/architecture.html
+
+      - name: Build tutorial pages
+        run: |
+          mkdir -p site/tutorial
+          # Index page
+          pandoc tutorial/README.md \
+            --from markdown --to html5 \
+            --standalone \
+            --template site/template.html \
+            --variable root=../ \
+            --metadata title="Tutorial" \
+            --output site/tutorial/index.html
+          # Individual modules
+          for f in tutorial/01-concepts.md tutorial/02-marketplace-setup.md \
+                   tutorial/03-first-asset.md tutorial/04-purview-integration.md \
+                   tutorial/05-sample-agent.md tutorial/06-aria-cli.md \
+                   tutorial/07-demo-script.md; do
+            name=$(basename "$f" .md)
+            title=$(echo "$name" | sed 's/^[0-9]*-//' | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
+            pandoc "$f" \
+              --from markdown --to html5 \
+              --standalone \
+              --template site/template.html \
+              --variable root=../ \
+              --metadata title="$title" \
+              --toc \
+              --output "site/tutorial/${name}.html"
+          done
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
