@@ -8,7 +8,10 @@
   --line: #d9dfd8;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: "Source Sans 3", "Segoe UI", sans-serif;
@@ -47,7 +50,11 @@ h1 {
   font-size: 1.12rem;
 }
 
-.cta-row { display: flex; gap: .75rem; flex-wrap: wrap; }
+.cta-row {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
 
 .btn {
   display: inline-block;
@@ -99,8 +106,14 @@ h2 {
   background: #fbfcfa;
 }
 
-.card h3 { margin: 0 0 .35rem; }
-.card p { margin: 0; color: var(--muted); }
+.card h3 {
+  margin: 0 0 .35rem;
+}
+
+.card p {
+  margin: 0;
+  color: var(--muted);
+}
 
 .links a {
   color: var(--brand-ink);
@@ -114,5 +127,7 @@ footer {
 }
 
 @media (max-width: 600px) {
-  .hero { padding-top: 3.5rem; }
+  .hero {
+    padding-top: 3.5rem;
+  }
 }

@@ -131,12 +131,12 @@ demo script with exact commands and talking points.
 
 ## The ARIA Framework
 
-| Layer | Function | Implementation |
-|-------|----------|----------------|
-| **Metamodel** | Entity types, relationships, lifecycle states | OASF Records, Skills, Domains, Modules |
-| **Marketplace** | Publish, discover, version, compose | GitHub repos + OCI registry + OASF manifests |
-| **Governance** | Classify, label, enforce, audit | Microsoft Purview + OASF governance overlay |
-| **Consumption** | Install, wire, validate at runtime | ARIA Package Manager (`aria`) CLI |
+| Layer           | Function                                      | Implementation                               |
+| --------------- | --------------------------------------------- | -------------------------------------------- |
+| **Metamodel**   | Entity types, relationships, lifecycle states | OASF Records, Skills, Domains, Modules       |
+| **Marketplace** | Publish, discover, version, compose           | GitHub repos + OCI registry + OASF manifests |
+| **Governance**  | Classify, label, enforce, audit               | Microsoft Purview + OASF governance overlay  |
+| **Consumption** | Install, wire, validate at runtime            | ARIA Package Manager (`aria`) CLI            |
 
 ## License
 
