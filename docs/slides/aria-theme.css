@@ -1,0 +1,61 @@
+/* @theme aria */
+@import 'default';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+:root {
+  --purple: #6B21A8;
+  --purple-light: #EEEDFE;
+  --dark: #1E1B2E;
+  --mid: #D1D5DB;
+  --accent: #0891B2;
+  --teal: #0D9488;
+  --coral: #F97316;
+  --white: #FFFFFF;
+  --light-bg: #F4F0FA;
+}
+
+section {
+  font-family: 'Inter', 'Calibri', sans-serif;
+  background: var(--white);
+  color: #4A4458;
+  padding: 40px 60px;
+}
+
+section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--purple);
+}
+
+h1 { color: var(--dark); font-weight: 700; }
+h2 { color: var(--accent); font-weight: 400; }
+h3 { color: var(--purple); font-weight: 600; font-size: 1.1em; }
+strong { color: var(--dark); }
+em { color: var(--accent); font-style: italic; }
+
+code {
+  background: rgba(107, 33, 168, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+th {
+  background: var(--purple);
+  color: white;
+  padding: 8px 12px;
+}
+
+td {
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+section.dark {
+  background: var(--dark);
+  color: var(--mid);
+}
+
+section.dark h1 { color: var(--white); }
+section.dark strong { color: var(--white); }

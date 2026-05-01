@@ -1,0 +1,42 @@
+# Build output
+out/
+bin/
+obj/
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+*.tfplan
+
+# .NET
+*.user
+*.suo
+*.vs/
+
+# Node
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+*.env
+.env.*
+!.env.example
+
+# ARIA cache
+.aria/
+
+# Transient logs
+*.log
+missfont.log

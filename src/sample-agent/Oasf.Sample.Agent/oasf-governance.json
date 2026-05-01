@@ -1,0 +1,13 @@
+{
+  "governance": {
+    "sensitivity_tier": "confidential",
+    "data_classifications": ["PII"],
+    "purview_label_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "approval_chain": ["ai-governance", "hr-data-steward"],
+    "allowed_consumers": ["hr-team", "onboarding-automation", "hiring-managers"],
+    "max_data_retention_days": 90,
+    "audit_level": "full",
+    "dependency_sensitivity_ceiling": "confidential",
+    "compliance_frameworks": ["SOC2", "GDPR"]
+  }
+}

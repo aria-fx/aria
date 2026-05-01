@@ -1,0 +1,53 @@
+{
+  "name": "ARIA Development Environment",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:9.0",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    },
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "marp-team.marp-vscode",
+        "yzhang.markdown-all-in-one",
+        "hashicorp.terraform",
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.csharp",
+        "ms-azuretools.vscode-azureterraform",
+        "editorconfig.editorconfig",
+        "bierner.markdown-mermaid",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "markdown.marp.enableHtml": true,
+        "markdown.marp.themes": [
+          "./docs/slides/aria-theme.css"
+        ],
+        "editor.formatOnSave": true,
+        "files.eol": "\n"
+      }
+    }
+  },
+
+  "forwardPorts": [],
+
+  "remoteEnv": {
+    "DOTNET_CLI_TELEMETRY_OPTOUT": "1"
+  },
+
+  "mounts": [],
+
+  "containerEnv": {
+    "ARIA_ENV": "dev"
+  }
+}

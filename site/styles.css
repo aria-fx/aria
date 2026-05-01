@@ -1,0 +1,118 @@
+:root {
+  --bg: #f6f7f4;
+  --surface: #ffffff;
+  --ink: #1b1d22;
+  --muted: #575f6b;
+  --brand: #0f766e;
+  --brand-ink: #05332f;
+  --line: #d9dfd8;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 15% -10%, #d7f3ea 0, #d7f3ea 18%, transparent 45%),
+    radial-gradient(circle at 85% 0%, #e6efe3 0, #e6efe3 22%, transparent 45%),
+    var(--bg);
+  line-height: 1.6;
+}
+
+.hero {
+  padding: 4.5rem 1.2rem 3rem;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 700;
+  color: var(--brand);
+  margin: 0 0 .5rem;
+}
+
+h1 {
+  font-family: "Merriweather", Georgia, serif;
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+}
+
+.lead {
+  max-width: 55ch;
+  color: var(--muted);
+  margin: 1rem 0 1.4rem;
+  font-size: 1.12rem;
+}
+
+.cta-row { display: flex; gap: .75rem; flex-wrap: wrap; }
+
+.btn {
+  display: inline-block;
+  border: 1px solid var(--line);
+  padding: .66rem .95rem;
+  border-radius: .55rem;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--surface);
+  font-weight: 700;
+}
+
+.btn-primary {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: white;
+}
+
+main {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 1.2rem 3.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+section {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: .8rem;
+  padding: 1rem 1.1rem;
+}
+
+h2 {
+  margin-top: .2rem;
+  font-family: "Merriweather", Georgia, serif;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: .7rem;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: .6rem;
+  padding: .8rem;
+  background: #fbfcfa;
+}
+
+.card h3 { margin: 0 0 .35rem; }
+.card p { margin: 0; color: var(--muted); }
+
+.links a {
+  color: var(--brand-ink);
+  text-decoration-thickness: 1px;
+}
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  padding: 0 1rem 2rem;
+}
+
+@media (max-width: 600px) {
+  .hero { padding-top: 3.5rem; }
+}
