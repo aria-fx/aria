@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- ARIA Favicon / App Icon -->
+  <rect x="0" y="0" width="512" height="512" rx="80" fill="#6B21A8"/>
+  <!-- Connection lines -->
+  <line x1="256" y1="256" x2="80" y2="80" stroke="#0891B2" stroke-width="12" stroke-linecap="round"/>
+  <line x1="256" y1="256" x2="432" y2="80" stroke="#0D9488" stroke-width="12" stroke-linecap="round"/>
+  <line x1="256" y1="256" x2="80" y2="432" stroke="#F97316" stroke-width="12" stroke-linecap="round"/>
+  <line x1="256" y1="256" x2="432" y2="432" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" opacity="0.2"/>
+  <!-- Hexagon -->
+  <polygon points="256,176 328,212 328,300 256,336 184,300 184,212" fill="#FFFFFF" opacity="0.95"/>
+  <!-- A -->
+  <text x="256" y="288" text-anchor="middle" font-family="Inter, Calibri, system-ui, sans-serif" font-size="88" font-weight="500" fill="#6B21A8">A</text>
+  <!-- Satellite nodes -->
+  <circle cx="80" cy="80" r="24" fill="#0891B2"/>
+  <circle cx="432" cy="80" r="24" fill="#0D9488"/>
+  <circle cx="80" cy="432" r="24" fill="#F97316"/>
+  <circle cx="432" cy="432" r="18" fill="#FFFFFF" opacity="0.3"/>
+</svg>
