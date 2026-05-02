@@ -25,6 +25,8 @@ permissions:
 #
 # Release notes template:
 # - .github/release-notes/aria-auth-core-release-template.md
+# Release process:
+# - src/aria-auth-core/RELEASING.md
 
 env:
   DOTNET_VERSION: "9.0.x"
