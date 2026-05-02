@@ -189,7 +189,7 @@ Teams can't find, reuse, or safely compose AI assets across organizational bound
 
 <!-- _class: light -->
 
-# Three-layer architecture
+# Three-layer architecture + distribution gateway
 
 <div class="columns-3">
 <div class="card">
@@ -217,6 +217,8 @@ Classify, label, enforce, and audit via Microsoft Purview + OASF overlay
 
 </div>
 </div>
+
+**+ Distribution Gateway** — Catalog API translates OCI artifacts into platform-native installs (Claude Desktop `.mcpb`, Cowork suggestions, web portal) with transparent governance enforcement
 
 ---
 
@@ -455,20 +457,65 @@ OTEL telemetry + evaluations
 
 <!-- _class: light -->
 
-# ARIA Package Manager (`aria`)
+# ARIA Package Manager (`apm`)
 
 *The "last mile" — from registry to runtime*
 
 | Command | Description |
 |---------|-------------|
-| `aria search` | Discover assets by OASF skill, domain, or keyword |
-| `aria inspect` | Display OASF Record and governance overlay |
-| `aria audit` | Validate sensitivity ceiling + consumer + dependencies |
-| `aria install` | Pull OCI artifact, enforce governance, wire into target |
-| `aria list` | List installed assets with version and sensitivity |
+| `apm search` | Discover assets by OASF skill, domain, or keyword |
+| `apm inspect` | Display OASF Record and governance overlay |
+| `apm audit` | Validate sensitivity ceiling + consumer + dependencies |
+| `apm install` | Pull OCI artifact, enforce governance, wire into target |
+| `apm list` | List installed assets with version and sensitivity |
 
 **Install targets:** Claude Desktop · VS Code · Agent Framework (local/A2A)
 **Governance:** Every install validates ceiling → consumer → dependencies → Purview audit
+
+---
+
+<!-- _class: light -->
+
+# Distribution gateway: Registry to end user
+
+*OCI is the governance layer. The gateway is the user-facing layer.*
+
+<div class="columns">
+<div>
+
+### The problem
+Non-technical users don't have Docker or ORAS. They need a **one-click experience** through the platforms they already use.
+
+### The solution
+A thin Catalog API that sits between OCI and end-user platforms:
+
+- Authenticates via **Entra ID**
+- Filters catalog by **governance policy**
+- Packages OCI artifacts as **`.mcpb` bundles**
+- Logs installs to **Purview audit trail**
+
+</div>
+<div>
+
+### Consumption channels
+
+<div class="card">
+
+**Claude Desktop** — organization's ARIA catalog appears in the Extensions panel. Click "Add to Claude." Governance runs transparently.
+
+</div>
+<div class="card card-teal">
+
+**Cowork** — contextual suggestions based on OASF domain matching. Blocked assets are never surfaced.
+
+</div>
+<div class="card card-accent">
+
+**Web Portal** — browse, filter, request access. For business users, governance teams, and auditors.
+
+</div>
+</div>
+</div>
 
 ---
 
@@ -482,7 +529,7 @@ OTEL telemetry + evaluations
 
 **04** Microsoft Purview extends existing data governance into the AI domain: sensitivity labels, DLP, lineage, and audit.
 
-**05** Governance must be embedded in the development workflow, not bolted on after deployment. Make compliance a natural consequence of building.
+**05** The governed path must be the easiest path. Non-technical users get one-click installs in Claude Desktop; governance runs invisibly behind it.
 
 ---
 

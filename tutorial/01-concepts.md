@@ -28,6 +28,13 @@ ARIA operates across three layers:
    - OASF governance overlay for policy-as-code
    - Sensitivity label inheritance through dependency graphs
 
+4. **Distribution** — How do non-technical users consume them?
+   - ARIA Catalog API translates OCI artifacts into platform-native installs
+   - Claude Desktop Extensions panel with enterprise allowlist
+   - Cowork contextual discovery based on OASF domain matching
+   - Web portal for browsing, filtering, and requesting access
+   - Governance enforcement is invisible — blocked assets are never shown
+
 ## The Five Entity Types
 
 | Entity | What it is | OASF classification |
@@ -63,7 +70,7 @@ This is enforced:
   declared `sensitivity_tier` ≥ max(dependency tiers)
 - **At runtime** — Purview DLP policies prevent under-classified agents from
   accessing sensitive knowledge
-- **At install time** — the `aria audit` command validates governance before
+- **At install time** — the `apm audit` command validates governance before
   pulling artifacts
 
 ## Next Steps
