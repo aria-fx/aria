@@ -43,7 +43,7 @@ fi
 
 # ── Terraform init ──────────────────────────────────────────
 echo "Initializing Terraform (skip provider download)..."
-cd terraform
+cd src/terraform
 terraform init -backend=false > /dev/null 2>&1 || true
 cd ..
 
