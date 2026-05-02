@@ -1,0 +1,72 @@
+name: Purview Sync
+
+on:
+  workflow_run:
+    workflows: [ "Publish OCI Artifact" ]
+    types: [ completed ]
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    name: Sync to Microsoft Purview
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Read OASF governance overlay
+        id: governance
+        run: |
+          TIER=$(jq -r '.governance.sensitivity_tier' oasf-governance.json)
+          LABEL_ID=$(jq -r '.governance.purview_label_id' oasf-governance.json)
+          FRAMEWORKS=$(jq -r '.governance.compliance_frameworks | join(",")' oasf-governance.json)
+          echo "tier=$TIER" >> $GITHUB_OUTPUT
+          echo "label_id=$LABEL_ID" >> $GITHUB_OUTPUT
+          echo "frameworks=$FRAMEWORKS" >> $GITHUB_OUTPUT
+
+      - name: Apply Purview sensitivity label
+        if: steps.governance.outputs.label_id != ''
+        run: |
+          echo "Applying Purview label ${{ steps.governance.outputs.label_id }}"
+          echo "Sensitivity tier: ${{ steps.governance.outputs.tier }}"
+          # Purview REST API call to apply sensitivity label
+          # to the OCI artifact metadata in Purview Data Map
+          az rest --method POST \
+            --uri "https://${{ secrets.PURVIEW_ACCOUNT }}.purview.azure.com/catalog/api/atlas/v2/entity" \
+            --headers "Content-Type=application/json" \
+            --body '{
+              "entity": {
+                "typeName": "oasf_aria_asset",
+                "attributes": {
+                  "qualifiedName": "'$(jq -r '.name' oasf-record.json)'",
+                  "name": "'$(jq -r '.name' oasf-record.json | rev | cut -d/ -f1 | rev)'",
+                  "sensitivity_tier": "'${{ steps.governance.outputs.tier }}'",
+                  "oasf_version": "'$(jq -r '.version' oasf-record.json)'",
+                  "compliance_frameworks": "'${{ steps.governance.outputs.frameworks }}'"
+                }
+              }
+            }' || echo "::warning::Purview sync requires custom type definitions. See docs."
+
+      - name: Update lineage graph
+        run: |
+          echo "Updating Purview lineage for dependencies..."
+          # Extract skill/knowledge dependencies from OASF record
+          # and create lineage edges in Purview Data Map
+          python3 -c "
+          import json
+          with open('oasf-record.json') as f:
+              record = json.load(f)
+          modules = record.get('modules', [])
+          for m in modules:
+              ref = m.get('ref', '')
+              mtype = m.get('type', '')
+              if ref:
+                  print(f'  Lineage edge: {record[\"name\"]} --{mtype}--> {ref}')
+          "

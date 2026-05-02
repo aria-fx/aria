@@ -1,0 +1,71 @@
+name: OASF Validate
+
+on:
+  pull_request:
+    paths:
+      - "oasf-record.json"
+      - "oasf-governance.json"
+      - "src/**"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate:
+    name: Validate OASF Record & Governance Overlay
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install OASF SDK
+        run: pip install oasf-sdk
+
+      - name: Validate OASF Record schema
+        run: |
+          python -c "
+          import json, sys
+          with open('oasf-record.json') as f:
+              record = json.load(f)
+          required = ['name', 'version', 'schema_version', 'skills', 'locators', 'authors']
+          missing = [k for k in required if k not in record]
+          if missing:
+              print(f'::error::Missing required fields: {missing}')
+              sys.exit(1)
+          print('OASF Record schema validation passed')
+          "
+
+      - name: Validate Governance Overlay
+        run: |
+          python -c "
+          import json, sys
+          with open('oasf-governance.json') as f:
+              gov = json.load(f)
+          g = gov.get('governance', {})
+          required = ['sensitivity_tier', 'approval_chain', 'audit_level']
+          missing = [k for k in required if k not in g]
+          if missing:
+              print(f'::error::Missing governance fields: {missing}')
+              sys.exit(1)
+          # Sensitivity tier must be in allowed values
+          allowed_tiers = ['public', 'internal', 'confidential', 'highly_confidential', 'restricted']
+          if g['sensitivity_tier'] not in allowed_tiers:
+              print(f'::error::Invalid sensitivity_tier: {g[\"sensitivity_tier\"]}')
+              sys.exit(1)
+          print('Governance overlay validation passed')
+          "
+
+      - name: Check sensitivity ceiling
+        run: |
+          python -c "
+          import json, sys
+          tiers = ['public', 'internal', 'confidential', 'highly_confidential', 'restricted']
+          with open('oasf-governance.json') as f:
+              gov = json.load(f)['governance']
+          asset_tier = tiers.index(gov['sensitivity_tier'])
+          ceiling = tiers.index(gov.get('dependency_sensitivity_ceiling', 'restricted'))
+          if asset_tier > ceiling:
+              print(f'::error::Asset tier ({gov[\"sensitivity_tier\"]}) exceeds ceiling ({gov[\"dependency_sensitivity_ceiling\"]})')
+              sys.exit(1)
+          print(f'Sensitivity ceiling check passed: {gov[\"sensitivity_tier\"]} <= {gov[\"dependency_sensitivity_ceiling\"]}')
+          "
