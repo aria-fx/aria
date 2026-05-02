@@ -1,0 +1,19 @@
+# @aria-fx/aria-cli
+
+npm wrapper for the ARIA .NET CLI.
+
+## Install
+
+```bash
+npm install -g @aria-fx/aria-cli --registry=https://npm.pkg.github.com
+```
+
+## Usage
+
+```bash
+aria search --keyword policy
+```
+
+## Runtime Requirement
+
+This package executes the .NET-based `aria` CLI and requires .NET 9 runtime on the host machine.

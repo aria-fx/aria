@@ -1,0 +1,162 @@
+name: Publish aria CLI Packages
+
+on:
+  push:
+    tags:
+      - "aria-cli-v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "SemVer version to publish (for example 1.2.3)"
+        required: true
+      dry_run:
+        description: "Build and validate only (no publish)"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  packages: write
+
+# Required auth:
+# - Uses the default GITHUB_TOKEN with packages:write permission
+# - No extra secrets are needed for GitHub Packages publish in this repository
+
+env:
+  DOTNET_VERSION: "9.0.x"
+  NODE_VERSION: "20"
+  NUGET_SOURCE_URL: "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+  NPM_REGISTRY_URL: "https://npm.pkg.github.com"
+  NUGET_PACKAGE_ID: "Aria.Cli"
+  NPM_PACKAGE_NAME: "@aria-fx/aria-cli"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve release version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            VERSION="${{ inputs.version }}"
+            DRY_RUN="${{ inputs.dry_run }}"
+          else
+            VERSION="${GITHUB_REF_NAME#aria-cli-v}"
+            DRY_RUN="false"
+          fi
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Version '$VERSION' is not valid SemVer" >&2
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "dry_run=$DRY_RUN" >> "$GITHUB_OUTPUT"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: ${{ env.NPM_REGISTRY_URL }}
+
+      - name: Validate package version is not already published
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          OWNER_TYPE: ${{ github.event.repository.owner.type }}
+          VERSION: ${{ steps.version.outputs.version }}
+          NUGET_PACKAGE_ID: ${{ env.NUGET_PACKAGE_ID }}
+          NPM_PACKAGE_NAME: ${{ env.NPM_PACKAGE_NAME }}
+          NPM_CONFIG_USERCONFIG: ${{ runner.temp }}/.npmrc
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "//npm.pkg.github.com/:_authToken=${GH_TOKEN}" > "$NPM_CONFIG_USERCONFIG"
+
+          if [[ "$OWNER_TYPE" == "Organization" ]]; then
+            BASE_PATH="/orgs/${OWNER}/packages"
+          else
+            BASE_PATH="/users/${OWNER}/packages"
+          fi
+
+          set +e
+          NUGET_VERSIONS_JSON=$(gh api "${BASE_PATH}/nuget/${NUGET_PACKAGE_ID}/versions" 2>/dev/null)
+          NUGET_EXIT=$?
+          set -e
+          if [[ $NUGET_EXIT -eq 0 ]]; then
+            if echo "$NUGET_VERSIONS_JSON" | jq -e --arg VERSION "$VERSION" '.[] | select(.name == $VERSION)' >/dev/null; then
+              echo "NuGet version ${VERSION} already exists for ${NUGET_PACKAGE_ID}" >&2
+              exit 1
+            fi
+          fi
+
+          if npm view "${NPM_PACKAGE_NAME}@${VERSION}" version --registry "${{ env.NPM_REGISTRY_URL }}" >/dev/null 2>&1; then
+            echo "npm version ${VERSION} already exists for ${NPM_PACKAGE_NAME}" >&2
+            exit 1
+          fi
+
+      - name: Restore and build aria CLI
+        run: |
+          dotnet restore src/aria-cli/Aria.Cli.csproj
+          dotnet build src/aria-cli/Aria.Cli.csproj -c Release --no-restore
+
+      - name: Pack NuGet tool package
+        run: |
+          dotnet pack src/aria-cli/Aria.Cli.csproj \
+            -c Release \
+            --no-build \
+            -o artifacts/nuget \
+            /p:ContinuousIntegrationBuild=true \
+            /p:PackageVersion=${{ steps.version.outputs.version }}
+
+      - name: Build npm runtime payload
+        run: |
+          dotnet publish src/aria-cli/Aria.Cli.csproj \
+            -c Release \
+            -o src/aria-cli/npm/dist/aria \
+            /p:Version=${{ steps.version.outputs.version }}
+
+      - name: Set npm package version
+        working-directory: src/aria-cli/npm
+        run: |
+          npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+
+      - name: Validate npm payload
+        run: |
+          make aria-npm-pack-dry-run
+
+      - name: Publish NuGet package to GitHub Packages
+        if: ${{ steps.version.outputs.dry_run != 'true' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dotnet nuget push artifacts/nuget/*.nupkg \
+            --source "${{ env.NUGET_SOURCE_URL }}" \
+            --api-key "${GITHUB_TOKEN}"
+
+      - name: Publish npm package to GitHub Packages
+        if: ${{ steps.version.outputs.dry_run != 'true' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: src/aria-cli/npm
+        run: |
+          npm publish --registry "${{ env.NPM_REGISTRY_URL }}"
+
+      - name: Publish summary
+        run: |
+          echo "Published aria CLI version ${{ steps.version.outputs.version }}"
+          echo "Dry run: ${{ steps.version.outputs.dry_run }}"
