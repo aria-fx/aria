@@ -20,6 +20,7 @@ agent runtime and governed by policy."
 | `aria inspect <ref>` | Display OASF Record and governance overlay without installing                    |
 | `aria audit <ref>`   | Validate governance (ceiling, consumer, dependencies) before install             |
 | `aria install <ref>` | Pull OCI artifact, enforce governance, install to target runtime                 |
+| `aria whoami`        | Resolve Entra identity and show effective sensitivity/Purview access             |
 | `aria list`          | List installed assets with version, sensitivity, and target                      |
 
 ## Install Targets
@@ -97,10 +98,79 @@ chain is displayed.
   },
   "purview": {
     "account": "purview-aria-dev",
-    "tenant_id": "your-tenant-id"
-  }
+    "tenant_id": "your-tenant-id",
+    "required_roles_by_sensitivity": {
+      "confidential": ["Data Reader"],
+      "highly_confidential": ["Data Curator"],
+      "restricted": ["Data Source Administrator"]
+    }
+  },
+  "auth": {
+    "provider": "entra",
+    "enable_experimental_providers": false
+  },
+  "entra": {
+    "enabled": true,
+    "tenant_id": "your-tenant-id",
+    "scopes": ["https://management.azure.com/.default"]
+  },
+  "okta": {
+    "enabled": false,
+    "issuer": "https://your-org.okta.com/oauth2/default",
+    "client_id": "your-okta-client-id",
+    "scopes": ["openid", "profile", "groups"],
+    "access_token_env_var": "OKTA_ACCESS_TOKEN",
+    "access_token_file": "~/.aria/okta-token.txt",
+    "token_endpoint": "https://your-org.okta.com/oauth2/default/v1/token",
+    "client_secret_env_var": "OKTA_CLIENT_SECRET"
+  },
+  "auth0": {
+    "enabled": false,
+    "domain": "your-tenant.us.auth0.com",
+    "client_id": "your-auth0-client-id",
+    "audience": "https://api.example.com",
+    "scopes": ["openid", "profile", "read:assets"]
+  },
+  "access_rules": [
+    {
+      "name": "hr-readers",
+      "any_entra_groups": ["entra-group-hr-readers"],
+      "sensitivity_ceiling": "confidential",
+      "purview_roles": ["Data Reader"]
+    },
+    {
+      "name": "governance-admins",
+      "any_entra_roles": ["Governance.Admin"],
+      "sensitivity_ceiling": "restricted",
+      "purview_roles": ["Data Source Administrator", "Data Curator"]
+    }
+  ]
 }
 ```
+
+### Entra-Based Authorization Model
+
+1. `aria` resolves `auth.provider` and uses the matching identity adapter (`entra`, `okta`, `auth0`).
+2. Entra (default) acquires a token via `DefaultAzureCredential` and reads claims (`oid`, `tid`, `groups`, `roles`/`scp`).
+3. Experimental providers (`okta`, `auth0`) require `auth.enable_experimental_providers=true`.
+4. Okta currently supports JWT access token resolution from env/file and optional client-credentials token endpoint flow.
+5. `access_rules` map normalized groups/roles to an effective sensitivity ceiling and granted Purview roles.
+6. Governance checks enforce:
+  - OASF sensitivity tier <= effective ceiling
+  - `allowed_consumers`, `allowed_entra_groups`, and `allowed_entra_roles` from governance overlay
+  - `purview.required_roles_by_sensitivity` for data-plane access
+
+Run `aria whoami` to verify the resolved identity and access profile before running `aria audit` or `aria install`.
+
+### Auth Adapter TODOs
+
+Entra is first-class today, but the auth layer now has an adapter seam to support additional identity providers.
+
+- TODO: Add `auth.provider` config selector (for example: `entra`, `okta`, `auth0`, `ping`).
+- TODO: Implement `IIdentityProvider` adapters for Okta/Auth0/Ping with claim normalization into the shared identity model.
+- TODO: Normalize group and role claim names per provider to a common shape before access rule evaluation.
+- TODO: Add integration tests for each provider adapter using representative JWT payloads.
+- TODO: Add provider capability matrix in docs (token source, group claim behavior, role claim behavior, tenant mapping).
 
 ## GitHub CLI Extension
 
@@ -115,12 +185,11 @@ gh aria install jgarverick/aria-policy-lookup-skill --target claude-desktop
 ## Architecture
 
 ```
-Program.cs           → System.CommandLine root + command tree
-Services/
-  OciRegistryService → OCI artifact fetch (Azure.Containers.ContainerRegistry / oras)
-  GovernanceService  → Sensitivity ceiling + consumer + dependency validation
-Targets/
-  InstallTargets     → Pluggable adapters (Claude Desktop, Agent Framework, VS Code)
-Models/
-  AriaConfig          → CLI config, OASF Record/Governance types, SensitivityTiers
+src/aria-auth-core/
+  Models/             → Shared config + OASF policy/record models
+  Services/           → Shared identity provider contracts, provider factory, governance/access policy
+src/aria-cli/
+  Program.cs          → System.CommandLine root + command tree
+  Services/           → CLI provider adapters + OCI registry implementation
+  Targets/            → Pluggable adapters (Claude Desktop, Agent Framework, VS Code)
 ```

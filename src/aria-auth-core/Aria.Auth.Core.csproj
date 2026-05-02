@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>Aria.Auth.Core</PackageId>
+    <PackageTitle>ARIA Auth Core</PackageTitle>
+    <Description>Shared authentication and authorization core for ARIA clients and services.</Description>
+    <Authors>ARIA Contributors</Authors>
+    <PackageTags>aria;auth;authorization;governance;oasf</PackageTags>
+    <RepositoryUrl>https://github.com/aria-fx/aria</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/aria-fx/aria</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+</Project>
