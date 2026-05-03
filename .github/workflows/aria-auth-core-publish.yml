@@ -6,9 +6,6 @@ on:
       - "aria-auth-core-v*"
   workflow_dispatch:
     inputs:
-      version:
-        description: "SemVer version to publish (for example 1.2.3)"
-        required: true
       dry_run:
         description: "Build and validate only (no publish)"
         required: false
@@ -27,6 +24,9 @@ permissions:
 # - .github/release-notes/aria-auth-core-release-template.md
 # Release process:
 # - src/aria-auth-core/RELEASING.md
+# Versioning:
+# - GitVersion computes SemVer from git history and release tags.
+# - GitVersion config: GitVersion.yml
 
 env:
   DOTNET_VERSION: "9.0.x"
@@ -40,6 +40,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup GitVersion
+        uses: gittools/actions/gitversion/setup@v3
+        with:
+          versionSpec: "6.x"
+
+      - name: Determine version with GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v3
 
       - name: Resolve release version
         id: version
@@ -47,12 +58,18 @@ jobs:
         run: |
           set -euo pipefail
 
+          VERSION="${{ steps.gitversion.outputs.SemVer }}"
+
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-            VERSION="${{ inputs.version }}"
             DRY_RUN="${{ inputs.dry_run }}"
           else
-            VERSION="${GITHUB_REF_NAME#aria-auth-core-v}"
             DRY_RUN="false"
+
+            TAG_VERSION="${GITHUB_REF_NAME#aria-auth-core-v}"
+            if [[ "$VERSION" != "$TAG_VERSION" ]]; then
+              echo "GitVersion SemVer (${VERSION}) does not match tag version (${TAG_VERSION})." >&2
+              exit 1
+            fi
           fi
 
           if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then

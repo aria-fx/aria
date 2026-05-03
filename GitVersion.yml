@@ -1,0 +1,13 @@
+next-version: 0.1.0
+mode: ContinuousDelivery
+tag-prefix: "aria-(cli|auth-core)-v"
+
+branches:
+  main:
+    regex: ^main$
+    increment: Patch
+    prevent-increment:
+      when-current-commit-tagged: true
+
+ignore:
+  sha: []

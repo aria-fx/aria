@@ -12,13 +12,18 @@
     "bugs": {
         "url": "https://github.com/aria-fx/aria/issues"
     },
+    "author": "ARIA Contributors",
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com"
+    },
     "bin": {
         "aria": "bin/aria.js"
     },
     "files": [
         "bin",
         "dist",
-        "README.md"
+        "README.md",
+        "CHANGELOG.md"
     ],
     "engines": {
         "node": ">=18"

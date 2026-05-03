@@ -9,7 +9,7 @@ This guide describes how to publish `Aria.Auth.Core` safely and consistently.
 3. Draft release notes using `.github/release-notes/aria-auth-core-release-template.md`.
 4. Confirm CI is green (`ARIA Auth Core CI`).
 5. Create a tag in the format `aria-auth-core-vX.Y.Z`.
-6. Verify the `Publish ARIA Auth Core` workflow succeeds.
+6. Verify the `Publish ARIA Auth Core` workflow succeeds and that GitVersion resolves the same SemVer as the tag.
 
 ## Changelog Format
 
@@ -31,11 +31,12 @@ The publish workflow fails if the target version heading is missing.
 ## Publish Triggers
 
 - Tag-based release: push `aria-auth-core-v*`
-- Manual release: run workflow dispatch and provide `version`
+- Manual release: run workflow dispatch (version is computed by GitVersion)
 
 ## Safety Checks in Publish Workflow
 
-- Validates SemVer format.
+- Computes SemVer with GitVersion and validates SemVer format.
+- For tag releases, validates that GitVersion SemVer matches the pushed tag version.
 - Verifies there are actual changes under `src/aria-auth-core/`.
 - Fails on duplicate package version in GitHub Packages.
 - Fails if changelog does not contain the release version.

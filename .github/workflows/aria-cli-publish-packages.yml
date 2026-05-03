@@ -6,9 +6,6 @@ on:
       - "aria-cli-v*"
   workflow_dispatch:
     inputs:
-      version:
-        description: "SemVer version to publish (for example 1.2.3)"
-        required: true
       dry_run:
         description: "Build and validate only (no publish)"
         required: false
@@ -22,6 +19,15 @@ permissions:
 # Required auth:
 # - Uses the default GITHUB_TOKEN with packages:write permission
 # - No extra secrets are needed for GitHub Packages publish in this repository
+#
+# Release notes template:
+# - .github/release-notes/aria-cli-release-template.md
+# Release process:
+# - src/aria-cli/RELEASING.md
+#
+# Versioning:
+# - GitVersion computes SemVer from git history and release tags.
+# - GitVersion config: GitVersion.yml
 
 env:
   DOTNET_VERSION: "9.0.x"
@@ -38,6 +44,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup GitVersion
+        uses: gittools/actions/gitversion/setup@v3
+        with:
+          versionSpec: "6.x"
+
+      - name: Determine version with GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v3
 
       - name: Resolve release version
         id: version
@@ -45,12 +62,18 @@ jobs:
         run: |
           set -euo pipefail
 
+          VERSION="${{ steps.gitversion.outputs.SemVer }}"
+
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-            VERSION="${{ inputs.version }}"
             DRY_RUN="${{ inputs.dry_run }}"
           else
-            VERSION="${GITHUB_REF_NAME#aria-cli-v}"
             DRY_RUN="false"
+
+            TAG_VERSION="${GITHUB_REF_NAME#aria-cli-v}"
+            if [[ "$VERSION" != "$TAG_VERSION" ]]; then
+              echo "GitVersion SemVer (${VERSION}) does not match tag version (${TAG_VERSION})." >&2
+              exit 1
+            fi
           fi
 
           if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
@@ -106,6 +129,24 @@ jobs:
 
           if npm view "${NPM_PACKAGE_NAME}@${VERSION}" version --registry "${{ env.NPM_REGISTRY_URL }}" >/dev/null 2>&1; then
             echo "npm version ${VERSION} already exists for ${NPM_PACKAGE_NAME}" >&2
+            exit 1
+          fi
+
+      - name: Validate changelog contains release version
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          CHANGELOG="src/aria-cli/CHANGELOG.md"
+          if [[ ! -f "$CHANGELOG" ]]; then
+            echo "Missing $CHANGELOG" >&2
+            exit 1
+          fi
+
+          if ! grep -Eq "^## ${VERSION}( |$)|^## ${VERSION} -" "$CHANGELOG"; then
+            echo "CHANGELOG.md must include a heading for version ${VERSION}" >&2
             exit 1
           fi
 
