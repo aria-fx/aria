@@ -1,6 +1,6 @@
 {
     "name": "@aria-fx/aria-cli",
-    "version": "0.0.0-dev",
+    "version": "0.0.1-22",
     "description": "ARIA CLI npm wrapper for the .NET aria command",
     "license": "MIT",
     "repository": {

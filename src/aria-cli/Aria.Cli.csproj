@@ -10,6 +10,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>aria</ToolCommandName>
     <PackageId>Aria.Cli</PackageId>
+    <Version>0.0.1-22</Version>
     <PackageTitle>ARIA CLI</PackageTitle>
     <Description>ARIA Package Manager CLI for discovering, validating, and installing OASF-governed AI assets.</Description>
     <Authors>ARIA Contributors</Authors>
