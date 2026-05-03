@@ -147,8 +147,8 @@ jobs:
             exit 1
           fi
 
-          if ! grep -Eq "^## ${VERSION}( |$)|^## ${VERSION} -|^## ${BASE_VERSION}( |$)|^## ${BASE_VERSION} -" "$CHANGELOG"; then
-            echo "CHANGELOG.md must include a heading for version ${VERSION} or ${BASE_VERSION}" >&2
+          if ! grep -Eq "^## ${VERSION}( |$)|^## ${VERSION} -|^## ${BASE_VERSION}( |$)|^## ${BASE_VERSION} -|^## Unreleased( |$)" "$CHANGELOG"; then
+            echo "CHANGELOG.md must include a heading for version ${VERSION}, ${BASE_VERSION}, or Unreleased" >&2
             exit 1
           fi
 
