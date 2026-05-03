@@ -140,13 +140,15 @@ jobs:
           set -euo pipefail
 
           CHANGELOG="src/aria-cli/CHANGELOG.md"
+          BASE_VERSION="${VERSION%%-*}"
+
           if [[ ! -f "$CHANGELOG" ]]; then
             echo "Missing $CHANGELOG" >&2
             exit 1
           fi
 
-          if ! grep -Eq "^## ${VERSION}( |$)|^## ${VERSION} -" "$CHANGELOG"; then
-            echo "CHANGELOG.md must include a heading for version ${VERSION}" >&2
+          if ! grep -Eq "^## ${VERSION}( |$)|^## ${VERSION} -|^## ${BASE_VERSION}( |$)|^## ${BASE_VERSION} -" "$CHANGELOG"; then
+            echo "CHANGELOG.md must include a heading for version ${VERSION} or ${BASE_VERSION}" >&2
             exit 1
           fi
 
