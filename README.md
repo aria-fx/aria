@@ -10,18 +10,26 @@ orchestration configurations at scale.
 
 ```
 aria/
-├── .github/
-│   └── workflows/
-│       └── pages-microsite.yml  # Publish project microsite to GitHub Pages
 ├── .devcontainer/              # Dev environment (Pandoc, Marp, .NET 9, Terraform)
+├── .github/                    # CI/CD, release notes templates, automation assets
+│   ├── workflows/
+│   └── release-notes/
 ├── docs/
 │   ├── architecture/           # Reference architecture (Markdown → PDF/DOCX via Pandoc)
 │   │   └── aria-reference-architecture.md
+│   ├── brand/                  # Logo/avatar/favicons for docs and microsite
 │   ├── slides/                 # Conference deck (Markdown → PPTX/PDF via Marp)
 │   │   ├── aria-deck.md
 │   │   └── aria-theme.css
 │   └── infographic/            # Leadership one-pager assets
+├── scripts/                    # Build helpers (Pandoc filters, transforms)
+│   └── pandoc-md-links-to-html.lua
+├── site/                       # Generated/static microsite artifacts for GitHub Pages
+│   ├── index.html
+│   ├── docs/
+│   └── tutorial/
 ├── src/
+│   ├── aria-auth-core/         # Shared auth and governance primitives (NuGet package)
 │   ├── terraform/              # Infrastructure-as-code (Azure + GitHub)
 │   │   ├── modules/
 │   │   │   ├── azure-governance/     # Purview, Key Vault, Storage, RBAC
@@ -30,13 +38,12 @@ aria/
 │   │   ├── environments/dev/
 │   │   └── workflows/                # GitHub Actions workflow references
 │   ├── sample-agent/           # C# sample: Agent Framework + Purview SDK
-│   │   ├── Oasf.Sample.Agent/       # Onboarding assistant runtime + OASF governance checks
+│   │   ├── Oasf.Sample.Agent/       # Onboarding assistant with governance middleware
 │   │   └── Oasf.Sample.Agent.Tests/ # Sensitivity tier + governance tests
-│   └── aria-cli/                # ARIA Package Manager CLI prototype
+│   └── aria-cli/                # ARIA Package Manager CLI prototype + npm package assets
 │       ├── Models/
 │       ├── Services/
 │       └── Targets/                  # Install adapters (Claude Desktop, VS Code, AF)
-├── site/                       # Static microsite published via GitHub Pages
 ├── tutorial/                   # Step-by-step guide + conference demo script
 ├── Makefile                    # Build docs, slides, and .NET projects
 └── README.md
@@ -47,7 +54,7 @@ aria/
 ### With devcontainer (recommended)
 
 ```bash
-git clone https://github.com/jgarverick/aria-framework
+git clone https://github.com/aria-fx/aria.git
 cd aria
 code .
 # VS Code will prompt: "Reopen in Container" → click yes
@@ -68,8 +75,9 @@ make all
 # Or individually:
 make docs       # Reference architecture → PDF + DOCX
 make slides     # Conference deck → PPTX + PDF + HTML
-make build      # .NET sample agent + ARIA CLI
+make build      # .NET sample agent + APM CLI
 make test       # Run .NET tests
+make site       # Build microsite HTML for docs + tutorial
 ```
 
 ## What's Inside
@@ -86,11 +94,16 @@ Build: `make docs` → `out/docs/aria-reference-architecture.pdf` + `.docx`
 
 **Conference Deck** — 13-slide presentation covering the problem, three-layer
 architecture, OASF overview, metamodel, lifecycle, GitHub marketplace,
-Purview integration, sensitivity inheritance, capability model, ARIA CLI,
+Purview integration, sensitivity inheritance, capability model, APM CLI,
 and key takeaways.
 
 Source: `docs/slides/aria-deck.md`
 Build: `make slides` → `out/slides/aria-deck.pptx` + `.pdf` + `.html`
+
+**Brand Assets** — Official ARIA logos, avatar, and favicon used in docs, slides,
+and the microsite.
+
+Source: `docs/brand/README.md`
 
 ### Infrastructure (`src/terraform/`)
 
@@ -101,22 +114,23 @@ Three Terraform modules provisioning the complete ARIA infrastructure:
   protection, CODEOWNERS, Actions workflows, org secrets
 - **oasf-validation** — Azure Container Registry, schema validation storage
 
+### Website / Docs Microsite (`site/`)
+
+Pre-rendered HTML pages for architecture and tutorial content used by GitHub Pages.
+
+- Architecture page: `site/docs/architecture.html`
+- Tutorial hub: `site/tutorial/index.html`
+- Rebuild locally: `make site` (or `make watch-site` for live rebuilds)
+
 ### Sample Agent (`src/sample-agent/`)
 
-Working C# application on Microsoft Agent Framework 1.3 demonstrating:
+Working C# application on Microsoft Agent Framework 1.0 demonstrating:
 
 - OASF Record + Governance Overlay loaded and validated at startup
-- Purview integration using `WithPurview(...)` on the agent builder
-- `OasfGovernanceMiddleware` helper for consumer validation and OASF telemetry
-- Interactive console runtime with policy-aware request handling
-
-### Microsite (`site/`)
-
-A lightweight static microsite for ARIA is published via GitHub Pages using:
-
-- Workflow: `.github/workflows/pages-microsite.yml`
-- Content root: `site/`
-- Trigger: push to `main` or `master` (plus manual dispatch)
+- `PurviewPolicyMiddleware` for DLP enforcement
+- Custom `OasfGovernanceMiddleware` for consumer validation and OASF telemetry
+- Sensitivity ceiling enforcement in agent tools
+- OpenTelemetry traces tagged with OASF metadata
 
 ### ARIA CLI (`src/aria-cli/`)
 
@@ -124,19 +138,41 @@ ARIA Package Manager prototype: `search`, `inspect`, `audit`, `install`, `list`
 with pluggable install targets (Claude Desktop, VS Code, Agent Framework) and
 governance enforcement at install time.
 
+Includes a .NET CLI project plus npm packaging assets under `src/aria-cli/npm/`.
+
+### Shared Auth Core (`src/aria-auth-core/`)
+
+Reusable authentication, identity provider abstraction, and governance primitives
+shared by ARIA clients and services.
+
+- Package metadata and usage: `src/aria-auth-core/README.md`
+- Change history: `src/aria-auth-core/CHANGELOG.md`
+- Release process: `src/aria-auth-core/RELEASING.md`
+
 ### Tutorial (`tutorial/`)
 
 Seven-module walkthrough from concepts to live demo, including a conference
 demo script with exact commands and talking points.
 
+## Release and CI
+
+Primary workflows and automation assets:
+
+- `/.github/workflows/aria-auth-core-ci.yml`
+- `/.github/workflows/aria-auth-core-publish.yml`
+- `/.github/workflows/aria-cli-publish-packages.yml`
+- `/.github/workflows/pages-microsite.yml`
+
 ## The ARIA Framework
 
-| Layer           | Function                                      | Implementation                               |
-| --------------- | --------------------------------------------- | -------------------------------------------- |
-| **Metamodel**   | Entity types, relationships, lifecycle states | OASF Records, Skills, Domains, Modules       |
-| **Marketplace** | Publish, discover, version, compose           | GitHub repos + OCI registry + OASF manifests |
-| **Governance**  | Classify, label, enforce, audit               | Microsoft Purview + OASF governance overlay  |
-| **Consumption** | Install, wire, validate at runtime            | ARIA Package Manager (`aria`) CLI            |
+| Layer            | Function                                           | Implementation                                                        |
+| ---------------- | -------------------------------------------------- | --------------------------------------------------------------------- |
+| **Metamodel**    | Entity types, relationships, lifecycle states      | OASF Records, Skills, Domains, Modules                                |
+| **Marketplace**  | Publish, discover, version, compose                | GitHub repos + OCI registry + OASF manifests                          |
+| **Governance**   | Classify, label, enforce, audit                    | Microsoft Purview + OASF governance overlay                           |
+| **Distribution** | End-user consumption, one-click installs           | Catalog API + .mcpb packager + Claude Desktop / Cowork integration    |
+| **AI FinOps**    | Cost attribution, budgets, rate limits, chargeback | Cost collector skill + budget enforcement middleware + cost dashboard |
+| **Consumption**  | Developer CLI, install validation                  | ARIA Package Manager (`aria`) CLI                                     |
 
 ## License
 

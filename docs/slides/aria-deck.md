@@ -476,6 +476,57 @@ OTEL telemetry + evaluations
 
 <!-- _class: light -->
 
+# AI FinOps: Cost governance for AI assets
+
+*"Are we allowed to use this?" and "Can we afford to use this?" — same framework, same overlay*
+
+<div class="columns">
+<div>
+
+### Cost governance overlay
+
+```json
+{
+  "cost_governance": {
+    "budget_monthly_usd": 500,
+    "budget_alert_threshold_pct": 80,
+    "cost_center": "CC-4200",
+    "chargeback_model": "per_invocation",
+    "rate_limits": {
+      "daily_invocations": 10000,
+      "monthly_tokens": 5000000
+    }
+  }
+}
+```
+
+</div>
+<div>
+
+### What it enables
+
+<div class="card card-coral">
+
+**Budget enforcement** — middleware blocks invocations when budget is exceeded, just like sensitivity ceiling blocks
+
+</div>
+<div class="card card-teal">
+
+**Cost inheritance** — orchestration cost = sum of composed agent costs, following the OASF dependency graph
+
+</div>
+<div class="card card-accent">
+
+**Cross-provider rollup** — Azure OpenAI + GitHub Copilot + Container Apps → single per-asset cost view
+
+</div>
+</div>
+</div>
+
+---
+
+<!-- _class: light -->
+
 # Distribution gateway: Registry to end user
 
 *OCI is the governance layer. The gateway is the user-facing layer.*
