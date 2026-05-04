@@ -52,11 +52,11 @@ The architecture draws on the metamodel tradition of TOGAF's Architecture Conten
 
 ## Solution Overview
 
-| Layer | Function | Implementation |
-|-------|----------|----------------|
-| Metamodel | Entity types, relationships, lifecycle states for AI primitives | OASF Records, Skills, Domains, Modules |
-| Marketplace | Publish, discover, version, and compose AI primitives | GitHub repos + OCI registry + OASF manifests |
-| Governance | Classify, label, enforce, and audit AI asset usage | Microsoft Purview + OASF overlay policies |
+| Layer       | Function                                                        | Implementation                               |
+| ----------- | --------------------------------------------------------------- | -------------------------------------------- |
+| Metamodel   | Entity types, relationships, lifecycle states for AI primitives | OASF Records, Skills, Domains, Modules       |
+| Marketplace | Publish, discover, version, and compose AI primitives           | GitHub repos + OCI registry + OASF manifests |
+| Governance  | Classify, label, enforce, and audit AI asset usage              | Microsoft Purview + OASF overlay policies    |
 
 # The ARIA Metamodel
 
@@ -64,24 +64,24 @@ Inspired by TOGAF's Architecture Content Framework, this metamodel defines the e
 
 ## Core Entity Types
 
-| Entity Type | OASF Classification | Description | Examples |
-|-------------|---------------------|-------------|----------|
-| Agent | Record (primary) | Autonomous or semi-autonomous AI unit with defined capabilities, identity, and lifecycle | Copilot agent, CrewAI crew, AutoGen group, A2A agent |
-| Skill | Skill annotation | Discrete, reusable capability that an agent can invoke | MCP server, function tool, API connector |
-| Instruction | Module (prompt_bundle) | System prompt, guardrail set, or behavioral configuration | System prompt, safety rules, persona config |
-| Knowledge | Module (knowledge_base) | Structured or unstructured data corpus for grounding and retrieval | RAG index, embeddings store, document collection |
-| Orchestration | Module (orchestration_config) | Composition and routing logic connecting agents, skills, and knowledge | Agent mesh config, routing DAG, workflow definition |
+| Entity Type   | OASF Classification           | Description                                                                              | Examples                                             |
+| ------------- | ----------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Agent         | Record (primary)              | Autonomous or semi-autonomous AI unit with defined capabilities, identity, and lifecycle | Copilot agent, CrewAI crew, AutoGen group, A2A agent |
+| Skill         | Skill annotation              | Discrete, reusable capability that an agent can invoke                                   | MCP server, function tool, API connector             |
+| Instruction   | Module (prompt_bundle)        | System prompt, guardrail set, or behavioral configuration                                | System prompt, safety rules, persona config          |
+| Knowledge     | Module (knowledge_base)       | Structured or unstructured data corpus for grounding and retrieval                       | RAG index, embeddings store, document collection     |
+| Orchestration | Module (orchestration_config) | Composition and routing logic connecting agents, skills, and knowledge                   | Agent mesh config, routing DAG, workflow definition  |
 
 ## Entity Relationships
 
-| Relationship | Source | Target | Cardinality | Governance Implication |
-|-------------|--------|--------|-------------|----------------------|
-| invokes | Agent | Skill | 1:N | Agent inherits sensitivity ceiling of invoked skills |
-| governed_by | Agent | Instruction | 1:N | Instruction version pinning required for compliance |
-| grounded_in | Agent | Knowledge | 1:N | Data classification of knowledge propagates to agent outputs |
-| composed_by | Orchestration | Agent | 1:N | Orchestration inherits highest sensitivity of member agents |
-| depends_on | Skill | Skill | N:M | Transitive dependency chain affects blast radius analysis |
-| extends | Module | Record | 1:N | Extension modules must pass schema validation |
+| Relationship | Source        | Target      | Cardinality | Governance Implication                                       |
+| ------------ | ------------- | ----------- | ----------- | ------------------------------------------------------------ |
+| invokes      | Agent         | Skill       | 1:N         | Agent inherits sensitivity ceiling of invoked skills         |
+| governed_by  | Agent         | Instruction | 1:N         | Instruction version pinning required for compliance          |
+| grounded_in  | Agent         | Knowledge   | 1:N         | Data classification of knowledge propagates to agent outputs |
+| composed_by  | Orchestration | Agent       | 1:N         | Orchestration inherits highest sensitivity of member agents  |
+| depends_on   | Skill         | Skill       | N:M         | Transitive dependency chain affects blast radius analysis    |
+| extends      | Module        | Record      | 1:N         | Extension modules must pass schema validation                |
 
 ## OASF Record Structure
 
@@ -99,27 +99,27 @@ Every entity in the metamodel is represented as an OASF Record containing identi
 
 ## Lifecycle States
 
-| State | Description | Allowed Transitions | Governance Gate |
-|-------|-------------|---------------------|----------------|
-| Draft | Asset under development, not discoverable | Draft → Review | None (author workspace) |
-| Review | PR submitted, OASF validation passing | Review → Published / Draft | CODEOWNERS approval + schema validation |
-| Published | Active in registry, discoverable and invocable | Published → Deprecated / Review | Purview sensitivity label assigned |
-| Deprecated | Marked for sunset, consumers warned | Deprecated → Archived | Migration plan required |
-| Archived | Immutable record preserved for audit | Terminal | Retention policy enforced via Purview DLM |
+| State      | Description                                    | Allowed Transitions             | Governance Gate                           |
+| ---------- | ---------------------------------------------- | ------------------------------- | ----------------------------------------- |
+| Draft      | Asset under development, not discoverable      | Draft → Review                  | None (author workspace)                   |
+| Review     | PR submitted, OASF validation passing          | Review → Published / Draft      | CODEOWNERS approval + schema validation   |
+| Published  | Active in registry, discoverable and invocable | Published → Deprecated / Review | Purview sensitivity label assigned        |
+| Deprecated | Marked for sunset, consumers warned            | Deprecated → Archived           | Migration plan required                   |
+| Archived   | Immutable record preserved for audit           | Terminal                        | Retention policy enforced via Purview DLM |
 
 # Enterprise Capability Model
 
 For an enterprise to successfully manage AI assets at scale, it needs capabilities across six domains.
 
-| Domain | Capabilities | Maturity Indicator |
-|--------|-------------|-------------------|
-| Asset Inventory & Classification | Discover, catalog, and classify all AI primitives using a standardized taxonomy | All AI assets registered with OASF Records |
-| Lifecycle Management | Version, publish, deprecate, and archive with automated gating | Automated CI/CD validates OASF schema on every PR |
-| Composition & Orchestration | Compose agents from skills and knowledge; resolve dependency chains | Orchestration configs reference only published, validated primitives |
-| Governance & Compliance | Apply sensitivity labels, enforce DLP, track lineage, maintain audit trails | Purview labels auto-propagate through dependency graph |
-| Discovery & Reuse | Search, filter, and consume AI assets by skill taxonomy or domain | Searchable registry with skill-based filtering active |
-| Observability & Evaluation | Monitor performance, track metrics, detect drift, surface violations | OTEL telemetry + evaluation modules attached to published Records |
-| AI FinOps & Cost Governance | Track per-asset costs across providers, enforce budgets, rate limits, chargeback | Per-asset cost attribution with budget enforcement middleware active |
+| Domain                           | Capabilities                                                                     | Maturity Indicator                                                   |
+| -------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Asset Inventory & Classification | Discover, catalog, and classify all AI primitives using a standardized taxonomy  | All AI assets registered with OASF Records                           |
+| Lifecycle Management             | Version, publish, deprecate, and archive with automated gating                   | Automated CI/CD validates OASF schema on every PR                    |
+| Composition & Orchestration      | Compose agents from skills and knowledge; resolve dependency chains              | Orchestration configs reference only published, validated primitives |
+| Governance & Compliance          | Apply sensitivity labels, enforce DLP, track lineage, maintain audit trails      | Purview labels auto-propagate through dependency graph               |
+| Discovery & Reuse                | Search, filter, and consume AI assets by skill taxonomy or domain                | Searchable registry with skill-based filtering active                |
+| Observability & Evaluation       | Monitor performance, track metrics, detect drift, surface violations             | OTEL telemetry + evaluation modules attached to published Records    |
+| AI FinOps & Cost Governance      | Track per-asset costs across providers, enforce budgets, rate limits, chargeback | Per-asset cost attribution with budget enforcement middleware active |
 
 # Reference Implementation: GitHub as ARIA Marketplace
 
@@ -199,27 +199,27 @@ Purview's sensitivity labels propagate through the AI asset dependency graph. Th
 
 # ARIA Package Manager
 
-The `apm` CLI bridges the OCI marketplace with developer runtimes.
+The `aria` CLI bridges the OCI marketplace with developer runtimes.
 
 ## Core Commands
 
-| Command | Description |
-|---------|-------------|
-| `apm search` | Discover assets by OASF skill taxonomy, domain, or keyword |
-| `apm inspect <ref>` | Display OASF Record and governance overlay |
-| `apm audit <ref>` | Validate sensitivity ceiling, consumer, and dependencies |
-| `apm install <ref>` | Pull OCI artifact, enforce governance, install to target |
-| `apm list` | List installed assets with version, sensitivity, and target |
+| Command              | Description                                                 |
+| -------------------- | ----------------------------------------------------------- |
+| `aria search`        | Discover assets by OASF skill taxonomy, domain, or keyword  |
+| `aria inspect <ref>` | Display OASF Record and governance overlay                  |
+| `aria audit <ref>`   | Validate sensitivity ceiling, consumer, and dependencies    |
+| `aria install <ref>` | Pull OCI artifact, enforce governance, install to target    |
+| `aria list`          | List installed assets with version, sensitivity, and target |
 
 ## Install Targets
 
-| OASF Module Type | Target | Install Behavior |
-|-----------------|--------|-----------------|
-| mcp_server | Claude Desktop | Add MCP entry to `claude_desktop_config.json` |
-| mcp_server | VS Code | Add to `.vscode/mcp.json` workspace config |
-| mcp_server | Agent Framework | Register as MCP tool provider |
-| Record (agent) | Agent Framework (A2A) | Register as remote A2A endpoint |
-| knowledge_base | Agent Framework | Register with RAG pipeline configuration |
+| OASF Module Type | Target                | Install Behavior                              |
+| ---------------- | --------------------- | --------------------------------------------- |
+| mcp_server       | Claude Desktop        | Add MCP entry to `claude_desktop_config.json` |
+| mcp_server       | VS Code               | Add to `.vscode/mcp.json` workspace config    |
+| mcp_server       | Agent Framework       | Register as MCP tool provider                 |
+| Record (agent)   | Agent Framework (A2A) | Register as remote A2A endpoint               |
+| knowledge_base   | Agent Framework       | Register with RAG pipeline configuration      |
 
 # Distribution Gateway: From Registry to Runtime
 
@@ -227,7 +227,7 @@ OCI is the right storage and governance layer for AI assets — it provides cont
 
 ## The Problem with Direct OCI Consumption
 
-The ARIA marketplace stores AI assets as OCI artifacts in Azure Container Registry or GitHub Container Registry. For developer workflows (CI/CD, the `apm` CLI, Terraform), OCI pull/push operations are natural. But enterprise end users — business analysts, HR managers, hiring coordinators — consume AI capabilities through platforms like Claude Desktop and Cowork. These users think in terms of "I need a capability," not "I need to pull an OCI artifact."
+The ARIA marketplace stores AI assets as OCI artifacts in Azure Container Registry or GitHub Container Registry. For developer workflows (CI/CD, the `aria` CLI, Terraform), OCI pull/push operations are natural. But enterprise end users — business analysts, HR managers, hiring coordinators — consume AI capabilities through platforms like Claude Desktop and Cowork. These users think in terms of "I need a capability," not "I need to pull an OCI artifact."
 
 ## Architecture
 
@@ -244,7 +244,7 @@ The distribution gateway is a thin REST service that sits between the OCI regist
 │              │     │  ┌────────────────┐  │     ├─────────────────────┤
 │              │     │  │ .mcpb Packager  │  │     │ Web Catalog Portal  │
 │              │     │  └────────────────┘  │     ├─────────────────────┤
-│              │     │  ┌────────────────┐  │     │ apm CLI             │
+│              │     │  ┌────────────────┐  │     │ aria CLI            │
 │              │     │  │ Search / Filter │  │     └─────────────────────┘
 │              │     │  └────────────────┘  │
 └─────────────┘     └──────────────────────┘
@@ -332,7 +332,7 @@ The portal is a lightweight web application backed entirely by the Catalog API. 
 
 ## Approval Workflow for Blocked Installs
 
-When any consumption channel (Claude Desktop, Cowork, web portal, apm CLI) encounters a governance block, the experience follows a consistent pattern:
+When any consumption channel (Claude Desktop, Cowork, web portal, aria CLI) encounters a governance block, the experience follows a consistent pattern:
 
 1. The user sees a clear explanation: "This asset is classified as Confidential and your team (Marketing) has an Internal ceiling"
 2. They see the required approval chain from the governance overlay: "Approval required from: AI Governance Lead → HR Data Steward"
@@ -436,14 +436,14 @@ Budget enforcement cascades: if Agent A's budget is $400/mo, it doesn't matter t
 
 ## Provider Integration Matrix
 
-| Provider | Usage API | Cost API | Per-Asset Attribution | Real-Time Metering |
-|----------|-----------|----------|----------------------|-------------------|
-| Azure OpenAI / AI Foundry | Azure Monitor metrics | Azure Cost Management | Via resource tags | Near-real-time via Monitor |
-| GitHub Copilot | Copilot Metrics API (per-user, per-org) | GitHub Billing API | Per-seat/per-org | Daily aggregation |
-| Anthropic Claude | Usage API (tokens per key) | Billing dashboard | Per-API-key | Per-request headers |
-| OpenAI | Usage API (tokens per org) | Organization billing | Per-API-key | Daily aggregation |
-| Azure Container Apps | Azure Monitor | Azure Cost Management | Via resource tags | Near-real-time |
-| AWS Lambda / Bedrock | CloudWatch Metrics | AWS Cost Explorer | Via cost allocation tags | Hourly aggregation |
+| Provider                  | Usage API                               | Cost API              | Per-Asset Attribution    | Real-Time Metering         |
+| ------------------------- | --------------------------------------- | --------------------- | ------------------------ | -------------------------- |
+| Azure OpenAI / AI Foundry | Azure Monitor metrics                   | Azure Cost Management | Via resource tags        | Near-real-time via Monitor |
+| GitHub Copilot            | Copilot Metrics API (per-user, per-org) | GitHub Billing API    | Per-seat/per-org         | Daily aggregation          |
+| Anthropic Claude          | Usage API (tokens per key)              | Billing dashboard     | Per-API-key              | Per-request headers        |
+| OpenAI                    | Usage API (tokens per org)              | Organization billing  | Per-API-key              | Daily aggregation          |
+| Azure Container Apps      | Azure Monitor                           | Azure Cost Management | Via resource tags        | Near-real-time             |
+| AWS Lambda / Bedrock      | CloudWatch Metrics                      | AWS Cost Explorer     | Via cost allocation tags | Hourly aggregation         |
 
 The cost collector normalizes all provider data into a common format using the OASF asset name as the join key, enabling cross-provider rollup per asset, per team, and per department.
 
@@ -485,15 +485,15 @@ The ARIA distribution gateway's web catalog is extended with a cost dashboard th
 
 # Implementation Roadmap
 
-| Phase | Duration | Deliverables | Success Criteria |
-|-------|----------|-------------|-----------------|
-| Foundation | 4–6 weeks | OASF server, governance overlay schema, GitHub template, validation Action | First asset registered with valid OASF Record |
-| Marketplace | 6–8 weeks | OCI publish pipeline, Agent Directory, discovery channels, CODEOWNERS | Teams discover and consume assets through registry |
-| Purview | 6–8 weeks | Label mapping, purview-sync Action, Data Map lineage, sensitivity propagation | Labels auto-propagate through dependency graphs |
-| Distribution | 6–8 weeks | Catalog API, governance gateway, .mcpb packager, Claude Desktop enterprise integration, web catalog portal | Non-technical users browse and install governed skills from Claude Desktop Extensions panel |
-| AI FinOps | 6–8 weeks | Cost governance overlay extension, cost collector skill, budget enforcement middleware, provider API integrations, cost dashboard | Per-asset cost attribution across providers with budget enforcement active |
-| Runtime | 4–6 weeks | DLP enforcement, DSPM dashboards, insider risk, audit logging | Compliance team generates AI audit reports |
-| Scale | Ongoing | Cross-team adoption, Cowork contextual discovery, eval framework, EU AI Act templates, federated directory | All production AI assets governed through ARIA |
+| Phase        | Duration  | Deliverables                                                                                                                      | Success Criteria                                                                            |
+| ------------ | --------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Foundation   | 4–6 weeks | OASF server, governance overlay schema, GitHub template, validation Action                                                        | First asset registered with valid OASF Record                                               |
+| Marketplace  | 6–8 weeks | OCI publish pipeline, Agent Directory, discovery channels, CODEOWNERS                                                             | Teams discover and consume assets through registry                                          |
+| Purview      | 6–8 weeks | Label mapping, purview-sync Action, Data Map lineage, sensitivity propagation                                                     | Labels auto-propagate through dependency graphs                                             |
+| Distribution | 6–8 weeks | Catalog API, governance gateway, .mcpb packager, Claude Desktop enterprise integration, web catalog portal                        | Non-technical users browse and install governed skills from Claude Desktop Extensions panel |
+| AI FinOps    | 6–8 weeks | Cost governance overlay extension, cost collector skill, budget enforcement middleware, provider API integrations, cost dashboard | Per-asset cost attribution across providers with budget enforcement active                  |
+| Runtime      | 4–6 weeks | DLP enforcement, DSPM dashboards, insider risk, audit logging                                                                     | Compliance team generates AI audit reports                                                  |
+| Scale        | Ongoing   | Cross-team adoption, Cowork contextual discovery, eval framework, EU AI Act templates, federated directory                        | All production AI assets governed through ARIA                                              |
 
 # Conclusion
 
