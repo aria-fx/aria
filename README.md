@@ -75,7 +75,7 @@ make all
 # Or individually:
 make docs       # Reference architecture → PDF + DOCX
 make slides     # Conference deck → PPTX + PDF + HTML
-make build      # .NET sample agent + APM CLI
+make build      # .NET sample agent + ARIA CLI
 make test       # Run .NET tests
 make site       # Build microsite HTML for docs + tutorial
 ```
@@ -94,7 +94,7 @@ Build: `make docs` → `out/docs/aria-reference-architecture.pdf` + `.docx`
 
 **Conference Deck** — 13-slide presentation covering the problem, three-layer
 architecture, OASF overview, metamodel, lifecycle, GitHub marketplace,
-Purview integration, sensitivity inheritance, capability model, APM CLI,
+Purview integration, sensitivity inheritance, capability model, ARIA CLI,
 and key takeaways.
 
 Source: `docs/slides/aria-deck.md`
@@ -158,10 +158,10 @@ demo script with exact commands and talking points.
 
 Primary workflows and automation assets:
 
-- `/.github/workflows/aria-auth-core-ci.yml`
-- `/.github/workflows/aria-auth-core-publish.yml`
-- `/.github/workflows/aria-cli-publish-packages.yml`
-- `/.github/workflows/pages-microsite.yml`
+- `.github/workflows/aria-auth-core-ci.yml`
+- `.github/workflows/aria-auth-core-publish.yml`
+- `.github/workflows/aria-cli-publish-packages.yml`
+- `.github/workflows/pages-microsite.yml`
 
 ## The ARIA Framework
 
