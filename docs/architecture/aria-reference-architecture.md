@@ -119,6 +119,7 @@ For an enterprise to successfully manage AI assets at scale, it needs capabiliti
 | Governance & Compliance | Apply sensitivity labels, enforce DLP, track lineage, maintain audit trails | Purview labels auto-propagate through dependency graph |
 | Discovery & Reuse | Search, filter, and consume AI assets by skill taxonomy or domain | Searchable registry with skill-based filtering active |
 | Observability & Evaluation | Monitor performance, track metrics, detect drift, surface violations | OTEL telemetry + evaluation modules attached to published Records |
+| AI FinOps & Cost Governance | Track per-asset costs across providers, enforce budgets, rate limits, chargeback | Per-asset cost attribution with budget enforcement middleware active |
 
 # Reference Implementation: GitHub as ARIA Marketplace
 
@@ -341,6 +342,147 @@ When any consumption channel (Claude Desktop, Cowork, web portal, apm CLI) encou
 6. Once approved, the user receives a notification and can retry the install
 7. The approval event is logged to Purview audit trail
 
+# AI FinOps: Cost Governance for AI Assets
+
+Governance answers "are we allowed to use this?" but enterprise leaders also need to answer "can we afford to use this?" With GitHub's move to usage-based billing and every AI provider metering by token, invocation, or seat, cost visibility and containment for AI assets is becoming as critical as sensitivity classification. ARIA extends the governance overlay with cost governance fields and introduces a metering framework that aggregates usage data across providers.
+
+## The Cost Visibility Problem
+
+AI costs are scattered across multiple billing systems with no unified attribution to business outcomes:
+
+- **Azure OpenAI / AI Foundry** — metered by tokens (input/output) per deployment, visible in Azure Cost Management
+- **GitHub Copilot** — metered by seat (moving to usage-based), visible in GitHub billing API and Copilot Metrics API
+- **Anthropic Claude** — metered by tokens per API key, visible in Anthropic Usage API
+- **OpenAI** — metered by tokens per organization, visible in OpenAI Usage API
+- **MCP servers / custom skills** — hosted on Azure Container Apps, AWS Lambda, or similar, metered by compute
+
+An ARIA agent that uses Azure OpenAI for inference, invokes an MCP skill hosted on Container Apps, and grounds itself in a knowledge base indexed by Azure AI Search has costs in three different billing systems. No provider aggregates this today.
+
+## Cost Governance Overlay Extension
+
+The OASF governance overlay is extended with a `cost_governance` section that declares budget constraints, rate limits, and cost attribution metadata:
+
+```json
+{
+  "governance": {
+    "sensitivity_tier": "confidential",
+    "cost_governance": {
+      "budget_monthly_usd": 500,
+      "budget_alert_threshold_pct": 80,
+      "cost_center": "engineering-platform",
+      "chargeback_model": "per_invocation",
+      "rate_limits": {
+        "daily_invocations": 10000,
+        "monthly_tokens": 5000000,
+        "concurrent_sessions": 50
+      },
+      "cost_attribution_tags": {
+        "department": "hr",
+        "project": "onboarding-automation",
+        "aria_asset": "aria.dev/agents/onboarding-assistant"
+      }
+    }
+  }
+}
+```
+
+Key fields:
+
+- **budget_monthly_usd**: Hard budget cap. The budget enforcement middleware blocks invocations when the asset's month-to-date cost reaches this threshold.
+- **budget_alert_threshold_pct**: Percentage of budget at which alerts are emitted (email, Teams, webhook).
+- **cost_center**: Maps to the organization's financial accounting structure for chargeback.
+- **chargeback_model**: How costs are allocated — `per_invocation` (usage-based), `per_seat` (license-based), `flat_rate` (fixed monthly), or `blended` (combination).
+- **rate_limits**: Operational guardrails that prevent runaway consumption independent of dollar budget.
+- **cost_attribution_tags**: Key-value pairs propagated to all downstream provider billing systems (Azure tags, AWS cost allocation tags) to enable cross-provider cost rollup.
+
+## Metering Module
+
+The OASF record supports a `metering` module type that declares what usage dimensions an asset emits and where metering data flows:
+
+```json
+{
+  "modules": [
+    {
+      "type": "metering",
+      "provider": "azure_cost_management",
+      "dimensions": ["tokens_in", "tokens_out", "invocations", "tool_calls", "latency_p95_ms"],
+      "export_target": "aria.dev/skills/cost-collector",
+      "billing_tags": {
+        "aria_asset": "aria.dev/agents/onboarding-assistant",
+        "aria_version": "2.1.0"
+      }
+    }
+  ]
+}
+```
+
+The metering module enables the cost collector to discover which providers to query and what dimensions to aggregate for each asset.
+
+## Cost Inheritance
+
+Cost inheritance follows the same dependency graph as sensitivity inheritance. An orchestration's cost is the sum of its composed agents' costs. An agent's cost is its own inference cost plus the costs of all skills it invokes. The cost collector builds this rollup by traversing the OASF module refs.
+
+```
+Orchestration (total: $850/mo)
+├── Agent A (inference: $300/mo)
+│   ├── Skill 1 — MCP server hosting: $50/mo
+│   └── Knowledge Base — Azure AI Search: $100/mo
+└── Agent B (inference: $200/mo)
+    ├── Skill 2 — MCP server hosting: $50/mo
+    └── Skill 3 — External API calls: $150/mo
+```
+
+Budget enforcement cascades: if Agent A's budget is $400/mo, it doesn't matter that the orchestration's budget is $850 — Agent A is capped at $400 and its downstream skills are counted against that cap.
+
+## Provider Integration Matrix
+
+| Provider | Usage API | Cost API | Per-Asset Attribution | Real-Time Metering |
+|----------|-----------|----------|----------------------|-------------------|
+| Azure OpenAI / AI Foundry | Azure Monitor metrics | Azure Cost Management | Via resource tags | Near-real-time via Monitor |
+| GitHub Copilot | Copilot Metrics API (per-user, per-org) | GitHub Billing API | Per-seat/per-org | Daily aggregation |
+| Anthropic Claude | Usage API (tokens per key) | Billing dashboard | Per-API-key | Per-request headers |
+| OpenAI | Usage API (tokens per org) | Organization billing | Per-API-key | Daily aggregation |
+| Azure Container Apps | Azure Monitor | Azure Cost Management | Via resource tags | Near-real-time |
+| AWS Lambda / Bedrock | CloudWatch Metrics | AWS Cost Explorer | Via cost allocation tags | Hourly aggregation |
+
+The cost collector normalizes all provider data into a common format using the OASF asset name as the join key, enabling cross-provider rollup per asset, per team, and per department.
+
+## Budget Enforcement Middleware
+
+The ARIA Agent Framework middleware pipeline is extended with a `BudgetEnforcementMiddleware` that sits alongside the governance and Purview middleware:
+
+```
+Request
+  → OasfGovernanceMiddleware   (consumer validation, sensitivity ceiling)
+  → BudgetEnforcementMiddleware (budget cap, rate limits)
+  → PurviewPolicyMiddleware    (DLP, compliance audit)
+  → Agent execution
+```
+
+The budget middleware checks the asset's `cost_governance` fields against the current month-to-date usage (cached from the cost collector). If the budget or rate limits are exceeded, it returns a structured denial similar to the sensitivity ceiling block:
+
+```json
+{
+  "allowed": false,
+  "reason": "This agent has reached 95% of its monthly budget ($475 of $500). Remaining budget: $25. Contact your AI Platform team to request a budget increase.",
+  "budget_used_pct": 95,
+  "budget_remaining_usd": 25,
+  "action_url": "/catalog/assets/aria.dev%2Fagents%2Fonboarding-assistant/2.1.0/request-budget-increase"
+}
+```
+
+## Cost Dashboard
+
+The ARIA distribution gateway's web catalog is extended with a cost dashboard that provides:
+
+- **Per-asset cost breakdown**: inference tokens, hosting, API calls, storage — attributed by OASF asset name
+- **Per-team rollup**: aggregated costs for all assets owned by or consumed by a team
+- **Per-department chargeback**: cost center-level reporting for financial reconciliation
+- **Budget burn rate**: current month spend vs. budget with projected end-of-month forecast
+- **Trend analysis**: month-over-month cost trends per asset with anomaly detection
+- **Cost-per-interaction**: blended cost per user interaction across all underlying providers
+- **Optimization recommendations**: identify underutilized assets (high cost, low invocations) and over-provisioned resources
+
 # Implementation Roadmap
 
 | Phase | Duration | Deliverables | Success Criteria |
@@ -349,11 +491,12 @@ When any consumption channel (Claude Desktop, Cowork, web portal, apm CLI) encou
 | Marketplace | 6–8 weeks | OCI publish pipeline, Agent Directory, discovery channels, CODEOWNERS | Teams discover and consume assets through registry |
 | Purview | 6–8 weeks | Label mapping, purview-sync Action, Data Map lineage, sensitivity propagation | Labels auto-propagate through dependency graphs |
 | Distribution | 6–8 weeks | Catalog API, governance gateway, .mcpb packager, Claude Desktop enterprise integration, web catalog portal | Non-technical users browse and install governed skills from Claude Desktop Extensions panel |
+| AI FinOps | 6–8 weeks | Cost governance overlay extension, cost collector skill, budget enforcement middleware, provider API integrations, cost dashboard | Per-asset cost attribution across providers with budget enforcement active |
 | Runtime | 4–6 weeks | DLP enforcement, DSPM dashboards, insider risk, audit logging | Compliance team generates AI audit reports |
 | Scale | Ongoing | Cross-team adoption, Cowork contextual discovery, eval framework, EU AI Act templates, federated directory | All production AI assets governed through ARIA |
 
 # Conclusion
 
-Enterprise AI is at an inflection point. ARIA — the combination of OASF for classification, GitHub for marketplace operations, Microsoft Purview for governance, and a distribution gateway for end-user consumption — creates a practical, implementable framework that transforms AI asset management from ad hoc artifact accumulation into a governed, discoverable, composable ecosystem.
+Enterprise AI is at an inflection point. ARIA addresses the three questions every enterprise leader asks about AI adoption: "Are we allowed to use this?" (governance), "Can we afford to use this?" (AI FinOps), and "How do our people access it?" (distribution). The combination of OASF for classification, GitHub for marketplace operations, Microsoft Purview for governance, a distribution gateway for end-user consumption, and a cost governance framework for financial accountability creates a practical, implementable architecture that transforms AI asset management from ad hoc artifact accumulation into a governed, discoverable, composable, and economically sustainable ecosystem.
 
-The key insight is that governance must be both embedded in the development workflow *and* invisible to end users. For developers, the OASF Record and governance overlay are part of every pull request, and Purview integration runs through CI/CD pipelines. For business users, the same governance runs transparently behind Claude Desktop's Extensions panel and Cowork's contextual suggestions. The governed path is the easiest path — which is what actually gets compliance at scale.
+The key insight is that governance, cost controls, and user experience must all be embedded in the same workflow. For developers, the OASF Record and governance overlay — including budget caps and rate limits — are part of every pull request. For business users, the same controls run transparently behind Claude Desktop's Extensions panel. For finance teams, per-asset cost attribution flows automatically from provider billing APIs through the OASF dependency graph. The governed path is the easiest path, the most cost-transparent path, and the most compliant path — which is what actually gets adoption at scale.
