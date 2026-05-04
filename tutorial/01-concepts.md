@@ -37,13 +37,13 @@ ARIA operates across three layers:
 
 ## The Five Entity Types
 
-| Entity | What it is | OASF classification |
-|--------|-----------|-------------------|
-| **Agent** | An autonomous AI unit with identity and lifecycle | OASF Record (primary) |
-| **Skill** | A reusable capability an agent can invoke | OASF Skill annotation |
-| **Instruction** | Behavioral configuration (prompts, guardrails) | OASF Module (prompt_bundle) |
-| **Knowledge** | Data corpus for grounding and retrieval | OASF Module (knowledge_base) |
-| **Orchestration** | Routing and composition logic | OASF Module (orchestration_config) |
+| Entity            | What it is                                        | OASF classification                |
+| ----------------- | ------------------------------------------------- | ---------------------------------- |
+| **Agent**         | An autonomous AI unit with identity and lifecycle | OASF Record (primary)              |
+| **Skill**         | A reusable capability an agent can invoke         | OASF Skill annotation              |
+| **Instruction**   | Behavioral configuration (prompts, guardrails)    | OASF Module (prompt_bundle)        |
+| **Knowledge**     | Data corpus for grounding and retrieval           | OASF Module (knowledge_base)       |
+| **Orchestration** | Routing and composition logic                     | OASF Module (orchestration_config) |
 
 ## Key Relationships
 
@@ -70,7 +70,7 @@ This is enforced:
   declared `sensitivity_tier` ≥ max(dependency tiers)
 - **At runtime** — Purview DLP policies prevent under-classified agents from
   accessing sensitive knowledge
-- **At install time** — the `apm audit` command validates governance before
+- **At install time** — the `aria audit` command validates governance before
   pulling artifacts
 
 ## Next Steps

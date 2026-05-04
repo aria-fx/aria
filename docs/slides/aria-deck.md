@@ -260,13 +260,13 @@ Classify, label, enforce, and audit via Microsoft Purview + OASF overlay
 
 *Analogous to TOGAF's Architecture Content Framework — but for AI building blocks*
 
-| Entity | OASF Type | Description |
-|--------|-----------|-------------|
-| **Agent** | Record (primary) | Autonomous AI unit with identity and lifecycle |
-| **Skill** | Skill annotation | Reusable capability (MCP, tools, APIs) |
-| **Instruction** | Module (prompt) | System prompts, guardrails, behavioral configs |
-| **Knowledge** | Module (knowledge) | RAG corpora, embeddings, document collections |
-| **Orchestration** | Module (orch_config) | Routing, composition, agent mesh DAGs |
+| Entity            | OASF Type            | Description                                    |
+| ----------------- | -------------------- | ---------------------------------------------- |
+| **Agent**         | Record (primary)     | Autonomous AI unit with identity and lifecycle |
+| **Skill**         | Skill annotation     | Reusable capability (MCP, tools, APIs)         |
+| **Instruction**   | Module (prompt)      | System prompts, guardrails, behavioral configs |
+| **Knowledge**     | Module (knowledge)   | RAG corpora, embeddings, document collections  |
+| **Orchestration** | Module (orch_config) | Routing, composition, agent mesh DAGs          |
 
 **Key relationships:** Agent → invokes → Skill (1:N) · Agent → governed_by → Instruction (1:N) · Agent → grounded_in → Knowledge (1:N) · Orchestration → composed_by → Agent (1:N)
 
@@ -280,12 +280,12 @@ Every asset progresses through governed states — enforced by CI/CD and tracked
 
 **Draft** → **Review** → **Published** → **Deprecated** → **Archived**
 
-| Transition | Governance gate |
-|------------|----------------|
-| Draft → Review | OASF schema validation passes; governance overlay present |
-| Review → Published | CODEOWNERS approval; sensitivity ceiling check; eval thresholds met |
-| Published → Deprecated | Deprecation notice issued; consumer dependency scan completed |
-| Deprecated → Archived | All consumers migrated; Purview retention policy activated |
+| Transition             | Governance gate                                                     |
+| ---------------------- | ------------------------------------------------------------------- |
+| Draft → Review         | OASF schema validation passes; governance overlay present           |
+| Review → Published     | CODEOWNERS approval; sensitivity ceiling check; eval thresholds met |
+| Published → Deprecated | Deprecation notice issued; consumer dependency scan completed       |
+| Deprecated → Archived  | All consumers migrated; Purview retention policy activated          |
 
 ---
 
@@ -457,17 +457,17 @@ OTEL telemetry + evaluations
 
 <!-- _class: light -->
 
-# ARIA Package Manager (`apm`)
+# ARIA Package Manager (`aria`)
 
 *The "last mile" — from registry to runtime*
 
-| Command | Description |
-|---------|-------------|
-| `apm search` | Discover assets by OASF skill, domain, or keyword |
-| `apm inspect` | Display OASF Record and governance overlay |
-| `apm audit` | Validate sensitivity ceiling + consumer + dependencies |
-| `apm install` | Pull OCI artifact, enforce governance, wire into target |
-| `apm list` | List installed assets with version and sensitivity |
+| Command        | Description                                             |
+| -------------- | ------------------------------------------------------- |
+| `aria search`  | Discover assets by OASF skill, domain, or keyword       |
+| `aria inspect` | Display OASF Record and governance overlay              |
+| `aria audit`   | Validate sensitivity ceiling + consumer + dependencies  |
+| `aria install` | Pull OCI artifact, enforce governance, wire into target |
+| `aria list`    | List installed assets with version and sensitivity      |
 
 **Install targets:** Claude Desktop · VS Code · Agent Framework (local/A2A)
 **Governance:** Every install validates ceiling → consumer → dependencies → Purview audit
