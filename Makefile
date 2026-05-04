@@ -3,7 +3,7 @@
 # Build documents, slides, and .NET projects
 # ─────────────────────────────────────────────────────────────
 
-.PHONY: all docs slides architecture build test clean help site watch-site
+.PHONY: all docs slides architecture build test clean help site watch-site aria-npm-pack aria-npm-pack-dry-run
 
 # Output directories
 OUT_DIR := out
@@ -44,6 +44,8 @@ help:
 	@echo "  make test          Run .NET tests"
 	@echo "  make site          Build GitHub Pages HTML from markdown sources"
 	@echo "  make watch-site    Rebuild site on markdown changes (requires inotify-tools)"
+	@echo "  make aria-npm-pack Build npm tarball from src/aria-cli/npm"
+	@echo "  make aria-npm-pack-dry-run Validate npm tarball from src/aria-cli/npm"
 	@echo "  make clean         Remove build artifacts"
 	@echo ""
 	@echo "Individual targets:"
@@ -214,6 +216,18 @@ test:
 	@echo "Running tests..."
 	dotnet test src/sample-agent/Oasf.Sample.sln --verbosity quiet
 	@echo "Tests complete"
+
+# ── ARIA npm Package ──────────────────────────────────────
+
+aria-npm-pack:
+	@echo "Packing aria CLI npm package from src/aria-cli/npm..."
+	cd src/aria-cli/npm && npm pack
+	@echo "npm pack complete"
+
+aria-npm-pack-dry-run:
+	@echo "Validating aria CLI npm package from src/aria-cli/npm..."
+	cd src/aria-cli/npm && npm run check:dist && npm pack --dry-run
+	@echo "npm dry-run pack complete"
 
 # ── Clean ──────────────────────────────────────────────────
 

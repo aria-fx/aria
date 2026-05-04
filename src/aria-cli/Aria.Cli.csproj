@@ -9,13 +9,43 @@
     <AssemblyName>aria</AssemblyName>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>aria</ToolCommandName>
+    <PackageId>Aria.Cli</PackageId>
+    <Version>0.0.1-22</Version>
+    <PackageTitle>ARIA CLI</PackageTitle>
+    <Description>ARIA Package Manager CLI for discovering, validating, and installing OASF-governed AI assets.</Description>
+    <Authors>ARIA Contributors</Authors>
+    <PackageTags>aria;oasf;cli;ai;governance</PackageTags>
+    <RepositoryUrl>https://github.com/aria-fx/aria</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/aria-fx/aria</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>See https://github.com/aria-fx/aria/blob/main/src/aria-cli/CHANGELOG.md for release notes.</PackageReleaseNotes>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Aria.Cli.Tests/**/*.cs" />
+    <EmbeddedResource Remove="Aria.Cli.Tests/**/*.resx" />
+    <None Remove="Aria.Cli.Tests/**/*.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageReference Include="Spectre.Console" Version="0.49.*" />
     <PackageReference Include="Azure.Identity" Version="1.*" />
     <PackageReference Include="Azure.Containers.ContainerRegistry" Version="1.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../aria-auth-core/Aria.Auth.Core.csproj" />
   </ItemGroup>
 
 </Project>

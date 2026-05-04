@@ -6,7 +6,8 @@
 
 using System.CommandLine;
 using System.Text.Json;
-using Aria.Cli.Models;
+using Aria.Auth.Core.Models;
+using Aria.Auth.Core.Services;
 using Aria.Cli.Services;
 using Aria.Cli.Targets;
 using Spectre.Console;
@@ -24,6 +25,26 @@ AriaConfig LoadConfig()
 
 var registry = new OciRegistryService();
 var governance = new GovernanceService();
+var identityProviderFactory = new IdentityProviderFactory(
+[
+    new EntraAuthService(),
+    new OktaIdentityProvider(),
+    new Auth0IdentityProvider()
+]);
+var accessPolicy = new AccessPolicyService(identityProviderFactory);
+
+async Task<EffectiveAccessContext?> ResolveAccessAsync(AriaConfig config)
+{
+    try
+    {
+        return await accessPolicy.ResolveAsync(config);
+    }
+    catch (Exception ex)
+    {
+        AnsiConsole.MarkupLine($"[red]Authentication error: {Markup.Escape(ex.Message)}[/]");
+        return null;
+    }
+}
 
 // ═══════════════════════════════════════════════════════════
 // ROOT COMMAND
@@ -139,6 +160,43 @@ inspectCommand.SetHandler(async (string reference) =>
 rootCommand.AddCommand(inspectCommand);
 
 // ═══════════════════════════════════════════════════════════
+// WHOAMI
+// ═══════════════════════════════════════════════════════════
+
+var whoAmICommand = new Command("whoami", "Show resolved identity provider and effective access profile");
+
+whoAmICommand.SetHandler(async () =>
+{
+    var config = LoadConfig();
+    var access = await ResolveAccessAsync(config);
+    if (access == null)
+        return;
+
+    AnsiConsole.MarkupLine("[bold]Effective access context[/]");
+    AnsiConsole.MarkupLine($"Consumer: [cyan]{access.ConsumerId}[/]");
+    AnsiConsole.MarkupLine($"Sensitivity ceiling: [cyan]{access.SensitivityCeiling}[/]");
+    AnsiConsole.MarkupLine($"Purview roles: [cyan]{(access.PurviewRoles.Count > 0 ? string.Join(", ", access.PurviewRoles) : "none")}[/]");
+    if (access.MatchedRules.Count > 0)
+        AnsiConsole.MarkupLine($"Matched rules: [cyan]{string.Join(", ", access.MatchedRules)}[/]");
+
+    if (access.Identity == null)
+    {
+        AnsiConsole.MarkupLine("Identity: [yellow]not resolved (provider disabled or no credential available)[/]");
+        return;
+    }
+
+    AnsiConsole.MarkupLine("\n[bold]Identity[/]");
+    AnsiConsole.MarkupLine($"Provider: [cyan]{access.Identity.Provider}[/]");
+    AnsiConsole.MarkupLine($"Object ID: [cyan]{access.Identity.ObjectId}[/]");
+    AnsiConsole.MarkupLine($"Tenant ID: [cyan]{access.Identity.TenantId}[/]");
+    AnsiConsole.MarkupLine($"UPN: [cyan]{access.Identity.UserPrincipalName ?? "(n/a)"}[/]");
+    AnsiConsole.MarkupLine($"Groups: [cyan]{(access.Identity.Groups.Count > 0 ? string.Join(", ", access.Identity.Groups) : "none")}[/]");
+    AnsiConsole.MarkupLine($"Roles/scopes: [cyan]{(access.Identity.Roles.Count > 0 ? string.Join(", ", access.Identity.Roles) : "none")}[/]");
+});
+
+rootCommand.AddCommand(whoAmICommand);
+
+// ═══════════════════════════════════════════════════════════
 // AUDIT
 // ═══════════════════════════════════════════════════════════
 
@@ -154,8 +212,12 @@ auditCommand.SetHandler(async (string reference, string? ceiling) =>
     if (ceiling != null)
         config = config with { SensitivityCeiling = ceiling };
 
+    var access = await ResolveAccessAsync(config);
+    if (access == null)
+        return;
+
     AnsiConsole.MarkupLine($"[dim]Auditing governance for {reference}...[/]");
-    AnsiConsole.MarkupLine($"[dim]Consumer: {config.ConsumerId} | Ceiling: {config.SensitivityCeiling}[/]\n");
+    AnsiConsole.MarkupLine($"[dim]Consumer: {access.ConsumerId} | Ceiling: {access.SensitivityCeiling}[/]\n");
 
     var record = await registry.FetchRecordAsync(reference);
     var gov = await registry.FetchGovernanceAsync(reference);
@@ -166,7 +228,7 @@ auditCommand.SetHandler(async (string reference, string? ceiling) =>
         return;
     }
 
-    var results = await governance.AuditAsync(config, record, gov, registry);
+    var results = await governance.AuditAsync(config, record, gov, registry, access);
 
     var passed = results.All(r => r.Allowed);
 
@@ -174,8 +236,8 @@ auditCommand.SetHandler(async (string reference, string? ceiling) =>
     {
         AnsiConsole.MarkupLine("[green]✓ All governance checks passed[/]");
         AnsiConsole.MarkupLine($"  Asset tier: [cyan]{gov.Governance.SensitivityTier}[/]");
-        AnsiConsole.MarkupLine($"  Your ceiling: [cyan]{config.SensitivityCeiling}[/]");
-        AnsiConsole.MarkupLine($"  Consumer: [cyan]{config.ConsumerId}[/]");
+        AnsiConsole.MarkupLine($"  Your ceiling: [cyan]{access.SensitivityCeiling}[/]");
+        AnsiConsole.MarkupLine($"  Consumer: [cyan]{access.ConsumerId}[/]");
         AnsiConsole.MarkupLine($"  Frameworks: [cyan]{string.Join(", ", gov.Governance.ComplianceFrameworks)}[/]");
     }
     else
@@ -205,6 +267,9 @@ installCommand.AddOption(targetOption);
 installCommand.SetHandler(async (string reference, string target) =>
 {
     var config = LoadConfig();
+    var access = await ResolveAccessAsync(config);
+    if (access == null)
+        return;
 
     AnsiConsole.MarkupLine($"[bold]aria install[/] {reference} → {target}\n");
 
@@ -225,14 +290,14 @@ installCommand.SetHandler(async (string reference, string target) =>
     AnsiConsole.MarkupLine("[dim]2. Validating governance...[/]");
     if (gov != null)
     {
-        var result = governance.ValidateInstall(config, gov);
+        var result = governance.ValidateInstall(config, gov, access);
         if (!result.Allowed)
         {
             AnsiConsole.MarkupLine($"[red]   ✗ {result.Reason}[/]");
             return;
         }
-        AnsiConsole.MarkupLine($"   [green]✓[/] Sensitivity: {gov.Governance.SensitivityTier} ≤ {config.SensitivityCeiling}");
-        AnsiConsole.MarkupLine($"   [green]✓[/] Consumer '{config.ConsumerId}' is authorized");
+        AnsiConsole.MarkupLine($"   [green]✓[/] Sensitivity: {gov.Governance.SensitivityTier} ≤ {access.SensitivityCeiling}");
+        AnsiConsole.MarkupLine($"   [green]✓[/] Consumer '{access.ConsumerId}' is authorized");
     }
     else
     {
@@ -371,15 +436,68 @@ initCommand.SetHandler(async () =>
         Purview = new()
         {
             Account = "purview-myorg",
-            TenantId = "your-tenant-id"
-        }
+            TenantId = "your-tenant-id",
+            RequiredRolesBySensitivity = new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["confidential"] = ["Data Reader"],
+                ["highly_confidential"] = ["Data Curator"],
+                ["restricted"] = ["Data Source Administrator"]
+            }
+        },
+        Entra = new()
+        {
+            Enabled = true,
+            TenantId = "your-tenant-id",
+            Scopes = ["https://management.azure.com/.default"]
+        },
+        Auth = new()
+        {
+            Provider = "entra",
+            EnableExperimentalProviders = false
+        },
+        Okta = new()
+        {
+            Enabled = false,
+            Issuer = "https://your-org.okta.com/oauth2/default",
+            ClientId = "your-okta-client-id",
+            Scopes = ["openid", "profile", "groups"],
+            AccessTokenEnvVar = "OKTA_ACCESS_TOKEN",
+            AccessTokenFile = "~/.aria/okta-token.txt",
+            TokenEndpoint = "https://your-org.okta.com/oauth2/default/v1/token",
+            ClientSecretEnvVar = "OKTA_CLIENT_SECRET"
+        },
+        Auth0 = new()
+        {
+            Enabled = false,
+            Domain = "your-tenant.us.auth0.com",
+            ClientId = "your-auth0-client-id",
+            Audience = "https://api.example.com",
+            Scopes = ["openid", "profile", "read:assets"]
+        },
+        AccessRules =
+        [
+            new()
+            {
+                Name = "hr-readers",
+                AnyEntraGroups = ["entra-group-hr-readers"],
+                SensitivityCeiling = "confidential",
+                PurviewRoles = ["Data Reader"]
+            },
+            new()
+            {
+                Name = "governance-admins",
+                AnyEntraRoles = ["Governance.Admin"],
+                SensitivityCeiling = "restricted",
+                PurviewRoles = ["Data Source Administrator", "Data Curator"]
+            }
+        ]
     };
 
     var json = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
     await File.WriteAllTextAsync(configPath, json);
 
     AnsiConsole.MarkupLine($"[green]✓ Created config at {configPath}[/]");
-    AnsiConsole.MarkupLine("[dim]Edit the file to set your consumer_id, registries, and target paths.[/]");
+    AnsiConsole.MarkupLine("[dim]Edit the file to set auth provider settings, access_rules, registries, and target paths.[/]");
 });
 
 rootCommand.AddCommand(initCommand);

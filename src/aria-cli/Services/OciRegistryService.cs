@@ -5,7 +5,8 @@
 // ─────────────────────────────────────────────────────────────
 
 using System.Text.Json;
-using Aria.Cli.Models;
+using Aria.Auth.Core.Models;
+using Aria.Auth.Core.Services;
 
 namespace Aria.Cli.Services;
 
@@ -15,7 +16,7 @@ namespace Aria.Cli.Services;
 /// or oras-go for registry interactions. For the prototype,
 /// it supports local file-based resolution for demo purposes.
 /// </summary>
-public sealed class OciRegistryService
+public sealed class OciRegistryService : IGovernanceOverlayResolver
 {
     /// <summary>
     /// Fetch the OASF Record from an OCI artifact reference.

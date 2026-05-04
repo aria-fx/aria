@@ -1,0 +1,234 @@
+name: Publish ARIA Auth Core
+
+on:
+  push:
+    tags:
+      - "aria-auth-core-v*"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build and validate only (no publish)"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  packages: write
+
+# Required auth:
+# - Uses the default GITHUB_TOKEN with packages:write permission.
+# - No extra secrets are needed for GitHub Packages publish in this repository.
+#
+# Release notes template:
+# - .github/release-notes/aria-auth-core-release-template.md
+# Release process:
+# - src/aria-auth-core/RELEASING.md
+# Versioning:
+# - GitVersion computes SemVer from git history and release tags.
+# - GitVersion config: GitVersion.yml
+
+env:
+  DOTNET_VERSION: "9.0.x"
+  NUGET_SOURCE_URL: "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+  NUGET_PACKAGE_ID: "Aria.Auth.Core"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup GitVersion
+        uses: gittools/actions/gitversion/setup@v3
+        with:
+          versionSpec: "6.x"
+
+      - name: Determine version with GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v3
+
+      - name: Resolve release version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="${{ steps.gitversion.outputs.SemVer }}"
+
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            DRY_RUN="${{ inputs.dry_run }}"
+          else
+            DRY_RUN="false"
+
+            TAG_VERSION="${GITHUB_REF_NAME#aria-auth-core-v}"
+            if [[ "$VERSION" != "$TAG_VERSION" ]]; then
+              echo "GitVersion SemVer (${VERSION}) does not match tag version (${TAG_VERSION})." >&2
+              exit 1
+            fi
+          fi
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Version '$VERSION' is not valid SemVer" >&2
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "dry_run=$DRY_RUN" >> "$GITHUB_OUTPUT"
+
+      - name: Verify auth core changed
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          CHANGED=""
+          PREV_TAG=$(git tag --list "aria-auth-core-v*" --sort=-v:refname | grep -v "^${GITHUB_REF_NAME}$" | head -n1 || true)
+
+          if [[ -n "$PREV_TAG" ]]; then
+            CHANGED=$(git diff --name-only "$PREV_TAG"...HEAD -- src/aria-auth-core/)
+          else
+            if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+              CHANGED=$(git diff --name-only HEAD^...HEAD -- src/aria-auth-core/)
+            else
+              CHANGED=$(git ls-files src/aria-auth-core/)
+            fi
+          fi
+
+          if [[ -z "$CHANGED" ]]; then
+            echo "No changes detected under src/aria-auth-core; refusing publish." >&2
+            exit 1
+          fi
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Validate package version is not already published
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          OWNER_TYPE: ${{ github.event.repository.owner.type }}
+          VERSION: ${{ steps.version.outputs.version }}
+          NUGET_PACKAGE_ID: ${{ env.NUGET_PACKAGE_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "$OWNER_TYPE" == "Organization" ]]; then
+            BASE_PATH="/orgs/${OWNER}/packages"
+          else
+            BASE_PATH="/users/${OWNER}/packages"
+          fi
+
+          set +e
+          NUGET_VERSIONS_JSON=$(gh api "${BASE_PATH}/nuget/${NUGET_PACKAGE_ID}/versions" 2>/dev/null)
+          NUGET_EXIT=$?
+          set -e
+
+          if [[ $NUGET_EXIT -eq 0 ]]; then
+            if echo "$NUGET_VERSIONS_JSON" | jq -e --arg VERSION "$VERSION" '.[] | select(.name == $VERSION)' >/dev/null; then
+              echo "NuGet version ${VERSION} already exists for ${NUGET_PACKAGE_ID}" >&2
+              exit 1
+            fi
+          fi
+
+      - name: Auto-update release metadata
+        if: ${{ github.event_name == 'workflow_dispatch' &&
+          steps.version.outputs.dry_run != 'true' }}
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          CHANGELOG="src/aria-auth-core/CHANGELOG.md"
+          CSPROJ="src/aria-auth-core/Aria.Auth.Core.csproj"
+          RELEASE_DATE="$(date -u +%Y-%m-%d)"
+
+          if [[ ! -f "$CHANGELOG" ]]; then
+            echo "Missing $CHANGELOG" >&2
+            exit 1
+          fi
+
+          if ! grep -Eq "^## ${VERSION}( |$)|^## ${VERSION} -" "$CHANGELOG"; then
+            perl -0777 -i -pe "s/^## Unreleased\\s*\\n/## Unreleased\\n\\n## ${VERSION} - ${RELEASE_DATE}\\n\\n### Changed\\n- Generated by publish workflow. Replace with user-facing release notes.\\n/sm" "$CHANGELOG"
+          fi
+
+          if grep -q "<Version>.*</Version>" "$CSPROJ"; then
+            sed -i -E "s|<Version>[^<]+</Version>|<Version>${VERSION}</Version>|" "$CSPROJ"
+          else
+            sed -i -E "s|<PackageId>Aria.Auth.Core</PackageId>|<PackageId>Aria.Auth.Core</PackageId>\\n    <Version>${VERSION}</Version>|" "$CSPROJ"
+          fi
+
+      - name: Validate changelog contains release version
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          CHANGELOG="src/aria-auth-core/CHANGELOG.md"
+          BASE_VERSION="${VERSION%%-*}"
+
+          if [[ ! -f "$CHANGELOG" ]]; then
+            echo "Missing $CHANGELOG" >&2
+            exit 1
+          fi
+
+          if ! grep -Eq "^## ${VERSION}( |$)|^## ${VERSION} -|^## ${BASE_VERSION}( |$)|^## ${BASE_VERSION} -|^## Unreleased( |$)" "$CHANGELOG"; then
+            echo "CHANGELOG.md must include a heading for version ${VERSION}, ${BASE_VERSION}, or Unreleased" >&2
+            exit 1
+          fi
+
+      - name: Restore and build auth core
+        run: |
+          dotnet restore src/aria-auth-core/Aria.Auth.Core.csproj
+          dotnet build src/aria-auth-core/Aria.Auth.Core.csproj -c Release --no-restore
+
+      - name: Pack NuGet package
+        run: |
+          dotnet pack src/aria-auth-core/Aria.Auth.Core.csproj \
+            -c Release \
+            --no-build \
+            -o artifacts/nuget \
+            /p:ContinuousIntegrationBuild=true \
+            /p:PackageVersion=${{ steps.version.outputs.version }}
+
+      - name: Publish NuGet package to GitHub Packages
+        if: ${{ steps.version.outputs.dry_run != 'true' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dotnet nuget push artifacts/nuget/*.nupkg \
+            --source "${{ env.NUGET_SOURCE_URL }}" \
+            --api-key "${GITHUB_TOKEN}"
+
+      - name: Commit release metadata updates
+        if: ${{ github.event_name == 'workflow_dispatch' &&
+          steps.version.outputs.dry_run != 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add src/aria-auth-core/CHANGELOG.md src/aria-auth-core/Aria.Auth.Core.csproj
+
+          if git diff --cached --quiet; then
+            echo "No release metadata changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore(release): update aria-auth-core metadata for ${{ steps.version.outputs.version }}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Publish summary
+        run: |
+          echo "Published ARIA Auth Core version ${{ steps.version.outputs.version }}"
+          echo "Dry run: ${{ steps.version.outputs.dry_run }}"

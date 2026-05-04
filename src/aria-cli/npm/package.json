@@ -1,0 +1,40 @@
+{
+    "name": "@aria-fx/aria-cli",
+    "version": "0.0.1-22",
+    "description": "ARIA CLI npm wrapper for the .NET aria command",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/aria-fx/aria.git",
+        "directory": "src/aria-cli"
+    },
+    "homepage": "https://github.com/aria-fx/aria",
+    "bugs": {
+        "url": "https://github.com/aria-fx/aria/issues"
+    },
+    "author": "ARIA Contributors",
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com"
+    },
+    "bin": {
+        "aria": "bin/aria.js"
+    },
+    "files": [
+        "bin",
+        "dist",
+        "README.md",
+        "CHANGELOG.md"
+    ],
+    "engines": {
+        "node": ">=18"
+    },
+    "scripts": {
+        "check:dist": "test -f dist/aria/aria.dll"
+    },
+    "keywords": [
+        "aria",
+        "cli",
+        "oasf",
+        "governance"
+    ]
+}

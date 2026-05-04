@@ -2,14 +2,21 @@
 out/
 bin/
 obj/
-
+*.dll
+*.exe
+*.pdb
+*.log
+artifacts/
+dist/
 # Terraform
 *.tfstate
 *.tfstate.backup
 .terraform/
 .terraform.lock.hcl
 *.tfplan
-
+*.tgz
+*.gz
+*.zip
 # .NET
 *.user
 *.suo

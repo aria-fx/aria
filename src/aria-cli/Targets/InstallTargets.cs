@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────
 
 using System.Text.Json;
-using Aria.Cli.Models;
+using Aria.Auth.Core.Models;
 
 namespace Aria.Cli.Targets;
 

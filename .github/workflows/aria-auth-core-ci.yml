@@ -1,0 +1,46 @@
+name: ARIA Auth Core CI
+
+on:
+  push:
+    paths:
+      - "src/aria-auth-core/**"
+      - "src/aria-cli/**"
+      - ".github/workflows/aria-auth-core-*.yml"
+  pull_request:
+    paths:
+      - "src/aria-auth-core/**"
+      - "src/aria-cli/**"
+      - ".github/workflows/aria-auth-core-*.yml"
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: "9.0.x"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore and build auth core
+        run: |
+          dotnet restore src/aria-auth-core/Aria.Auth.Core.csproj
+          dotnet build src/aria-auth-core/Aria.Auth.Core.csproj -c Release --no-restore
+
+      - name: Restore and build CLI consumer
+        run: |
+          dotnet restore src/aria-cli/Aria.Cli.csproj
+          dotnet build src/aria-cli/Aria.Cli.csproj -c Release --no-restore
+
+      - name: Run CLI tests
+        run: dotnet test src/aria-cli/Aria.Cli.Tests/Aria.Cli.Tests.csproj -c Release
+          --no-build
