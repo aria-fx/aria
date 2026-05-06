@@ -92,7 +92,7 @@ ARIA Package Manager concept, and implementation roadmap.
 Source: `docs/architecture/aria-reference-architecture.md`
 Build: `make docs` → `out/docs/aria-reference-architecture.pdf` + `.docx`
 
-**Conference Deck** — 13-slide presentation covering the problem, three-layer
+**Conference Deck** — 13-slide presentation covering the problem, four-layer
 architecture, OASF overview, metamodel, lifecycle, GitHub marketplace,
 Purview integration, sensitivity inheritance, capability model, ARIA CLI,
 and key takeaways.

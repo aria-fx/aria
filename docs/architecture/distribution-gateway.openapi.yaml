@@ -1,0 +1,359 @@
+openapi: 3.1.0
+info:
+  title: ARIA Distribution Gateway API
+  version: 1.0.0
+  summary: Runtime-oriented delivery API for governed ARIA assets.
+  description: |
+    The Distribution Gateway transforms governed OCI artifacts into channel-native
+    install bundles and brokered experiences for enterprise runtimes.
+servers:
+  - url: https://gateway.aria.example.com
+    description: Production
+  - url: https://gateway-staging.aria.example.com
+    description: Staging
+security:
+  - bearerAuth: []
+tags:
+  - name: Registry
+  - name: Bundles
+  - name: Channels
+  - name: Access
+paths:
+  /v1/registry/assets/{name}/{version}:
+    get:
+      tags: [ Registry ]
+      operationId: getRegistryAssetMetadata
+      summary: Resolve canonical metadata for an asset version.
+      parameters:
+        - $ref: "#/components/parameters/name"
+        - $ref: "#/components/parameters/version"
+      responses:
+        "200":
+          description: Registry metadata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegistryAssetMetadata"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/bundles/mcpb:
+    post:
+      tags: [ Bundles ]
+      operationId: createMcpBundle
+      summary: Build a governed MCP bundle for supported channels.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/McpBundleRequest"
+      responses:
+        "201":
+          description: Bundle generated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BundleResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/bundles/{bundleId}:
+    get:
+      tags: [ Bundles ]
+      operationId: getBundle
+      summary: Retrieve bundle metadata and download URL.
+      parameters:
+        - $ref: "#/components/parameters/bundleId"
+      responses:
+        "200":
+          description: Bundle details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BundleResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/channels/{channel}/install:
+    post:
+      tags: [ Channels ]
+      operationId: startChannelInstall
+      summary: Trigger channel-specific install flow.
+      parameters:
+        - $ref: "#/components/parameters/channel"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChannelInstallRequest"
+      responses:
+        "202":
+          description: Install started.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChannelInstallResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/channels/{channel}/catalog:
+    get:
+      tags: [ Channels ]
+      operationId: listChannelCatalog
+      summary: Return channel-shaped catalog for current user.
+      parameters:
+        - $ref: "#/components/parameters/channel"
+        - $ref: "#/components/parameters/skill"
+        - $ref: "#/components/parameters/domain"
+      responses:
+        "200":
+          description: Channel catalog payload.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChannelCatalogResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /v1/access/evaluate:
+    post:
+      tags: [ Access ]
+      operationId: evaluateAccess
+      summary: Evaluate access for consumer and target asset.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccessEvaluationRequest"
+      responses:
+        "200":
+          description: Access decision.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessEvaluationResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    name:
+      name: name
+      in: path
+      required: true
+      schema:
+        type: string
+      example: xebia.com/agents/onboarding-assistant
+    version:
+      name: version
+      in: path
+      required: true
+      schema:
+        type: string
+      example: 2.1.0
+    bundleId:
+      name: bundleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    channel:
+      name: channel
+      in: path
+      required: true
+      schema:
+        type: string
+        enum: [ claude_desktop, vscode, cowork, web_portal, aria_cli ]
+    skill:
+      name: skill
+      in: query
+      schema:
+        type: string
+    domain:
+      name: domain
+      in: query
+      schema:
+        type: string
+  responses:
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Missing or invalid authentication.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Request blocked by governance policy.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  schemas:
+    RegistryAssetMetadata:
+      type: object
+      required: [ name, version, digest, governance ]
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        digest:
+          type: string
+        recordLocator:
+          type: string
+        governance:
+          type: object
+          additionalProperties: true
+    McpBundleRequest:
+      type: object
+      required: [ name, version, channel ]
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        channel:
+          type: string
+          enum: [ claude_desktop, cowork ]
+        configuration:
+          type: object
+          additionalProperties:
+            type: string
+    BundleResponse:
+      type: object
+      required: [ bundleId, status, format ]
+      properties:
+        bundleId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [ ready, building, expired ]
+        format:
+          type: string
+          enum: [ mcpb ]
+        downloadUrl:
+          type: string
+          format: uri
+        expiresAt:
+          type: string
+          format: date-time
+    ChannelInstallRequest:
+      type: object
+      required: [ name, version ]
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        bundleId:
+          type: string
+          format: uuid
+        context:
+          type: object
+          additionalProperties: true
+    ChannelInstallResponse:
+      type: object
+      required: [ installId, status ]
+      properties:
+        installId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [ accepted, in_progress ]
+        channelReference:
+          type: string
+    ChannelCatalogItem:
+      type: object
+      required: [ name, version, title ]
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        title:
+          type: string
+        capabilitySummary:
+          type: string
+        trustBadge:
+          type: string
+    ChannelCatalogResponse:
+      type: object
+      required: [ channel, items ]
+      properties:
+        channel:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChannelCatalogItem"
+    AccessEvaluationRequest:
+      type: object
+      required: [ consumerId, name, version ]
+      properties:
+        consumerId:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        dependencyDepth:
+          type: integer
+          minimum: 0
+          default: 3
+    AccessEvaluationResponse:
+      type: object
+      required: [ allowed, policyDecision ]
+      properties:
+        allowed:
+          type: boolean
+        policyDecision:
+          type: string
+          enum: [ allow, deny, require_approval ]
+        reasons:
+          type: array
+          items:
+            type: string
+        approvalChain:
+          type: array
+          items:
+            type: string
+    ErrorResponse:
+      type: object
+      required: [ errorCode, message ]
+      properties:
+        errorCode:
+          type: string
+        message:
+          type: string
+        correlationId:
+          type: string

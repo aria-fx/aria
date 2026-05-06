@@ -189,7 +189,7 @@ Teams can't find, reuse, or safely compose AI assets across organizational bound
 
 <!-- _class: light -->
 
-# Three-layer architecture + distribution gateway
+# Four-layer architecture
 
 <div class="columns-3">
 <div class="card">
@@ -218,7 +218,7 @@ Classify, label, enforce, and audit via Microsoft Purview + OASF overlay
 </div>
 </div>
 
-**+ Distribution Gateway** — Catalog API translates OCI artifacts into platform-native installs (Claude Desktop `.mcpb`, Cowork suggestions, web portal) with transparent governance enforcement
+**Distribution** — Catalog API (distribution gateway) translates OCI artifacts into platform-native installs (Claude Desktop `.mcpb`, Cowork suggestions, web portal) with transparent governance enforcement
 
 ---
 

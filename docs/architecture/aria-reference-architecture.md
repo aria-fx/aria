@@ -10,8 +10,9 @@ abstract: |
   for classifying, governing, and composing them. This document presents ARIA
   (Asset Registry for Intelligent Agents), a reference architecture that applies the
   Open Agentic Schema Framework (OASF) as the classification taxonomy, uses GitHub
-  as the canonical marketplace and registry, and integrates Microsoft Purview as the
-  governance and compliance layer.
+  as the canonical marketplace and registry, integrates Microsoft Purview as the
+  governance and compliance layer, and adds a distribution layer for governed
+  end-user delivery.
 keywords:
   - ARIA
   - OASF
@@ -39,7 +40,7 @@ header-includes:
 
 # Executive Summary
 
-Enterprises are rapidly accumulating AI primitives — agents, skills, instructions, knowledge bases, and orchestration configurations — without a standardized metamodel for classifying, governing, and composing them. ARIA (Asset Registry for Intelligent Agents) presents a reference architecture that applies the Open Agentic Schema Framework (OASF) as the classification taxonomy, uses GitHub as the canonical marketplace and registry for these primitives, and integrates Microsoft Purview as the governance and compliance layer.
+Enterprises are rapidly accumulating AI primitives — agents, skills, instructions, knowledge bases, and orchestration configurations — without a standardized metamodel for classifying, governing, and composing them. ARIA (Asset Registry for Intelligent Agents) presents a four-layer reference architecture: the Open Agentic Schema Framework (OASF) as the classification taxonomy, GitHub as the canonical marketplace and registry, Microsoft Purview as the governance and compliance layer, and a distribution layer for governed end-user delivery.
 
 The architecture draws on the metamodel tradition of TOGAF's Architecture Content Framework, adapting it to the unique requirements of AI asset management: versioned, composable primitives with sensitivity-aware lineage and automated compliance enforcement.
 
@@ -52,11 +53,14 @@ The architecture draws on the metamodel tradition of TOGAF's Architecture Conten
 
 ## Solution Overview
 
-| Layer       | Function                                                        | Implementation                               |
-| ----------- | --------------------------------------------------------------- | -------------------------------------------- |
-| Metamodel   | Entity types, relationships, lifecycle states for AI primitives | OASF Records, Skills, Domains, Modules       |
-| Marketplace | Publish, discover, version, and compose AI primitives           | GitHub repos + OCI registry + OASF manifests |
-| Governance  | Classify, label, enforce, and audit AI asset usage              | Microsoft Purview + OASF overlay policies    |
+| Layer        | Function                                                        | Implementation                                    |
+| ------------ | --------------------------------------------------------------- | ------------------------------------------------- |
+| Metamodel    | Entity types, relationships, lifecycle states for AI primitives | OASF Records, Skills, Domains, Modules            |
+| Marketplace  | Publish, discover, version, and compose AI primitives           | GitHub repos + OCI registry + OASF manifests      |
+| Governance   | Classify, label, enforce, and audit AI asset usage              | Microsoft Purview + OASF overlay policies         |
+| Distribution | Deliver governed assets through end-user channels               | Catalog API + bundle packaging + channel adapters |
+
+![ARIA four-layer reference architecture](aria-layered-architecture.svg)
 
 # The ARIA Metamodel
 
@@ -233,22 +237,9 @@ The ARIA marketplace stores AI assets as OCI artifacts in Azure Container Regist
 
 The distribution gateway is a thin REST service that sits between the OCI registry and end-user platforms. It translates governed OCI artifacts into platform-native install experiences.
 
-```
-┌─────────────┐     ┌──────────────────────┐     ┌─────────────────────┐
-│ OCI Registry │────▶│  ARIA Catalog API     │────▶│ Claude Desktop      │
-│ (ACR / GHCR) │     │  ┌────────────────┐  │     │ Extensions Panel    │
-│              │     │  │ Governance      │  │     ├─────────────────────┤
-│ oasf-record  │     │  │ Gateway         │  │     │ VS Code Extensions  │
-│ oasf-gov     │     │  │ (Entra ID auth) │  │     ├─────────────────────┤
-│ src/         │     │  └────────────────┘  │     │ Cowork Suggestions  │
-│              │     │  ┌────────────────┐  │     ├─────────────────────┤
-│              │     │  │ .mcpb Packager  │  │     │ Web Catalog Portal  │
-│              │     │  └────────────────┘  │     ├─────────────────────┤
-│              │     │  ┌────────────────┐  │     │ aria CLI            │
-│              │     │  │ Search / Filter │  │     └─────────────────────┘
-│              │     │  └────────────────┘  │
-└─────────────┘     └──────────────────────┘
-```
+OpenAPI specification: [distribution-gateway.openapi.yaml](distribution-gateway.openapi.yaml)
+
+![Distribution gateway architecture from OCI to end-user channels](aria-distribution-gateway.svg)
 
 ## ARIA Catalog API
 
@@ -264,6 +255,8 @@ Key endpoints:
 - `POST /catalog/assets/{name}/{version}/request-access` — initiate approval workflow for blocked assets
 
 Every request is authenticated via Entra ID. The API resolves the user's team membership and sensitivity ceiling from Entra security groups, evaluates the OASF governance overlay, and filters results so users only see assets they're authorized to install.
+
+OpenAPI specification: [catalog-api.openapi.yaml](catalog-api.openapi.yaml)
 
 ## Governance Gateway
 
