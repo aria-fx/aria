@@ -197,7 +197,7 @@ Purview's sensitivity labels propagate through the AI asset dependency graph. Th
 - **DLP Policy Enforcement**: Block under-classified agents from accessing sensitive data
 - **Purview SDK**: Embedded in Agent Framework SDK for shift-left governance
 
-# ARIA Package Manager
+## ARIA Package Manager
 
 The `aria` CLI bridges the OCI marketplace with developer runtimes.
 
@@ -221,7 +221,7 @@ The `aria` CLI bridges the OCI marketplace with developer runtimes.
 | Record (agent)   | Agent Framework (A2A) | Register as remote A2A endpoint               |
 | knowledge_base   | Agent Framework       | Register with RAG pipeline configuration      |
 
-# Distribution Gateway: From Registry to Runtime
+## Distribution Gateway: From Registry to Runtime
 
 OCI is the right storage and governance layer for AI assets — it provides content addressing, signatures, lineage tracking, and Purview integration. However, OCI is the wrong *delivery* layer for end-user consumption. Non-technical users should never need Docker, ORAS, or any registry tooling. The distribution gateway bridges this gap.
 
@@ -287,9 +287,9 @@ The packager reads the OASF record's `mcp_server` module descriptor, extracts th
 
 For enterprise deployments, organization owners can configure the ARIA Catalog API as a custom extension registry in Claude Desktop's admin settings. This replaces or supplements Anthropic's public extension directory with the organization's governed ARIA catalog. Users browse their organization's AI assets directly in Claude Desktop's Extensions panel, with governance enforcement happening transparently.
 
-# End-User Consumption Experiences
+## End-User Consumption Experiences
 
-## Claude Desktop: Enterprise Skills Marketplace
+### Claude Desktop: Enterprise Skills Marketplace
 
 Claude Desktop already has an Extensions panel where users browse and install MCP servers. ARIA integrates with this existing infrastructure rather than replacing it.
 
@@ -311,7 +311,7 @@ Enterprise admins manage the catalog through the ARIA Catalog API's admin endpoi
 - Block public extensions that conflict with governed alternatives
 - Monitor extension usage and compliance posture via Purview
 
-## Cowork: Contextual AI Capability Discovery
+### Cowork: Contextual AI Capability Discovery
 
 Cowork is task-oriented rather than chat-oriented. Users work on files and workflows, and Cowork suggests relevant AI capabilities in context. ARIA integrates with this model through contextual discovery.
 
@@ -319,7 +319,7 @@ When a user is working on an onboarding workflow in Cowork, the ARIA Catalog API
 
 The governance filtering happens before the suggestion is shown. If the user isn't in the `allowed_consumers` list or their team's ceiling is insufficient, the asset is never surfaced — no confusing blocked states, no dead-end error messages.
 
-## Web Catalog Portal
+### Web Catalog Portal
 
 For broader organizational visibility, the ARIA Catalog API powers a web-based catalog portal where anyone can browse the organization's AI asset inventory. This serves multiple audiences:
 
@@ -330,7 +330,7 @@ For broader organizational visibility, the ARIA Catalog API powers a web-based c
 
 The portal is a lightweight web application backed entirely by the Catalog API. It requires no special tooling — just a browser and an Entra ID login.
 
-## Approval Workflow for Blocked Installs
+### Approval Workflow for Blocked Installs
 
 When any consumption channel (Claude Desktop, Cowork, web portal, aria CLI) encounters a governance block, the experience follows a consistent pattern:
 
