@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="840" viewBox="0 0 1400 840" role="img" aria-labelledby="title desc">
+  <title id="title">ARIA Distribution Gateway Architecture</title>
+  <desc id="desc">Governed distribution from OCI registry through ARIA Catalog API to end-user channels.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4A4458"/>
+    </marker>
+    <style>
+      .bg { fill: #F8F7FC; }
+      .title { font: 700 42px 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; fill: #1E1B2E; }
+      .subtitle { font: 500 23px 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; fill: #4A4458; }
+      .h { font: 700 27px 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }
+      .b { font: 500 18px 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; fill: #3A3351; }
+      .s { font: 600 18px 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; fill: #4A4458; }
+      .node { stroke: #1E1B2E; stroke-opacity: 0.16; stroke-width: 2; rx: 16; }
+      .arrow { stroke: #4A4458; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1400" height="840" rx="24"/>
+  <text class="title" x="62" y="84">Distribution Gateway: From Registry to Runtime</text>
+  <text class="subtitle" x="62" y="122">Branded, governed delivery path for enterprise AI assets</text>
+
+  <g transform="translate(70,200)">
+    <rect class="node" x="0" y="0" width="300" height="420" fill="#EEE9FA"/>
+    <text class="h" x="24" y="52" fill="#6B21A8">OCI Registry</text>
+    <text class="b" x="24" y="98">Azure Container Registry</text>
+    <text class="b" x="24" y="130">GitHub Container Registry</text>
+    <line x1="24" y1="158" x2="270" y2="158" stroke="#6B21A8" stroke-opacity="0.28"/>
+    <text class="s" x="24" y="202">Stored artifacts</text>
+    <text class="b" x="24" y="236">oasf-record.json</text>
+    <text class="b" x="24" y="268">oasf-governance.json</text>
+    <text class="b" x="24" y="300">source and modules</text>
+    <text class="b" x="24" y="332">signed OCI layers</text>
+  </g>
+
+  <g transform="translate(500,160)">
+    <rect class="node" x="0" y="0" width="390" height="500" fill="#E9F6FA"/>
+    <text class="h" x="28" y="58" fill="#0891B2">ARIA Catalog API</text>
+
+    <rect x="28" y="92" width="334" height="84" rx="12" fill="#F7FCFE" stroke="#0891B2" stroke-opacity="0.3"/>
+    <text class="s" x="44" y="125">Governance Gateway</text>
+    <text class="b" x="44" y="148">Entra ID auth, sensitivity ceiling,</text>
+    <text class="b" x="44" y="170">and policy checks</text>
+
+    <rect x="28" y="196" width="334" height="84" rx="12" fill="#F7FCFE" stroke="#0891B2" stroke-opacity="0.3"/>
+    <text class="s" x="44" y="229">Catalog and Search</text>
+    <text class="b" x="44" y="252">Skill, domain, and keyword</text>
+    <text class="b" x="44" y="274">discovery endpoints</text>
+
+    <rect x="28" y="300" width="334" height="84" rx="12" fill="#F7FCFE" stroke="#0891B2" stroke-opacity="0.3"/>
+    <text class="s" x="44" y="333">Packaging Service</text>
+    <text class="b" x="44" y="356">Generate .mcpb and runtime-native</text>
+    <text class="b" x="44" y="378">bundles</text>
+
+    <rect x="28" y="404" width="334" height="88" rx="12" fill="#F7FCFE" stroke="#0891B2" stroke-opacity="0.3"/>
+    <text class="s" x="44" y="437">Audit and Telemetry</text>
+    <text class="b" x="44" y="458">Events synchronized with</text>
+    <text class="b" x="44" y="480">Microsoft Purview</text>
+  </g>
+
+  <g transform="translate(1010,210)">
+    <rect class="node" x="0" y="0" width="320" height="420" fill="#FFF2E8"/>
+    <text class="h" x="28" y="52" fill="#F97316">Consumption</text>
+    <text class="h" x="28" y="84" fill="#F97316">Channels</text>
+    <text class="b" x="28" y="102">Claude Desktop Extensions</text>
+    <text class="b" x="28" y="140">VS Code + MCP tools</text>
+    <text class="b" x="28" y="178">Cowork suggestions</text>
+    <text class="b" x="28" y="216">Web catalog portal</text>
+    <text class="b" x="28" y="254">aria CLI installations</text>
+    <line x1="28" y1="280" x2="292" y2="280" stroke="#F97316" stroke-opacity="0.35"/>
+    <text class="s" x="28" y="320">User experience</text>
+    <text class="b" x="28" y="352">One-click install</text>
+    <text class="b" x="28" y="384">Governed visibility</text>
+  </g>
+
+  <path class="arrow" d="M370 410 L490 410"/>
+  <path class="arrow" d="M890 410 L1000 410"/>
+
+  <g transform="translate(515,706)">
+    <rect x="0" y="0" width="360" height="44" rx="22" fill="#0D9488"/>
+    <text x="180" y="28" text-anchor="middle" style="font: 700 18px 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; fill: #FFFFFF;">DATA GOVERNANCE</text>
+  </g>
+
+  <path d="M695 706 L695 664" stroke="#0D9488" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+</svg>

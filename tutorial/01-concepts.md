@@ -9,9 +9,9 @@ instructions, knowledge bases, and orchestration configurations.
 Think of it as **TOGAF for AI assets**: a metamodel that defines what these
 things are, how they relate to each other, and how they're governed.
 
-## The Three Layers
+## The Four Layers
 
-ARIA operates across three layers:
+ARIA operates across four layers:
 
 1. **Metamodel** — What are these things and how do they relate?
    - Five entity types classified by OASF

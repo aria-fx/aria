@@ -85,11 +85,47 @@ Agents — ARIA Framework</title>
           <li><a href="#sensitivity-label-inheritance">Sensitivity Label
           Inheritance</a></li>
           <li><a href="#integration-points">Integration Points</a></li>
-          </ul></li>
-          <li><a href="#aria-package-manager">ARIA Package Manager</a>
-          <ul>
+          <li><a href="#aria-package-manager">ARIA Package
+          Manager</a></li>
           <li><a href="#core-commands">Core Commands</a></li>
           <li><a href="#install-targets">Install Targets</a></li>
+          <li><a
+          href="#distribution-gateway-from-registry-to-runtime">Distribution
+          Gateway: From Registry to Runtime</a></li>
+          <li><a href="#the-problem-with-direct-oci-consumption">The
+          Problem with Direct OCI Consumption</a></li>
+          <li><a href="#architecture">Architecture</a></li>
+          <li><a href="#aria-catalog-api">ARIA Catalog API</a></li>
+          <li><a href="#governance-gateway">Governance Gateway</a></li>
+          <li><a href="#mcpb-packager">.mcpb Packager</a></li>
+          <li><a href="#end-user-consumption-experiences">End-User
+          Consumption Experiences</a>
+          <ul>
+          <li><a
+          href="#claude-desktop-enterprise-skills-marketplace">Claude
+          Desktop: Enterprise Skills Marketplace</a></li>
+          <li><a
+          href="#cowork-contextual-ai-capability-discovery">Cowork:
+          Contextual AI Capability Discovery</a></li>
+          <li><a href="#web-catalog-portal">Web Catalog Portal</a></li>
+          <li><a href="#approval-workflow-for-blocked-installs">Approval
+          Workflow for Blocked Installs</a></li>
+          </ul></li>
+          </ul></li>
+          <li><a href="#ai-finops-cost-governance-for-ai-assets">AI
+          FinOps: Cost Governance for AI Assets</a>
+          <ul>
+          <li><a href="#the-cost-visibility-problem">The Cost Visibility
+          Problem</a></li>
+          <li><a href="#cost-governance-overlay-extension">Cost
+          Governance Overlay Extension</a></li>
+          <li><a href="#metering-module">Metering Module</a></li>
+          <li><a href="#cost-inheritance">Cost Inheritance</a></li>
+          <li><a href="#provider-integration-matrix">Provider
+          Integration Matrix</a></li>
+          <li><a href="#budget-enforcement-middleware">Budget
+          Enforcement Middleware</a></li>
+          <li><a href="#cost-dashboard">Cost Dashboard</a></li>
           </ul></li>
           <li><a href="#implementation-roadmap">Implementation
           Roadmap</a></li>
@@ -103,12 +139,12 @@ Agents — ARIA Framework</title>
           agents, skills, instructions, knowledge bases, and
           orchestration configurations — without a standardized
           metamodel for classifying, governing, and composing them. ARIA
-          (Asset Registry for Intelligent Agents) presents a reference
-          architecture that applies the Open Agentic Schema Framework
-          (OASF) as the classification taxonomy, uses GitHub as the
-          canonical marketplace and registry for these primitives, and
-          integrates Microsoft Purview as the governance and compliance
-          layer.</p>
+          (Asset Registry for Intelligent Agents) presents a four-layer
+          reference architecture: the Open Agentic Schema Framework
+          (OASF) as the classification taxonomy, GitHub as the canonical
+          marketplace and registry, Microsoft Purview as the governance
+          and compliance layer, and a distribution layer for governed
+          end-user delivery.</p>
           <p>The architecture draws on the metamodel tradition of
           TOGAF’s Architecture Content Framework, adapting it to the
           unique requirements of AI asset management: versioned,
@@ -158,8 +194,19 @@ Agents — ARIA Framework</title>
           <td>Classify, label, enforce, and audit AI asset usage</td>
           <td>Microsoft Purview + OASF overlay policies</td>
           </tr>
+          <tr class="even">
+          <td>Distribution</td>
+          <td>Deliver governed assets through end-user channels</td>
+          <td>Catalog API + bundle packaging + channel adapters</td>
+          </tr>
           </tbody>
           </table>
+          <figure>
+          <img src="aria-layered-architecture.svg"
+          alt="ARIA four-layer reference architecture" />
+          <figcaption aria-hidden="true">ARIA four-layer reference
+          architecture</figcaption>
+          </figure>
           <h1 id="the-aria-metamodel">The ARIA Metamodel</h1>
           <p>Inspired by TOGAF’s Architecture Content Framework, this
           metamodel defines the entity types that constitute an
@@ -294,7 +341,7 @@ Agents — ARIA Framework</title>
           <ul>
           <li><strong>name</strong>: Unique identifier using
           domain-based naming (e.g.,
-          <code>aria.dev/agents/onboarding-assistant</code>)</li>
+          <code>xebia.com/agents/onboarding-assistant</code>)</li>
           <li><strong>version</strong>: Semantic version enabling
           dependency resolution and rollback</li>
           <li><strong>schema_version</strong>: OASF schema version for
@@ -418,6 +465,13 @@ Agents — ARIA Framework</title>
           <td>OTEL telemetry + evaluation modules attached to published
           Records</td>
           </tr>
+          <tr class="odd">
+          <td>AI FinOps &amp; Cost Governance</td>
+          <td>Track per-asset costs across providers, enforce budgets,
+          rate limits, chargeback</td>
+          <td>Per-asset cost attribution with budget enforcement
+          middleware active</td>
+          </tr>
           </tbody>
           </table>
           <h1
@@ -444,7 +498,7 @@ Agents — ARIA Framework</title>
           Example</h2>
           <div class="sourceCode" id="cb2"><pre
           class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;aria.dev/agents/onboarding-assistant&quot;</span><span class="fu">,</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;xebia.com/agents/onboarding-assistant&quot;</span><span class="fu">,</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;version&quot;</span><span class="fu">:</span> <span class="st">&quot;2.1.0&quot;</span><span class="fu">,</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;schema_version&quot;</span><span class="fu">:</span> <span class="st">&quot;1.0.0&quot;</span><span class="fu">,</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;HR onboarding agent with document generation and policy Q&amp;A&quot;</span><span class="fu">,</span></span>
@@ -455,9 +509,9 @@ Agents — ARIA Framework</title>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;domains&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span> <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;human_resources/onboarding&quot;</span> <span class="fu">}</span><span class="ot">]</span><span class="fu">,</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;modules&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span> <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;mcp_server&quot;</span><span class="fu">,</span> <span class="dt">&quot;transport&quot;</span><span class="fu">:</span> <span class="st">&quot;stdio&quot;</span><span class="fu">,</span> <span class="dt">&quot;tools&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;lookup_policy&quot;</span><span class="ot">]</span> <span class="fu">}</span><span class="ot">,</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span> <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;knowledge_base&quot;</span><span class="fu">,</span> <span class="dt">&quot;ref&quot;</span><span class="fu">:</span> <span class="st">&quot;aria.dev/knowledge/hr-policies&quot;</span> <span class="fu">}</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span> <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;knowledge_base&quot;</span><span class="fu">,</span> <span class="dt">&quot;ref&quot;</span><span class="fu">:</span> <span class="st">&quot;xebia.com/knowledge/hr-policies&quot;</span> <span class="fu">}</span></span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;authors&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;Josh Garverick &lt;josh.garverick@aria.dev&gt;&quot;</span><span class="ot">]</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;authors&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;Josh Garverick &lt;josh.garverick@xebia.com&gt;&quot;</span><span class="ot">]</span></span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
           <h2 id="governance-overlay-manifest-example">Governance
           Overlay Manifest Example</h2>
@@ -504,14 +558,14 @@ Agents — ARIA Framework</title>
           <li><strong>Purview SDK</strong>: Embedded in Agent Framework
           SDK for shift-left governance</li>
           </ul>
-          <h1 id="aria-package-manager">ARIA Package Manager</h1>
+          <h2 id="aria-package-manager">ARIA Package Manager</h2>
           <p>The <code>aria</code> CLI bridges the OCI marketplace with
           developer runtimes.</p>
           <h2 id="core-commands">Core Commands</h2>
           <table>
           <colgroup>
-          <col style="width: 24%" />
-          <col style="width: 75%" />
+          <col style="width: 25%" />
+          <col style="width: 74%" />
           </colgroup>
           <thead>
           <tr class="header">
@@ -589,13 +643,462 @@ Agents — ARIA Framework</title>
           </tr>
           </tbody>
           </table>
+          <h2
+          id="distribution-gateway-from-registry-to-runtime">Distribution
+          Gateway: From Registry to Runtime</h2>
+          <p>OCI is the right storage and governance layer for AI assets
+          — it provides content addressing, signatures, lineage
+          tracking, and Purview integration. However, OCI is the wrong
+          <em>delivery</em> layer for end-user consumption.
+          Non-technical users should never need Docker, ORAS, or any
+          registry tooling. The distribution gateway bridges this
+          gap.</p>
+          <h2 id="the-problem-with-direct-oci-consumption">The Problem
+          with Direct OCI Consumption</h2>
+          <p>The ARIA marketplace stores AI assets as OCI artifacts in
+          Azure Container Registry or GitHub Container Registry. For
+          developer workflows (CI/CD, the <code>aria</code> CLI,
+          Terraform), OCI pull/push operations are natural. But
+          enterprise end users — business analysts, HR managers, hiring
+          coordinators — consume AI capabilities through platforms like
+          Claude Desktop and Cowork. These users think in terms of “I
+          need a capability,” not “I need to pull an OCI artifact.”</p>
+          <h2 id="architecture">Architecture</h2>
+          <p>The distribution gateway is a thin REST service that sits
+          between the OCI registry and end-user platforms. It translates
+          governed OCI artifacts into platform-native install
+          experiences.</p>
+          <p>OpenAPI specification: <a
+          href="distribution-gateway.openapi.yaml">distribution-gateway.openapi.yaml</a></p>
+          <figure>
+          <img src="aria-distribution-gateway.svg"
+          alt="Distribution gateway architecture from OCI to end-user channels" />
+          <figcaption aria-hidden="true">Distribution gateway
+          architecture from OCI to end-user channels</figcaption>
+          </figure>
+          <h2 id="aria-catalog-api">ARIA Catalog API</h2>
+          <p>The Catalog API serves the browsable, searchable catalog of
+          governed AI assets. It reads OASF records from OCI manifests,
+          transforms them into user-friendly listings, applies
+          governance filtering based on the authenticated user’s
+          identity, and supports search by skill taxonomy, domain, and
+          keyword.</p>
+          <p>Key endpoints:</p>
+          <ul>
+          <li><code>GET /catalog/assets</code> — browse all assets the
+          user is authorized to see</li>
+          <li><code>GET /catalog/assets?skill=knowledge_retrieval/rag&amp;domain=human_resources</code>
+          — filtered search</li>
+          <li><code>GET /catalog/assets/{name}/versions</code> — list
+          versions of a specific asset</li>
+          <li><code>GET /catalog/assets/{name}/{version}/manifest</code>
+          — full OASF Record + governance overlay</li>
+          <li><code>POST /catalog/assets/{name}/{version}/install</code>
+          — trigger governed install to a target platform</li>
+          <li><code>POST /catalog/assets/{name}/{version}/request-access</code>
+          — initiate approval workflow for blocked assets</li>
+          </ul>
+          <p>Every request is authenticated via Entra ID. The API
+          resolves the user’s team membership and sensitivity ceiling
+          from Entra security groups, evaluates the OASF governance
+          overlay, and filters results so users only see assets they’re
+          authorized to install.</p>
+          <p>OpenAPI specification: <a
+          href="catalog-api.openapi.yaml">catalog-api.openapi.yaml</a></p>
+          <h2 id="governance-gateway">Governance Gateway</h2>
+          <p>The governance gateway is the policy enforcement point
+          within the Catalog API. It operates on every catalog query and
+          every install request:</p>
+          <ol type="1">
+          <li>Authenticate the user via Entra ID</li>
+          <li>Resolve the user’s team membership to determine their
+          <code>consumer_id</code></li>
+          <li>Look up the team’s sensitivity ceiling from Entra group
+          attributes</li>
+          <li>Evaluate the asset’s governance overlay: check
+          <code>allowed_consumers</code> and
+          <code>sensitivity_tier</code></li>
+          <li>For install requests, scan transitive dependencies
+          recursively</li>
+          <li>Allow or block with a clear, actionable explanation</li>
+          <li>Log the event to Purview audit trail</li>
+          </ol>
+          <p>When a user is blocked, the gateway returns a structured
+          response that includes the reason, the required approval chain
+          from the governance overlay, and an action URL to initiate the
+          approval workflow.</p>
+          <h2 id="mcpb-packager">.mcpb Packager</h2>
+          <p>For Claude Desktop and Cowork consumption, the distribution
+          gateway includes a packager that converts OCI-stored ARIA
+          assets into <code>.mcpb</code> (MCP Bundle) format on-the-fly.
+          Claude Desktop’s enterprise extension system already supports
+          <code>.mcpb</code> files with one-click installation,
+          organization allowlists, and admin controls.</p>
+          <p>The packager reads the OASF record’s
+          <code>mcp_server</code> module descriptor, extracts the server
+          configuration (command, args, transport, environment),
+          generates the <code>.mcpb</code> manifest with user
+          configuration prompts (API keys, endpoints), and bundles the
+          server implementation from the OCI artifact layers. The
+          resulting <code>.mcpb</code> file is served to Claude
+          Desktop’s Extensions panel as if it were a native desktop
+          extension.</p>
+          <p>For enterprise deployments, organization owners can
+          configure the ARIA Catalog API as a custom extension registry
+          in Claude Desktop’s admin settings. This replaces or
+          supplements Anthropic’s public extension directory with the
+          organization’s governed ARIA catalog. Users browse their
+          organization’s AI assets directly in Claude Desktop’s
+          Extensions panel, with governance enforcement happening
+          transparently.</p>
+          <h2 id="end-user-consumption-experiences">End-User Consumption
+          Experiences</h2>
+          <h3 id="claude-desktop-enterprise-skills-marketplace">Claude
+          Desktop: Enterprise Skills Marketplace</h3>
+          <p>Claude Desktop already has an Extensions panel where users
+          browse and install MCP servers. ARIA integrates with this
+          existing infrastructure rather than replacing it.</p>
+          <p>The experience for an enterprise Claude Desktop user:</p>
+          <ol type="1">
+          <li>User opens Claude Desktop → Settings → Extensions</li>
+          <li>The Extensions panel shows their organization’s ARIA
+          catalog alongside (or instead of) the public directory</li>
+          <li>Each listing shows a plain-language name, description, the
+          publishing team, capability summary (what tools it adds), and
+          a trust badge based on the governance overlay (e.g., “Approved
+          by IT Security,” “Internal Use Only”)</li>
+          <li>User clicks “Add to Claude” on the policy-lookup
+          skill</li>
+          <li>Behind the scenes: the ARIA Catalog API authenticates via
+          their Entra SSO session, checks governance, generates the
+          <code>.mcpb</code> bundle from the OCI artifact, and pushes it
+          to Claude Desktop</li>
+          <li>The skill appears in the user’s tool list. Done.</li>
+          </ol>
+          <p>If the user is blocked by governance (not in
+          <code>allowed_consumers</code>, or their team’s ceiling is too
+          low), they see: “This skill requires HR team access. Request
+          access →” with a link that triggers the approval workflow
+          through the Catalog API.</p>
+          <p>Enterprise admins manage the catalog through the ARIA
+          Catalog API’s admin endpoints or the Claude Desktop admin
+          console:</p>
+          <ul>
+          <li>Upload custom <code>.mcpb</code> extensions built from
+          ARIA assets</li>
+          <li>Configure the allowlist — which ARIA assets are available
+          to which Entra groups</li>
+          <li>Block public extensions that conflict with governed
+          alternatives</li>
+          <li>Monitor extension usage and compliance posture via
+          Purview</li>
+          </ul>
+          <h3 id="cowork-contextual-ai-capability-discovery">Cowork:
+          Contextual AI Capability Discovery</h3>
+          <p>Cowork is task-oriented rather than chat-oriented. Users
+          work on files and workflows, and Cowork suggests relevant AI
+          capabilities in context. ARIA integrates with this model
+          through contextual discovery.</p>
+          <p>When a user is working on an onboarding workflow in Cowork,
+          the ARIA Catalog API is queried with the user’s context
+          (document type, domain keywords, current task). The API
+          matches OASF domain annotations against the context and
+          returns relevant assets that the user is authorized to use.
+          Cowork surfaces these as suggestions: “The HR Policy Assistant
+          can help with this. Add it?”</p>
+          <p>The governance filtering happens before the suggestion is
+          shown. If the user isn’t in the <code>allowed_consumers</code>
+          list or their team’s ceiling is insufficient, the asset is
+          never surfaced — no confusing blocked states, no dead-end
+          error messages.</p>
+          <h3 id="web-catalog-portal">Web Catalog Portal</h3>
+          <p>For broader organizational visibility, the ARIA Catalog API
+          powers a web-based catalog portal where anyone can browse the
+          organization’s AI asset inventory. This serves multiple
+          audiences:</p>
+          <ul>
+          <li><strong>Business users</strong> browse by department and
+          capability to find skills they can add to Claude Desktop or
+          Cowork</li>
+          <li><strong>Developers</strong> search by OASF skill taxonomy
+          to find assets to compose into new agents</li>
+          <li><strong>AI governance teams</strong> review the full
+          inventory with sensitivity classifications, approval chains,
+          and compliance framework coverage</li>
+          <li><strong>Compliance auditors</strong> generate reports on
+          AI asset usage, classification distribution, and governance
+          posture</li>
+          </ul>
+          <p>The portal is a lightweight web application backed entirely
+          by the Catalog API. It requires no special tooling — just a
+          browser and an Entra ID login.</p>
+          <h3 id="approval-workflow-for-blocked-installs">Approval
+          Workflow for Blocked Installs</h3>
+          <p>When any consumption channel (Claude Desktop, Cowork, web
+          portal, aria CLI) encounters a governance block, the
+          experience follows a consistent pattern:</p>
+          <ol type="1">
+          <li>The user sees a clear explanation: “This asset is
+          classified as Confidential and your team (Marketing) has an
+          Internal ceiling”</li>
+          <li>They see the required approval chain from the governance
+          overlay: “Approval required from: AI Governance Lead → HR Data
+          Steward”</li>
+          <li>They click “Request Access” which calls the Catalog API’s
+          request-access endpoint</li>
+          <li>The API generates an approval request routed to the
+          appropriate channel — Teams Adaptive Card, ServiceNow ticket,
+          email, or a custom webhook defined in the governance
+          overlay</li>
+          <li>Approvers see the request with full context: who is
+          asking, what asset, current classification, and the business
+          justification</li>
+          <li>Once approved, the user receives a notification and can
+          retry the install</li>
+          <li>The approval event is logged to Purview audit trail</li>
+          </ol>
+          <h1 id="ai-finops-cost-governance-for-ai-assets">AI FinOps:
+          Cost Governance for AI Assets</h1>
+          <p>Governance answers “are we allowed to use this?” but
+          enterprise leaders also need to answer “can we afford to use
+          this?” With GitHub’s move to usage-based billing and every AI
+          provider metering by token, invocation, or seat, cost
+          visibility and containment for AI assets is becoming as
+          critical as sensitivity classification. ARIA extends the
+          governance overlay with cost governance fields and introduces
+          a metering framework that aggregates usage data across
+          providers.</p>
+          <h2 id="the-cost-visibility-problem">The Cost Visibility
+          Problem</h2>
+          <p>AI costs are scattered across multiple billing systems with
+          no unified attribution to business outcomes:</p>
+          <ul>
+          <li><strong>Azure OpenAI / AI Foundry</strong> — metered by
+          tokens (input/output) per deployment, visible in Azure Cost
+          Management</li>
+          <li><strong>GitHub Copilot</strong> — metered by seat (moving
+          to usage-based), visible in GitHub billing API and Copilot
+          Metrics API</li>
+          <li><strong>Anthropic Claude</strong> — metered by tokens per
+          API key, visible in Anthropic Usage API</li>
+          <li><strong>OpenAI</strong> — metered by tokens per
+          organization, visible in OpenAI Usage API</li>
+          <li><strong>MCP servers / custom skills</strong> — hosted on
+          Azure Container Apps, AWS Lambda, or similar, metered by
+          compute</li>
+          </ul>
+          <p>An ARIA agent that uses Azure OpenAI for inference, invokes
+          an MCP skill hosted on Container Apps, and grounds itself in a
+          knowledge base indexed by Azure AI Search has costs in three
+          different billing systems. No provider aggregates this
+          today.</p>
+          <h2 id="cost-governance-overlay-extension">Cost Governance
+          Overlay Extension</h2>
+          <p>The OASF governance overlay is extended with a
+          <code>cost_governance</code> section that declares budget
+          constraints, rate limits, and cost attribution metadata:</p>
+          <div class="sourceCode" id="cb4"><pre
+          class="sourceCode json"><code class="sourceCode json"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;governance&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;sensitivity_tier&quot;</span><span class="fu">:</span> <span class="st">&quot;confidential&quot;</span><span class="fu">,</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;cost_governance&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;budget_monthly_usd&quot;</span><span class="fu">:</span> <span class="dv">500</span><span class="fu">,</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;budget_alert_threshold_pct&quot;</span><span class="fu">:</span> <span class="dv">80</span><span class="fu">,</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;cost_center&quot;</span><span class="fu">:</span> <span class="st">&quot;engineering-platform&quot;</span><span class="fu">,</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;chargeback_model&quot;</span><span class="fu">:</span> <span class="st">&quot;per_invocation&quot;</span><span class="fu">,</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;rate_limits&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;daily_invocations&quot;</span><span class="fu">:</span> <span class="dv">10000</span><span class="fu">,</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;monthly_tokens&quot;</span><span class="fu">:</span> <span class="dv">5000000</span><span class="fu">,</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;concurrent_sessions&quot;</span><span class="fu">:</span> <span class="dv">50</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">},</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;cost_attribution_tags&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;department&quot;</span><span class="fu">:</span> <span class="st">&quot;hr&quot;</span><span class="fu">,</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;project&quot;</span><span class="fu">:</span> <span class="st">&quot;onboarding-automation&quot;</span><span class="fu">,</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;aria_asset&quot;</span><span class="fu">:</span> <span class="st">&quot;aria.dev/agents/onboarding-assistant&quot;</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+          <p>Key fields:</p>
+          <ul>
+          <li><strong>budget_monthly_usd</strong>: Hard budget cap. The
+          budget enforcement middleware blocks invocations when the
+          asset’s month-to-date cost reaches this threshold.</li>
+          <li><strong>budget_alert_threshold_pct</strong>: Percentage of
+          budget at which alerts are emitted (email, Teams,
+          webhook).</li>
+          <li><strong>cost_center</strong>: Maps to the organization’s
+          financial accounting structure for chargeback.</li>
+          <li><strong>chargeback_model</strong>: How costs are allocated
+          — <code>per_invocation</code> (usage-based),
+          <code>per_seat</code> (license-based), <code>flat_rate</code>
+          (fixed monthly), or <code>blended</code> (combination).</li>
+          <li><strong>rate_limits</strong>: Operational guardrails that
+          prevent runaway consumption independent of dollar budget.</li>
+          <li><strong>cost_attribution_tags</strong>: Key-value pairs
+          propagated to all downstream provider billing systems (Azure
+          tags, AWS cost allocation tags) to enable cross-provider cost
+          rollup.</li>
+          </ul>
+          <h2 id="metering-module">Metering Module</h2>
+          <p>The OASF record supports a <code>metering</code> module
+          type that declares what usage dimensions an asset emits and
+          where metering data flows:</p>
+          <div class="sourceCode" id="cb5"><pre
+          class="sourceCode json"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;modules&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;metering&quot;</span><span class="fu">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;provider&quot;</span><span class="fu">:</span> <span class="st">&quot;azure_cost_management&quot;</span><span class="fu">,</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;dimensions&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;tokens_in&quot;</span><span class="ot">,</span> <span class="st">&quot;tokens_out&quot;</span><span class="ot">,</span> <span class="st">&quot;invocations&quot;</span><span class="ot">,</span> <span class="st">&quot;tool_calls&quot;</span><span class="ot">,</span> <span class="st">&quot;latency_p95_ms&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;export_target&quot;</span><span class="fu">:</span> <span class="st">&quot;aria.dev/skills/cost-collector&quot;</span><span class="fu">,</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;billing_tags&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;aria_asset&quot;</span><span class="fu">:</span> <span class="st">&quot;aria.dev/agents/onboarding-assistant&quot;</span><span class="fu">,</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;aria_version&quot;</span><span class="fu">:</span> <span class="st">&quot;2.1.0&quot;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+          <p>The metering module enables the cost collector to discover
+          which providers to query and what dimensions to aggregate for
+          each asset.</p>
+          <h2 id="cost-inheritance">Cost Inheritance</h2>
+          <p>Cost inheritance follows the same dependency graph as
+          sensitivity inheritance. An orchestration’s cost is the sum of
+          its composed agents’ costs. An agent’s cost is its own
+          inference cost plus the costs of all skills it invokes. The
+          cost collector builds this rollup by traversing the OASF
+          module refs.</p>
+          <pre><code>Orchestration (total: $850/mo)
+├── Agent A (inference: $300/mo)
+│   ├── Skill 1 — MCP server hosting: $50/mo
+│   └── Knowledge Base — Azure AI Search: $100/mo
+└── Agent B (inference: $200/mo)
+    ├── Skill 2 — MCP server hosting: $50/mo
+    └── Skill 3 — External API calls: $150/mo</code></pre>
+          <p>Budget enforcement cascades: if Agent A’s budget is
+          $400/mo, it doesn’t matter that the orchestration’s budget is
+          $850 — Agent A is capped at $400 and its downstream skills are
+          counted against that cap.</p>
+          <h2 id="provider-integration-matrix">Provider Integration
+          Matrix</h2>
+          <table>
+          <colgroup>
+          <col style="width: 18%" />
+          <col style="width: 28%" />
+          <col style="width: 15%" />
+          <col style="width: 17%" />
+          <col style="width: 19%" />
+          </colgroup>
+          <thead>
+          <tr class="header">
+          <th>Provider</th>
+          <th>Usage API</th>
+          <th>Cost API</th>
+          <th>Per-Asset Attribution</th>
+          <th>Real-Time Metering</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr class="odd">
+          <td>Azure OpenAI / AI Foundry</td>
+          <td>Azure Monitor metrics</td>
+          <td>Azure Cost Management</td>
+          <td>Via resource tags</td>
+          <td>Near-real-time via Monitor</td>
+          </tr>
+          <tr class="even">
+          <td>GitHub Copilot</td>
+          <td>Copilot Metrics API (per-user, per-org)</td>
+          <td>GitHub Billing API</td>
+          <td>Per-seat/per-org</td>
+          <td>Daily aggregation</td>
+          </tr>
+          <tr class="odd">
+          <td>Anthropic Claude</td>
+          <td>Usage API (tokens per key)</td>
+          <td>Billing dashboard</td>
+          <td>Per-API-key</td>
+          <td>Per-request headers</td>
+          </tr>
+          <tr class="even">
+          <td>OpenAI</td>
+          <td>Usage API (tokens per org)</td>
+          <td>Organization billing</td>
+          <td>Per-API-key</td>
+          <td>Daily aggregation</td>
+          </tr>
+          <tr class="odd">
+          <td>Azure Container Apps</td>
+          <td>Azure Monitor</td>
+          <td>Azure Cost Management</td>
+          <td>Via resource tags</td>
+          <td>Near-real-time</td>
+          </tr>
+          <tr class="even">
+          <td>AWS Lambda / Bedrock</td>
+          <td>CloudWatch Metrics</td>
+          <td>AWS Cost Explorer</td>
+          <td>Via cost allocation tags</td>
+          <td>Hourly aggregation</td>
+          </tr>
+          </tbody>
+          </table>
+          <p>The cost collector normalizes all provider data into a
+          common format using the OASF asset name as the join key,
+          enabling cross-provider rollup per asset, per team, and per
+          department.</p>
+          <h2 id="budget-enforcement-middleware">Budget Enforcement
+          Middleware</h2>
+          <p>The ARIA Agent Framework middleware pipeline is extended
+          with a <code>BudgetEnforcementMiddleware</code> that sits
+          alongside the governance and Purview middleware:</p>
+          <pre><code>Request
+  → OasfGovernanceMiddleware   (consumer validation, sensitivity ceiling)
+  → BudgetEnforcementMiddleware (budget cap, rate limits)
+  → PurviewPolicyMiddleware    (DLP, compliance audit)
+  → Agent execution</code></pre>
+          <p>The budget middleware checks the asset’s
+          <code>cost_governance</code> fields against the current
+          month-to-date usage (cached from the cost collector). If the
+          budget or rate limits are exceeded, it returns a structured
+          denial similar to the sensitivity ceiling block:</p>
+          <div class="sourceCode" id="cb8"><pre
+          class="sourceCode json"><code class="sourceCode json"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;allowed&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;reason&quot;</span><span class="fu">:</span> <span class="st">&quot;This agent has reached 95% of its monthly budget ($475 of $500). Remaining budget: $25. Contact your AI Platform team to request a budget increase.&quot;</span><span class="fu">,</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;budget_used_pct&quot;</span><span class="fu">:</span> <span class="dv">95</span><span class="fu">,</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;budget_remaining_usd&quot;</span><span class="fu">:</span> <span class="dv">25</span><span class="fu">,</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;action_url&quot;</span><span class="fu">:</span> <span class="st">&quot;/catalog/assets/aria.dev%2Fagents%2Fonboarding-assistant/2.1.0/request-budget-increase&quot;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+          <h2 id="cost-dashboard">Cost Dashboard</h2>
+          <p>The ARIA distribution gateway’s web catalog is extended
+          with a cost dashboard that provides:</p>
+          <ul>
+          <li><strong>Per-asset cost breakdown</strong>: inference
+          tokens, hosting, API calls, storage — attributed by OASF asset
+          name</li>
+          <li><strong>Per-team rollup</strong>: aggregated costs for all
+          assets owned by or consumed by a team</li>
+          <li><strong>Per-department chargeback</strong>: cost
+          center-level reporting for financial reconciliation</li>
+          <li><strong>Budget burn rate</strong>: current month spend
+          vs. budget with projected end-of-month forecast</li>
+          <li><strong>Trend analysis</strong>: month-over-month cost
+          trends per asset with anomaly detection</li>
+          <li><strong>Cost-per-interaction</strong>: blended cost per
+          user interaction across all underlying providers</li>
+          <li><strong>Optimization recommendations</strong>: identify
+          underutilized assets (high cost, low invocations) and
+          over-provisioned resources</li>
+          </ul>
           <h1 id="implementation-roadmap">Implementation Roadmap</h1>
           <table>
           <colgroup>
-          <col style="width: 7%" />
-          <col style="width: 6%" />
-          <col style="width: 52%" />
-          <col style="width: 34%" />
+          <col style="width: 4%" />
+          <col style="width: 3%" />
+          <col style="width: 53%" />
+          <col style="width: 37%" />
           </colgroup>
           <thead>
           <tr class="header">
@@ -628,6 +1131,23 @@ Agents — ARIA Framework</title>
           <td>Labels auto-propagate through dependency graphs</td>
           </tr>
           <tr class="even">
+          <td>Distribution</td>
+          <td>6–8 weeks</td>
+          <td>Catalog API, governance gateway, .mcpb packager, Claude
+          Desktop enterprise integration, web catalog portal</td>
+          <td>Non-technical users browse and install governed skills
+          from Claude Desktop Extensions panel</td>
+          </tr>
+          <tr class="odd">
+          <td>AI FinOps</td>
+          <td>6–8 weeks</td>
+          <td>Cost governance overlay extension, cost collector skill,
+          budget enforcement middleware, provider API integrations, cost
+          dashboard</td>
+          <td>Per-asset cost attribution across providers with budget
+          enforcement active</td>
+          </tr>
+          <tr class="even">
           <td>Runtime</td>
           <td>4–6 weeks</td>
           <td>DLP enforcement, DSPM dashboards, insider risk, audit
@@ -637,25 +1157,36 @@ Agents — ARIA Framework</title>
           <tr class="odd">
           <td>Scale</td>
           <td>Ongoing</td>
-          <td>Cross-team adoption, eval framework, EU AI Act templates,
-          federated directory</td>
+          <td>Cross-team adoption, Cowork contextual discovery, eval
+          framework, EU AI Act templates, federated directory</td>
           <td>All production AI assets governed through ARIA</td>
           </tr>
           </tbody>
           </table>
           <h1 id="conclusion">Conclusion</h1>
-          <p>Enterprise AI is at an inflection point. ARIA — the
-          combination of OASF for classification, GitHub for marketplace
-          operations, and Microsoft Purview for governance — creates a
-          practical, implementable framework that transforms AI asset
-          management from ad hoc artifact accumulation into a governed,
-          discoverable, composable ecosystem.</p>
-          <p>The key insight is that governance must be embedded in the
-          development workflow — not bolted on after deployment. By
-          making the OASF Record and governance overlay part of every
-          pull request, and by automating Purview integration through
-          CI/CD pipelines, ARIA makes compliance a natural consequence
-          of building AI assets rather than an afterthought.</p>
+          <p>Enterprise AI is at an inflection point. ARIA addresses the
+          three questions every enterprise leader asks about AI
+          adoption: “Are we allowed to use this?” (governance), “Can we
+          afford to use this?” (AI FinOps), and “How do our people
+          access it?” (distribution). The combination of OASF for
+          classification, GitHub for marketplace operations, Microsoft
+          Purview for governance, a distribution gateway for end-user
+          consumption, and a cost governance framework for financial
+          accountability creates a practical, implementable architecture
+          that transforms AI asset management from ad hoc artifact
+          accumulation into a governed, discoverable, composable, and
+          economically sustainable ecosystem.</p>
+          <p>The key insight is that governance, cost controls, and user
+          experience must all be embedded in the same workflow. For
+          developers, the OASF Record and governance overlay — including
+          budget caps and rate limits — are part of every pull request.
+          For business users, the same controls run transparently behind
+          Claude Desktop’s Extensions panel. For finance teams,
+          per-asset cost attribution flows automatically from provider
+          billing APIs through the OASF dependency graph. The governed
+          path is the easiest path, the most cost-transparent path, and
+          the most compliant path — which is what actually gets adoption
+          at scale.</p>
         </article>
       </main>
 
