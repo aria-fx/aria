@@ -16,7 +16,7 @@
   <rect class="bg" x="0" y="0" width="1400" height="760" rx="26"/>
 
   <text class="title" x="70" y="90">ARIA Reference Architecture</text>
-  <text class="subtitle" x="70" y="128">Four-layer model with OASF, GitHub, Purview, and governed distribution</text>
+  <text class="subtitle" x="70" y="128">Four-layer model with OASF (https://schema.oasf.outshift.com/), GitHub, Purview, and governed distribution</text>
 
   <rect x="70" y="176" width="300" height="52" rx="26" fill="#6B21A8"/>
   <text class="pill" x="220" y="209" text-anchor="middle" fill="#FFFFFF">ENTERPRISE AI ASSETS</text>
@@ -24,7 +24,7 @@
   <g transform="translate(70,260)">
     <rect class="stroke" x="0" y="0" width="1260" height="104" rx="18" fill="#EEE9FA"/>
     <text class="layer-title" x="28" y="50" fill="#6B21A8">Metamodel</text>
-    <text class="layer-body" x="320" y="50" fill="#3A3351">OASF records, entity types, relationships, lifecycle states</text>
+    <text class="layer-body" x="320" y="50" fill="#3A3351">OASF (https://schema.oasf.outshift.com/) records, entity types, relationships, lifecycle states</text>
     <text class="layer-body" x="320" y="82" fill="#4A4458">Agent, Skill, Instruction, Knowledge, Orchestration</text>
   </g>
 

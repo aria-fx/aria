@@ -29,7 +29,7 @@ code .
 prompt libraries, and RAG pipelines scattered across teams with no inventory,
 no governance, and no way to discover what already exists."
 
-**Show:** The OASF Record and governance overlay files side by side.
+**Show:** The [OASF](https://schema.oasf.outshift.com/) Record and governance overlay files side by side.
 
 ```bash
 # Show what an AI asset looks like in ARIA
@@ -40,7 +40,7 @@ cat src/sample-agent/Oasf.Sample.Agent/oasf-governance.json | jq .
 ### Act 2: "The marketplace" (3 min)
 
 **Talking point:** "ARIA uses GitHub as the marketplace. Every AI asset
-gets an OASF manifest, a governance overlay, and three GitHub Actions
+gets an [OASF](https://schema.oasf.outshift.com/) manifest, a governance overlay, and three GitHub Actions
 workflows that enforce policy on every PR."
 
 **Show:** The template repo structure and the CI/CD pipeline.
@@ -90,7 +90,7 @@ dotnet run --project src/sample-agent/Oasf.Sample.Agent
 ## Key Lines to Deliver
 
 - "ARIA is TOGAF for AI assets — a metamodel, a marketplace, a governance layer, and a distribution gateway."
-- "The OASF Record and governance overlay travel with the asset — in every PR, in every OCI artifact, in every runtime."
+- "The [OASF](https://schema.oasf.outshift.com/) Record and governance overlay travel with the asset — in every PR, in every OCI artifact, in every runtime."
 - "For developers, governance is in the PR. For end users, governance is invisible — they just see a curated Extensions panel in Claude Desktop."
 - "The sensitivity ceiling check that runs in CI is the same check that runs at runtime in the agent middleware, and the same check that runs when someone clicks 'Add to Claude.' One rule, enforced everywhere."
 - "The governed path is the easiest path. That's what gets compliance at scale."

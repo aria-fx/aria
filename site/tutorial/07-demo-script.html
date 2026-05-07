@@ -51,24 +51,30 @@
                 <nav id="toc" class="toc-panel" aria-label="Table of contents">
           <h2>On This Page</h2>
           <ul>
-          <li><a href="#conference-demo-script">07 — Conference Demo
+          <li><a href="#conference-demo-script"
+          id="toc-conference-demo-script">07 — Conference Demo
           Script</a>
           <ul>
-          <li><a href="#setup-before-going-on-stage">Setup (before going
-          on stage)</a></li>
-          <li><a href="#demo-flow">Demo Flow</a>
+          <li><a href="#setup-before-going-on-stage"
+          id="toc-setup-before-going-on-stage">Setup (before going on
+          stage)</a></li>
+          <li><a href="#demo-flow" id="toc-demo-flow">Demo Flow</a>
           <ul>
-          <li><a href="#act-1-the-problem-2-min">Act 1: “The problem” (2
+          <li><a href="#act-1-the-problem-2-min"
+          id="toc-act-1-the-problem-2-min">Act 1: “The problem” (2
           min)</a></li>
-          <li><a href="#act-2-the-marketplace-3-min">Act 2: “The
-          marketplace” (3 min)</a></li>
-          <li><a href="#act-3-the-package-manager-3-min">Act 3: “The
-          package manager” (3 min)</a></li>
-          <li><a href="#act-4-governance-in-action-2-min">Act 4:
-          “Governance in action” (2 min)</a></li>
+          <li><a href="#act-2-the-marketplace-3-min"
+          id="toc-act-2-the-marketplace-3-min">Act 2: “The marketplace”
+          (3 min)</a></li>
+          <li><a href="#act-3-the-package-manager-3-min"
+          id="toc-act-3-the-package-manager-3-min">Act 3: “The package
+          manager” (3 min)</a></li>
+          <li><a href="#act-4-governance-in-action-2-min"
+          id="toc-act-4-governance-in-action-2-min">Act 4: “Governance
+          in action” (2 min)</a></li>
           </ul></li>
-          <li><a href="#key-lines-to-deliver">Key Lines to
-          Deliver</a></li>
+          <li><a href="#key-lines-to-deliver"
+          id="toc-key-lines-to-deliver">Key Lines to Deliver</a></li>
           </ul></li>
           </ul>
         </nav>
@@ -102,8 +108,9 @@
           with has agents, MCP servers, prompt libraries, and RAG
           pipelines scattered across teams with no inventory, no
           governance, and no way to discover what already exists.”</p>
-          <p><strong>Show:</strong> The OASF Record and governance
-          overlay files side by side.</p>
+          <p><strong>Show:</strong> The <a
+          href="https://schema.oasf.outshift.com/">OASF</a> Record and
+          governance overlay files side by side.</p>
           <div class="sourceCode" id="cb2"><pre
           class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show what an AI asset looks like in ARIA</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> src/sample-agent/Oasf.Sample.Agent/oasf-record.json <span class="kw">|</span> <span class="ex">jq</span> .</span>
@@ -111,7 +118,8 @@
           <h3 id="act-2-the-marketplace-3-min">Act 2: “The marketplace”
           (3 min)</h3>
           <p><strong>Talking point:</strong> “ARIA uses GitHub as the
-          marketplace. Every AI asset gets an OASF manifest, a
+          marketplace. Every AI asset gets an <a
+          href="https://schema.oasf.outshift.com/">OASF</a> manifest, a
           governance overlay, and three GitHub Actions workflows that
           enforce policy on every PR.”</p>
           <p><strong>Show:</strong> The template repo structure and the
@@ -156,9 +164,9 @@
           <ul>
           <li>“ARIA is TOGAF for AI assets — a metamodel, a marketplace,
           a governance layer, and a distribution gateway.”</li>
-          <li>“The OASF Record and governance overlay travel with the
-          asset — in every PR, in every OCI artifact, in every
-          runtime.”</li>
+          <li>“The <a href="https://schema.oasf.outshift.com/">OASF</a>
+          Record and governance overlay travel with the asset — in every
+          PR, in every OCI artifact, in every runtime.”</li>
           <li>“For developers, governance is in the PR. For end users,
           governance is invisible — they just see a curated Extensions
           panel in Claude Desktop.”</li>

@@ -6,8 +6,8 @@ runtimes using the ARIA Package Manager.
 ## What you'll do
 
 - Initialize the aria CLI with your consumer identity and registry
-- Search for assets by OASF skill taxonomy
-- Inspect an asset's OASF Record and governance overlay
+- Search for assets by [OASF](https://schema.oasf.outshift.com/) skill taxonomy
+- Inspect an asset's [OASF](https://schema.oasf.outshift.com/) Record and governance overlay
 - Audit governance compliance before installing
 - Install an MCP skill into Claude Desktop
 - See governance blocking an over-classified install
@@ -29,15 +29,15 @@ Output:
 
 ```
 Description:
-  aria — ARIA Package Manager for OASF-governed AI assets
+  aria — ARIA Package Manager for [OASF](https://schema.oasf.outshift.com/)-governed AI assets
 
 Usage:
   aria [command] [options]
 
 Commands:
   init       Initialize aria configuration in ~/.aria/config.json
-  search     Discover AI assets by OASF skill, domain, or keyword
-  inspect    Display OASF Record and governance overlay for an asset
+  search     Discover AI assets by [OASF](https://schema.oasf.outshift.com/) skill, domain, or keyword
+  inspect    Display [OASF](https://schema.oasf.outshift.com/) Record and governance overlay for an asset
   audit      Validate governance compliance before install
   install    Pull and install an AI asset into a target runtime
   list       List installed AI assets
@@ -109,7 +109,7 @@ You'll see a table of matching assets:
 
 ## Step 4: Inspect an asset
 
-Before installing, inspect the full OASF metadata:
+Before installing, inspect the full [OASF](https://schema.oasf.outshift.com/) metadata:
 
 ```bash
 dotnet run -- inspect ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0
@@ -117,7 +117,7 @@ dotnet run -- inspect ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0
 
 This displays two panels:
 
-- **OASF Record** — name, version, skills, domains, modules, authors
+- **[OASF](https://schema.oasf.outshift.com/) Record** — name, version, skills, domains, modules, authors
 - **Governance Overlay** — sensitivity tier, classifications, ceiling,
   approval chain, allowed consumers, compliance frameworks
 
@@ -175,7 +175,7 @@ The install flow:
 ```
 aria install ghcr.io/jgarverick/aria-assets/policy-lookup-skill:1.0.0 → claude-desktop
 
-1. Fetching OASF metadata...
+1. Fetching [OASF](https://schema.oasf.outshift.com/) metadata...
    Asset: aria.dev/skills/policy-lookup v1.0.0
 2. Validating governance...
    ✓ Sensitivity: internal ≤ confidential
@@ -223,7 +223,7 @@ The CLI uses pluggable adapters for different runtimes:
 
 | Target              | What it does                                                                                                                                                         |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **claude-desktop**  | Reads the OASF module descriptor, generates a `claude_desktop_config.json` entry with command, args, and transport, then writes it to the Claude Desktop config path |
+| **claude-desktop**  | Reads the [OASF](https://schema.oasf.outshift.com/) module descriptor, generates a `claude_desktop_config.json` entry with command, args, and transport, then writes it to the Claude Desktop config path |
 | **vscode**          | Similar to Claude Desktop but targets `.vscode/mcp.json` in the workspace                                                                                            |
 | **agent-framework** | For MCP modules, registers as a tool provider. For agent Records, registers as a remote A2A endpoint using the `a2a_endpoint` from config                            |
 

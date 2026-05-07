@@ -4,7 +4,7 @@ A reference architecture for enterprise AI asset management: classifying,
 governing, and composing agents, skills, instructions, knowledge, and
 orchestration configurations at scale.
 
-**ARIA = OASF Classification + GitHub Marketplace + Microsoft Purview Governance**
+**ARIA = [OASF](https://schema.oasf.outshift.com/) Classification + GitHub Marketplace + Microsoft Purview Governance**
 
 ## Repository Structure
 
@@ -86,14 +86,14 @@ make site       # Build microsite HTML for docs + tutorial
 
 **Reference Architecture** — The full ARIA specification: metamodel (5 entity
 types, 6 relationship types, lifecycle states), capability model, GitHub
-marketplace design with OASF manifests, Microsoft Purview integration,
+marketplace design with [OASF](https://schema.oasf.outshift.com/) manifests, Microsoft Purview integration,
 ARIA Package Manager concept, and implementation roadmap.
 
 Source: `docs/architecture/aria-reference-architecture.md`
 Build: `make docs` → `out/docs/aria-reference-architecture.pdf` + `.docx`
 
 **Conference Deck** — 13-slide presentation covering the problem, four-layer
-architecture, OASF overview, metamodel, lifecycle, GitHub marketplace,
+architecture, [OASF](https://schema.oasf.outshift.com/) overview, metamodel, lifecycle, GitHub marketplace,
 Purview integration, sensitivity inheritance, capability model, ARIA CLI,
 and key takeaways.
 
@@ -126,11 +126,11 @@ Pre-rendered HTML pages for architecture and tutorial content used by GitHub Pag
 
 Working C# application on Microsoft Agent Framework 1.0 demonstrating:
 
-- OASF Record + Governance Overlay loaded and validated at startup
+- [OASF](https://schema.oasf.outshift.com/) Record + Governance Overlay loaded and validated at startup
 - `PurviewPolicyMiddleware` for DLP enforcement
-- Custom `OasfGovernanceMiddleware` for consumer validation and OASF telemetry
+- Custom `OasfGovernanceMiddleware` for consumer validation and [OASF](https://schema.oasf.outshift.com/) telemetry
 - Sensitivity ceiling enforcement in agent tools
-- OpenTelemetry traces tagged with OASF metadata
+- OpenTelemetry traces tagged with [OASF](https://schema.oasf.outshift.com/) metadata
 
 ### ARIA CLI (`src/aria-cli/`)
 
@@ -167,9 +167,9 @@ Primary workflows and automation assets:
 
 | Layer            | Function                                           | Implementation                                                        |
 | ---------------- | -------------------------------------------------- | --------------------------------------------------------------------- |
-| **Metamodel**    | Entity types, relationships, lifecycle states      | OASF Records, Skills, Domains, Modules                                |
-| **Marketplace**  | Publish, discover, version, compose                | GitHub repos + OCI registry + OASF manifests                          |
-| **Governance**   | Classify, label, enforce, audit                    | Microsoft Purview + OASF governance overlay                           |
+| **Metamodel**    | Entity types, relationships, lifecycle states      | [OASF](https://schema.oasf.outshift.com/) Records, Skills, Domains, Modules                                |
+| **Marketplace**  | Publish, discover, version, compose                | GitHub repos + OCI registry + [OASF](https://schema.oasf.outshift.com/) manifests                          |
+| **Governance**   | Classify, label, enforce, audit                    | Microsoft Purview + [OASF](https://schema.oasf.outshift.com/) governance overlay                           |
 | **Distribution** | End-user consumption, one-click installs           | Catalog API + .mcpb packager + Claude Desktop / Cowork integration    |
 | **AI FinOps**    | Cost attribution, budgets, rate limits, chargeback | Cost collector skill + budget enforcement middleware + cost dashboard |
 | **Consumption**  | Developer CLI, install validation                  | ARIA Package Manager (`aria`) CLI                                     |

@@ -63,7 +63,7 @@ paths:
     get:
       tags: [ Catalog ]
       operationId: getAssetManifest
-      summary: Get OASF record and governance overlay.
+      summary: Get OASF (https://schema.oasf.outshift.com/) record and governance overlay.
       parameters:
         - $ref: "#/components/parameters/name"
         - $ref: "#/components/parameters/version"
@@ -163,7 +163,7 @@ components:
       required: false
       schema:
         type: string
-      description: OASF skill taxonomy filter.
+      description: OASF (https://schema.oasf.outshift.com/) skill taxonomy filter.
       example: knowledge_retrieval/rag
     domain:
       name: domain
@@ -171,7 +171,7 @@ components:
       required: false
       schema:
         type: string
-      description: OASF domain filter.
+      description: OASF (https://schema.oasf.outshift.com/) domain filter.
       example: human_resources
     search:
       name: q
@@ -297,7 +297,7 @@ components:
         record:
           type: object
           additionalProperties: true
-          description: OASF record payload.
+          description: OASF (https://schema.oasf.outshift.com/) record payload.
         governance:
           type: object
           additionalProperties: true

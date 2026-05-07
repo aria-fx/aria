@@ -6,9 +6,9 @@ Step-by-step guide to understanding, deploying, and using the ARIA framework.
 
 | Module                                                  | Description                                             | Time   |
 | ------------------------------------------------------- | ------------------------------------------------------- | ------ |
-| [01 — Concepts](./01-concepts.md)                       | ARIA metamodel, entity types, OASF classification       | 15 min |
+| [01 — Concepts](./01-concepts.md)                       | ARIA metamodel, entity types, [OASF](https://schema.oasf.outshift.com/) classification       | 15 min |
 | [02 — Marketplace setup](./02-marketplace-setup.md)     | Deploy Terraform infrastructure (GitHub + Azure)        | 30 min |
-| [03 — Your first asset](./03-first-asset.md)            | Create, govern, and publish an OASF-governed skill      | 20 min |
+| [03 — Your first asset](./03-first-asset.md)            | Create, govern, and publish an [OASF](https://schema.oasf.outshift.com/)-governed skill      | 20 min |
 | [04 — Purview integration](./04-purview-integration.md) | Configure sensitivity labels and DLP enforcement        | 20 min |
 | [05 — Sample agent](./05-sample-agent.md)               | Run the onboarding assistant with governance middleware | 15 min |
 | [06 — ARIA CLI](./06-aria-cli.md)                       | Discover, audit, and install assets into runtimes       | 15 min |

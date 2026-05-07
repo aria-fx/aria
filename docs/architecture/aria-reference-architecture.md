@@ -9,13 +9,13 @@ abstract: |
   knowledge bases, and orchestration configurations — without a standardized metamodel
   for classifying, governing, and composing them. This document presents ARIA
   (Asset Registry for Intelligent Agents), a reference architecture that applies the
-  Open Agentic Schema Framework (OASF) as the classification taxonomy, uses GitHub
+  Open Agentic Schema Framework ([OASF](https://schema.oasf.outshift.com/)) as the classification taxonomy, uses GitHub
   as the canonical marketplace and registry, integrates Microsoft Purview as the
   governance and compliance layer, and adds a distribution layer for governed
   end-user delivery.
 keywords:
   - ARIA
-  - OASF
+  - OASF (https://schema.oasf.outshift.com/)
   - AI governance
   - enterprise architecture
   - Microsoft Purview
@@ -40,7 +40,7 @@ header-includes:
 
 # Executive Summary
 
-Enterprises are rapidly accumulating AI primitives — agents, skills, instructions, knowledge bases, and orchestration configurations — without a standardized metamodel for classifying, governing, and composing them. ARIA (Asset Registry for Intelligent Agents) presents a four-layer reference architecture: the Open Agentic Schema Framework (OASF) as the classification taxonomy, GitHub as the canonical marketplace and registry, Microsoft Purview as the governance and compliance layer, and a distribution layer for governed end-user delivery.
+Enterprises are rapidly accumulating AI primitives — agents, skills, instructions, knowledge bases, and orchestration configurations — without a standardized metamodel for classifying, governing, and composing them. ARIA (Asset Registry for Intelligent Agents) presents a four-layer reference architecture: the Open Agentic Schema Framework ([OASF](https://schema.oasf.outshift.com/)) as the classification taxonomy, GitHub as the canonical marketplace and registry, Microsoft Purview as the governance and compliance layer, and a distribution layer for governed end-user delivery.
 
 The architecture draws on the metamodel tradition of TOGAF's Architecture Content Framework, adapting it to the unique requirements of AI asset management: versioned, composable primitives with sensitivity-aware lineage and automated compliance enforcement.
 
@@ -55,20 +55,20 @@ The architecture draws on the metamodel tradition of TOGAF's Architecture Conten
 
 | Layer        | Function                                                        | Implementation                                    |
 | ------------ | --------------------------------------------------------------- | ------------------------------------------------- |
-| Metamodel    | Entity types, relationships, lifecycle states for AI primitives | OASF Records, Skills, Domains, Modules            |
-| Marketplace  | Publish, discover, version, and compose AI primitives           | GitHub repos + OCI registry + OASF manifests      |
-| Governance   | Classify, label, enforce, and audit AI asset usage              | Microsoft Purview + OASF overlay policies         |
+| Metamodel    | Entity types, relationships, lifecycle states for AI primitives | [OASF](https://schema.oasf.outshift.com/) Records, Skills, Domains, Modules            |
+| Marketplace  | Publish, discover, version, and compose AI primitives           | GitHub repos + OCI registry + [OASF](https://schema.oasf.outshift.com/) manifests      |
+| Governance   | Classify, label, enforce, and audit AI asset usage              | Microsoft Purview + [OASF](https://schema.oasf.outshift.com/) overlay policies         |
 | Distribution | Deliver governed assets through end-user channels               | Catalog API + bundle packaging + channel adapters |
 
 ![ARIA four-layer reference architecture](aria-layered-architecture.svg)
 
 # The ARIA Metamodel
 
-Inspired by TOGAF's Architecture Content Framework, this metamodel defines the entity types that constitute an enterprise's AI capability inventory. Each entity is classified using OASF's attribute-based taxonomy and stored as an OASF Record with skills, domains, and module annotations.
+Inspired by TOGAF's Architecture Content Framework, this metamodel defines the entity types that constitute an enterprise's AI capability inventory. Each entity is classified using [OASF](https://schema.oasf.outshift.com/)'s attribute-based taxonomy and stored as an [OASF](https://schema.oasf.outshift.com/) Record with skills, domains, and module annotations.
 
 ## Core Entity Types
 
-| Entity Type   | OASF Classification           | Description                                                                              | Examples                                             |
+| Entity Type   | [OASF](https://schema.oasf.outshift.com/) Classification           | Description                                                                              | Examples                                             |
 | ------------- | ----------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | Agent         | Record (primary)              | Autonomous or semi-autonomous AI unit with defined capabilities, identity, and lifecycle | Copilot agent, CrewAI crew, AutoGen group, A2A agent |
 | Skill         | Skill annotation              | Discrete, reusable capability that an agent can invoke                                   | MCP server, function tool, API connector             |
@@ -87,14 +87,14 @@ Inspired by TOGAF's Architecture Content Framework, this metamodel defines the e
 | depends_on   | Skill         | Skill       | N:M         | Transitive dependency chain affects blast radius analysis    |
 | extends      | Module        | Record      | 1:N         | Extension modules must pass schema validation                |
 
-## OASF Record Structure
+## [OASF](https://schema.oasf.outshift.com/) Record Structure
 
-Every entity in the metamodel is represented as an OASF Record containing identity, classification metadata, capability annotations, and governance envelope:
+Every entity in the metamodel is represented as an [OASF](https://schema.oasf.outshift.com/) Record containing identity, classification metadata, capability annotations, and governance envelope:
 
 - **name**: Unique identifier using domain-based naming (e.g., `xebia.com/agents/onboarding-assistant`)
 - **version**: Semantic version enabling dependency resolution and rollback
-- **schema_version**: OASF schema version for forward compatibility
-- **skills**: Array of OASF skill taxonomy references describing capabilities
+- **schema_version**: [OASF](https://schema.oasf.outshift.com/) schema version for forward compatibility
+- **skills**: Array of [OASF](https://schema.oasf.outshift.com/) skill taxonomy references describing capabilities
 - **domains**: Business domain annotations for discovery scoping
 - **modules**: Extensible metadata blocks (MCP descriptors, evaluation metrics, prompt bundles)
 - **locators**: References to source code, container images, or service endpoints
@@ -106,7 +106,7 @@ Every entity in the metamodel is represented as an OASF Record containing identi
 | State      | Description                                    | Allowed Transitions             | Governance Gate                           |
 | ---------- | ---------------------------------------------- | ------------------------------- | ----------------------------------------- |
 | Draft      | Asset under development, not discoverable      | Draft → Review                  | None (author workspace)                   |
-| Review     | PR submitted, OASF validation passing          | Review → Published / Draft      | CODEOWNERS approval + schema validation   |
+| Review     | PR submitted, [OASF](https://schema.oasf.outshift.com/) validation passing          | Review → Published / Draft      | CODEOWNERS approval + schema validation   |
 | Published  | Active in registry, discoverable and invocable | Published → Deprecated / Review | Purview sensitivity label assigned        |
 | Deprecated | Marked for sunset, consumers warned            | Deprecated → Archived           | Migration plan required                   |
 | Archived   | Immutable record preserved for audit           | Terminal                        | Retention policy enforced via Purview DLM |
@@ -117,8 +117,8 @@ For an enterprise to successfully manage AI assets at scale, it needs capabiliti
 
 | Domain                           | Capabilities                                                                     | Maturity Indicator                                                   |
 | -------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Asset Inventory & Classification | Discover, catalog, and classify all AI primitives using a standardized taxonomy  | All AI assets registered with OASF Records                           |
-| Lifecycle Management             | Version, publish, deprecate, and archive with automated gating                   | Automated CI/CD validates OASF schema on every PR                    |
+| Asset Inventory & Classification | Discover, catalog, and classify all AI primitives using a standardized taxonomy  | All AI assets registered with [OASF](https://schema.oasf.outshift.com/) Records                           |
+| Lifecycle Management             | Version, publish, deprecate, and archive with automated gating                   | Automated CI/CD validates [OASF](https://schema.oasf.outshift.com/) schema on every PR                    |
 | Composition & Orchestration      | Compose agents from skills and knowledge; resolve dependency chains              | Orchestration configs reference only published, validated primitives |
 | Governance & Compliance          | Apply sensitivity labels, enforce DLP, track lineage, maintain audit trails      | Purview labels auto-propagate through dependency graph               |
 | Discovery & Reuse                | Search, filter, and consume AI assets by skill taxonomy or domain                | Searchable registry with skill-based filtering active                |
@@ -133,7 +133,7 @@ GitHub provides the foundation for the canonical marketplace due to its native s
 
 ```
 aria-assets/
-├── oasf-record.json          # OASF Record manifest (required)
+├── oasf-record.json          # [OASF](https://schema.oasf.outshift.com/) Record manifest (required)
 ├── oasf-governance.json      # Governance overlay
 ├── src/                      # Asset implementation
 ├── tests/                    # Validation and evaluation tests
@@ -146,7 +146,7 @@ aria-assets/
         └── purview-sync.yml  # Sync labels to Purview
 ```
 
-## OASF Record Manifest Example
+## [OASF](https://schema.oasf.outshift.com/) Record Manifest Example
 
 ```json
 {
@@ -209,15 +209,15 @@ The `aria` CLI bridges the OCI marketplace with developer runtimes.
 
 | Command              | Description                                                 |
 | -------------------- | ----------------------------------------------------------- |
-| `aria search`        | Discover assets by OASF skill taxonomy, domain, or keyword  |
-| `aria inspect <ref>` | Display OASF Record and governance overlay                  |
+| `aria search`        | Discover assets by [OASF](https://schema.oasf.outshift.com/) skill taxonomy, domain, or keyword  |
+| `aria inspect <ref>` | Display [OASF](https://schema.oasf.outshift.com/) Record and governance overlay                  |
 | `aria audit <ref>`   | Validate sensitivity ceiling, consumer, and dependencies    |
 | `aria install <ref>` | Pull OCI artifact, enforce governance, install to target    |
 | `aria list`          | List installed assets with version, sensitivity, and target |
 
 ## Install Targets
 
-| OASF Module Type | Target                | Install Behavior                              |
+| [OASF](https://schema.oasf.outshift.com/) Module Type | Target                | Install Behavior                              |
 | ---------------- | --------------------- | --------------------------------------------- |
 | mcp_server       | Claude Desktop        | Add MCP entry to `claude_desktop_config.json` |
 | mcp_server       | VS Code               | Add to `.vscode/mcp.json` workspace config    |
@@ -243,18 +243,18 @@ OpenAPI specification: [distribution-gateway.openapi.yaml](distribution-gateway.
 
 ## ARIA Catalog API
 
-The Catalog API serves the browsable, searchable catalog of governed AI assets. It reads OASF records from OCI manifests, transforms them into user-friendly listings, applies governance filtering based on the authenticated user's identity, and supports search by skill taxonomy, domain, and keyword.
+The Catalog API serves the browsable, searchable catalog of governed AI assets. It reads [OASF](https://schema.oasf.outshift.com/) records from OCI manifests, transforms them into user-friendly listings, applies governance filtering based on the authenticated user's identity, and supports search by skill taxonomy, domain, and keyword.
 
 Key endpoints:
 
 - `GET /catalog/assets` — browse all assets the user is authorized to see
 - `GET /catalog/assets?skill=knowledge_retrieval/rag&domain=human_resources` — filtered search
 - `GET /catalog/assets/{name}/versions` — list versions of a specific asset
-- `GET /catalog/assets/{name}/{version}/manifest` — full OASF Record + governance overlay
+- `GET /catalog/assets/{name}/{version}/manifest` — full [OASF](https://schema.oasf.outshift.com/) Record + governance overlay
 - `POST /catalog/assets/{name}/{version}/install` — trigger governed install to a target platform
 - `POST /catalog/assets/{name}/{version}/request-access` — initiate approval workflow for blocked assets
 
-Every request is authenticated via Entra ID. The API resolves the user's team membership and sensitivity ceiling from Entra security groups, evaluates the OASF governance overlay, and filters results so users only see assets they're authorized to install.
+Every request is authenticated via Entra ID. The API resolves the user's team membership and sensitivity ceiling from Entra security groups, evaluates the [OASF](https://schema.oasf.outshift.com/) governance overlay, and filters results so users only see assets they're authorized to install.
 
 OpenAPI specification: [catalog-api.openapi.yaml](catalog-api.openapi.yaml)
 
@@ -276,7 +276,7 @@ When a user is blocked, the gateway returns a structured response that includes 
 
 For Claude Desktop and Cowork consumption, the distribution gateway includes a packager that converts OCI-stored ARIA assets into `.mcpb` (MCP Bundle) format on-the-fly. Claude Desktop's enterprise extension system already supports `.mcpb` files with one-click installation, organization allowlists, and admin controls.
 
-The packager reads the OASF record's `mcp_server` module descriptor, extracts the server configuration (command, args, transport, environment), generates the `.mcpb` manifest with user configuration prompts (API keys, endpoints), and bundles the server implementation from the OCI artifact layers. The resulting `.mcpb` file is served to Claude Desktop's Extensions panel as if it were a native desktop extension.
+The packager reads the [OASF](https://schema.oasf.outshift.com/) record's `mcp_server` module descriptor, extracts the server configuration (command, args, transport, environment), generates the `.mcpb` manifest with user configuration prompts (API keys, endpoints), and bundles the server implementation from the OCI artifact layers. The resulting `.mcpb` file is served to Claude Desktop's Extensions panel as if it were a native desktop extension.
 
 For enterprise deployments, organization owners can configure the ARIA Catalog API as a custom extension registry in Claude Desktop's admin settings. This replaces or supplements Anthropic's public extension directory with the organization's governed ARIA catalog. Users browse their organization's AI assets directly in Claude Desktop's Extensions panel, with governance enforcement happening transparently.
 
@@ -308,7 +308,7 @@ Enterprise admins manage the catalog through the ARIA Catalog API's admin endpoi
 
 Cowork is task-oriented rather than chat-oriented. Users work on files and workflows, and Cowork suggests relevant AI capabilities in context. ARIA integrates with this model through contextual discovery.
 
-When a user is working on an onboarding workflow in Cowork, the ARIA Catalog API is queried with the user's context (document type, domain keywords, current task). The API matches OASF domain annotations against the context and returns relevant assets that the user is authorized to use. Cowork surfaces these as suggestions: "The HR Policy Assistant can help with this. Add it?"
+When a user is working on an onboarding workflow in Cowork, the ARIA Catalog API is queried with the user's context (document type, domain keywords, current task). The API matches [OASF](https://schema.oasf.outshift.com/) domain annotations against the context and returns relevant assets that the user is authorized to use. Cowork surfaces these as suggestions: "The HR Policy Assistant can help with this. Add it?"
 
 The governance filtering happens before the suggestion is shown. If the user isn't in the `allowed_consumers` list or their team's ceiling is insufficient, the asset is never surfaced — no confusing blocked states, no dead-end error messages.
 
@@ -317,7 +317,7 @@ The governance filtering happens before the suggestion is shown. If the user isn
 For broader organizational visibility, the ARIA Catalog API powers a web-based catalog portal where anyone can browse the organization's AI asset inventory. This serves multiple audiences:
 
 - **Business users** browse by department and capability to find skills they can add to Claude Desktop or Cowork
-- **Developers** search by OASF skill taxonomy to find assets to compose into new agents
+- **Developers** search by [OASF](https://schema.oasf.outshift.com/) skill taxonomy to find assets to compose into new agents
 - **AI governance teams** review the full inventory with sensitivity classifications, approval chains, and compliance framework coverage
 - **Compliance auditors** generate reports on AI asset usage, classification distribution, and governance posture
 
@@ -353,7 +353,7 @@ An ARIA agent that uses Azure OpenAI for inference, invokes an MCP skill hosted 
 
 ## Cost Governance Overlay Extension
 
-The OASF governance overlay is extended with a `cost_governance` section that declares budget constraints, rate limits, and cost attribution metadata:
+The [OASF](https://schema.oasf.outshift.com/) governance overlay is extended with a `cost_governance` section that declares budget constraints, rate limits, and cost attribution metadata:
 
 ```json
 {
@@ -390,7 +390,7 @@ Key fields:
 
 ## Metering Module
 
-The OASF record supports a `metering` module type that declares what usage dimensions an asset emits and where metering data flows:
+The [OASF](https://schema.oasf.outshift.com/) record supports a `metering` module type that declares what usage dimensions an asset emits and where metering data flows:
 
 ```json
 {
@@ -413,7 +413,7 @@ The metering module enables the cost collector to discover which providers to qu
 
 ## Cost Inheritance
 
-Cost inheritance follows the same dependency graph as sensitivity inheritance. An orchestration's cost is the sum of its composed agents' costs. An agent's cost is its own inference cost plus the costs of all skills it invokes. The cost collector builds this rollup by traversing the OASF module refs.
+Cost inheritance follows the same dependency graph as sensitivity inheritance. An orchestration's cost is the sum of its composed agents' costs. An agent's cost is its own inference cost plus the costs of all skills it invokes. The cost collector builds this rollup by traversing the [OASF](https://schema.oasf.outshift.com/) module refs.
 
 ```
 Orchestration (total: $850/mo)
@@ -438,7 +438,7 @@ Budget enforcement cascades: if Agent A's budget is $400/mo, it doesn't matter t
 | Azure Container Apps      | Azure Monitor                           | Azure Cost Management | Via resource tags        | Near-real-time             |
 | AWS Lambda / Bedrock      | CloudWatch Metrics                      | AWS Cost Explorer     | Via cost allocation tags | Hourly aggregation         |
 
-The cost collector normalizes all provider data into a common format using the OASF asset name as the join key, enabling cross-provider rollup per asset, per team, and per department.
+The cost collector normalizes all provider data into a common format using the [OASF](https://schema.oasf.outshift.com/) asset name as the join key, enabling cross-provider rollup per asset, per team, and per department.
 
 ## Budget Enforcement Middleware
 
@@ -468,7 +468,7 @@ The budget middleware checks the asset's `cost_governance` fields against the cu
 
 The ARIA distribution gateway's web catalog is extended with a cost dashboard that provides:
 
-- **Per-asset cost breakdown**: inference tokens, hosting, API calls, storage — attributed by OASF asset name
+- **Per-asset cost breakdown**: inference tokens, hosting, API calls, storage — attributed by [OASF](https://schema.oasf.outshift.com/) asset name
 - **Per-team rollup**: aggregated costs for all assets owned by or consumed by a team
 - **Per-department chargeback**: cost center-level reporting for financial reconciliation
 - **Budget burn rate**: current month spend vs. budget with projected end-of-month forecast
@@ -480,7 +480,7 @@ The ARIA distribution gateway's web catalog is extended with a cost dashboard th
 
 | Phase        | Duration  | Deliverables                                                                                                                      | Success Criteria                                                                            |
 | ------------ | --------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Foundation   | 4–6 weeks | OASF server, governance overlay schema, GitHub template, validation Action                                                        | First asset registered with valid OASF Record                                               |
+| Foundation   | 4–6 weeks | [OASF](https://schema.oasf.outshift.com/) server, governance overlay schema, GitHub template, validation Action                                                        | First asset registered with valid [OASF](https://schema.oasf.outshift.com/) Record                                               |
 | Marketplace  | 6–8 weeks | OCI publish pipeline, Agent Directory, discovery channels, CODEOWNERS                                                             | Teams discover and consume assets through registry                                          |
 | Purview      | 6–8 weeks | Label mapping, purview-sync Action, Data Map lineage, sensitivity propagation                                                     | Labels auto-propagate through dependency graphs                                             |
 | Distribution | 6–8 weeks | Catalog API, governance gateway, .mcpb packager, Claude Desktop enterprise integration, web catalog portal                        | Non-technical users browse and install governed skills from Claude Desktop Extensions panel |
@@ -490,6 +490,6 @@ The ARIA distribution gateway's web catalog is extended with a cost dashboard th
 
 # Conclusion
 
-Enterprise AI is at an inflection point. ARIA addresses the three questions every enterprise leader asks about AI adoption: "Are we allowed to use this?" (governance), "Can we afford to use this?" (AI FinOps), and "How do our people access it?" (distribution). The combination of OASF for classification, GitHub for marketplace operations, Microsoft Purview for governance, a distribution gateway for end-user consumption, and a cost governance framework for financial accountability creates a practical, implementable architecture that transforms AI asset management from ad hoc artifact accumulation into a governed, discoverable, composable, and economically sustainable ecosystem.
+Enterprise AI is at an inflection point. ARIA addresses the three questions every enterprise leader asks about AI adoption: "Are we allowed to use this?" (governance), "Can we afford to use this?" (AI FinOps), and "How do our people access it?" (distribution). The combination of [OASF](https://schema.oasf.outshift.com/) for classification, GitHub for marketplace operations, Microsoft Purview for governance, a distribution gateway for end-user consumption, and a cost governance framework for financial accountability creates a practical, implementable architecture that transforms AI asset management from ad hoc artifact accumulation into a governed, discoverable, composable, and economically sustainable ecosystem.
 
-The key insight is that governance, cost controls, and user experience must all be embedded in the same workflow. For developers, the OASF Record and governance overlay — including budget caps and rate limits — are part of every pull request. For business users, the same controls run transparently behind Claude Desktop's Extensions panel. For finance teams, per-asset cost attribution flows automatically from provider billing APIs through the OASF dependency graph. The governed path is the easiest path, the most cost-transparent path, and the most compliant path — which is what actually gets adoption at scale.
+The key insight is that governance, cost controls, and user experience must all be embedded in the same workflow. For developers, the [OASF](https://schema.oasf.outshift.com/) Record and governance overlay — including budget caps and rate limits — are part of every pull request. For business users, the same controls run transparently behind Claude Desktop's Extensions panel. For finance teams, per-asset cost attribution flows automatically from provider billing APIs through the [OASF](https://schema.oasf.outshift.com/) dependency graph. The governed path is the easiest path, the most cost-transparent path, and the most compliant path — which is what actually gets adoption at scale.
