@@ -51,30 +51,44 @@
                 <nav id="toc" class="toc-panel" aria-label="Table of contents">
           <h2>On This Page</h2>
           <ul>
-          <li><a href="#marketplace-setup">02 — Marketplace Setup</a>
+          <li><a href="#marketplace-setup" id="toc-marketplace-setup">02
+          — Marketplace Setup</a>
           <ul>
-          <li><a href="#what-youll-build">What you’ll build</a></li>
-          <li><a href="#prerequisites">Prerequisites</a></li>
-          <li><a href="#step-1-configure-your-environment">Step 1:
-          Configure your environment</a></li>
-          <li><a href="#step-2-initialize-terraform">Step 2: Initialize
+          <li><a href="#what-youll-build" id="toc-what-youll-build">What
+          you’ll build</a></li>
+          <li><a href="#prerequisites"
+          id="toc-prerequisites">Prerequisites</a></li>
+          <li><a href="#step-1-configure-your-environment"
+          id="toc-step-1-configure-your-environment">Step 1: Configure
+          your environment</a></li>
+          <li><a href="#step-2-initialize-terraform"
+          id="toc-step-2-initialize-terraform">Step 2: Initialize
           Terraform</a></li>
-          <li><a href="#step-3-review-the-plan">Step 3: Review the
+          <li><a href="#step-3-review-the-plan"
+          id="toc-step-3-review-the-plan">Step 3: Review the
           plan</a></li>
-          <li><a href="#step-4-apply">Step 4: Apply</a></li>
-          <li><a href="#step-5-verify-the-deployment">Step 5: Verify the
+          <li><a href="#step-4-apply" id="toc-step-4-apply">Step 4:
+          Apply</a></li>
+          <li><a href="#step-5-verify-the-deployment"
+          id="toc-step-5-verify-the-deployment">Step 5: Verify the
           deployment</a></li>
-          <li><a href="#step-6-inspect-the-template-repository">Step 6:
+          <li><a href="#step-6-inspect-the-template-repository"
+          id="toc-step-6-inspect-the-template-repository">Step 6:
           Inspect the template repository</a></li>
-          <li><a href="#understanding-the-modules">Understanding the
+          <li><a href="#understanding-the-modules"
+          id="toc-understanding-the-modules">Understanding the
           modules</a>
           <ul>
-          <li><a href="#azure-governance">azure-governance</a></li>
-          <li><a href="#github-marketplace">github-marketplace</a></li>
-          <li><a href="#oasf-validation">oasf-validation</a></li>
+          <li><a href="#azure-governance"
+          id="toc-azure-governance">azure-governance</a></li>
+          <li><a href="#github-marketplace"
+          id="toc-github-marketplace">github-marketplace</a></li>
+          <li><a href="#oasf-validation"
+          id="toc-oasf-validation">oasf-validation</a></li>
           </ul></li>
-          <li><a href="#cleanup">Cleanup</a></li>
-          <li><a href="#next-steps">Next Steps</a></li>
+          <li><a href="#cleanup" id="toc-cleanup">Cleanup</a></li>
+          <li><a href="#next-steps" id="toc-next-steps">Next
+          Steps</a></li>
           </ul></li>
           </ul>
         </nav>
@@ -90,18 +104,21 @@
           system-assigned managed identity</li>
           <li>An <strong>Azure Key Vault</strong> storing sensitivity
           tier configuration</li>
-          <li>A <strong>Storage Account</strong> for OASF lineage
+          <li>A <strong>Storage Account</strong> for <a
+          href="https://schema.oasf.outshift.com/">OASF</a> lineage
           metadata and governance overlays</li>
           <li>An <strong>Azure Container Registry</strong> for OCI
           artifact storage</li>
-          <li>A <strong>GitHub template repository</strong> with OASF
-          manifests, CODEOWNERS, and three Actions workflows</li>
+          <li>A <strong>GitHub template repository</strong> with <a
+          href="https://schema.oasf.outshift.com/">OASF</a> manifests,
+          CODEOWNERS, and three Actions workflows</li>
           <li>A <strong>sample agent repository</strong> bootstrapped
           from the template</li>
           <li>Three <strong>GitHub teams</strong> (AI Platform, AI
           Governance, AI Consumers) with scoped permissions</li>
-          <li><strong>Branch protection</strong> requiring OASF
-          validation to pass before merge</li>
+          <li><strong>Branch protection</strong> requiring <a
+          href="https://schema.oasf.outshift.com/">OASF</a> validation
+          to pass before merge</li>
           </ul>
           <h2 id="prerequisites">Prerequisites</h2>
           <ul>
@@ -150,24 +167,24 @@ github_default_branch = &quot;main&quot;</code></pre>
           <col style="width: 26%" />
           </colgroup>
           <thead>
-          <tr class="header">
+          <tr>
           <th>Module</th>
           <th>Resources</th>
           <th>Count</th>
           </tr>
           </thead>
           <tbody>
-          <tr class="odd">
+          <tr>
           <td>azure-governance</td>
           <td>Resource group, Purview, Key Vault, Storage, RBAC</td>
           <td>~10</td>
           </tr>
-          <tr class="even">
+          <tr>
           <td>github-marketplace</td>
           <td>Repos, teams, branch protection, workflows, secrets</td>
           <td>~15</td>
           </tr>
-          <tr class="odd">
+          <tr>
           <td>oasf-validation</td>
           <td>Container Registry, schema storage, RBAC</td>
           <td>~5</td>
@@ -205,7 +222,7 @@ sample_repo            = &quot;https://github.com/your-org/aria-onboarding-assis
           Inspect the template repository</h2>
           <p>Open the template repo in your browser. You should see:</p>
           <pre><code>aria-asset-template/
-├── oasf-record.json          ← OASF Record stub (needs customization)
+├── oasf-record.json          ← [OASF](https://schema.oasf.outshift.com/) Record stub (needs customization)
 ├── oasf-governance.json      ← Governance overlay stub
 ├── src/README.md
 ├── tests/README.md
@@ -219,8 +236,9 @@ sample_repo            = &quot;https://github.com/your-org/aria-onboarding-assis
         └── purview-sync.yml  ← Runs post-publish: apply Purview labels + lineage</code></pre>
           <p>The branch protection on <code>main</code> requires:</p>
           <ul>
-          <li>The <code>validate</code> status check to pass (OASF
-          schema validation)</li>
+          <li>The <code>validate</code> status check to pass (<a
+          href="https://schema.oasf.outshift.com/">OASF</a> schema
+          validation)</li>
           <li>At least one CODEOWNERS approval</li>
           <li>Stale reviews dismissed on new pushes</li>
           </ul>
@@ -241,11 +259,11 @@ sample_repo            = &quot;https://github.com/your-org/aria-onboarding-assis
           endpoint URL</li>
           </ul>
           <h3 id="github-marketplace">github-marketplace</h3>
-          <p>This module creates the template repository with all OASF
-          manifest stubs and workflows pre-configured. The CODEOWNERS
-          file routes governance overlay changes to the
-          <code>ai-governance</code> team and workflow changes to
-          <code>ai-platform</code>.</p>
+          <p>This module creates the template repository with all <a
+          href="https://schema.oasf.outshift.com/">OASF</a> manifest
+          stubs and workflows pre-configured. The CODEOWNERS file routes
+          governance overlay changes to the <code>ai-governance</code>
+          team and workflow changes to <code>ai-platform</code>.</p>
           <p>Organization-level Actions secrets
           (<code>ACR_LOGIN_SERVER</code>, <code>PURVIEW_ACCOUNT</code>,
           <code>AZURE_SUBSCRIPTION_ID</code>) are created and scoped to
@@ -257,8 +275,9 @@ sample_repo            = &quot;https://github.com/your-org/aria-onboarding-assis
           <code>AcrPull</code> access so it can scan the registry and
           catalog AI assets in the Data Map.</p>
           <p>A schema version reference blob is seeded into the schema
-          storage account, defining required fields for both the OASF
-          Record and governance overlay.</p>
+          storage account, defining required fields for both the <a
+          href="https://schema.oasf.outshift.com/">OASF</a> Record and
+          governance overlay.</p>
           <h2 id="cleanup">Cleanup</h2>
           <p>To tear down the entire environment:</p>
           <div class="sourceCode" id="cb11"><pre

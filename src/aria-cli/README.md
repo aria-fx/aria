@@ -1,12 +1,12 @@
 # aria — ARIA Package Manager
 
 A command-line interface for discovering, validating, and installing
-OASF-governed AI assets from OCI registries into target runtimes.
+[OASF](https://schema.oasf.outshift.com/)-governed AI assets from OCI registries into target runtimes.
 
 ## Overview
 
 `aria` is the "last mile" tool that connects the Enterprise AI Asset
-Management marketplace (GitHub + OCI registry + OASF classification)
+Management marketplace (GitHub + OCI registry + [OASF](https://schema.oasf.outshift.com/) classification)
 to developer workstations and production runtimes. It bridges the gap
 between "assets exist in a registry" and "assets are wired into my
 agent runtime and governed by policy."
@@ -16,8 +16,8 @@ agent runtime and governed by policy."
 | Command              | Description                                                                      |
 | -------------------- | -------------------------------------------------------------------------------- |
 | `aria init`          | Initialize `~/.aria/config.json` with consumer identity, registries, and targets |
-| `aria search`        | Discover assets by OASF skill taxonomy, domain, or keyword                       |
-| `aria inspect <ref>` | Display OASF Record and governance overlay without installing                    |
+| `aria search`        | Discover assets by [OASF](https://schema.oasf.outshift.com/) skill taxonomy, domain, or keyword                       |
+| `aria inspect <ref>` | Display [OASF](https://schema.oasf.outshift.com/) Record and governance overlay without installing                    |
 | `aria audit <ref>`   | Validate governance (ceiling, consumer, dependencies) before install             |
 | `aria install <ref>` | Pull OCI artifact, enforce governance, install to target runtime                 |
 | `aria whoami`        | Resolve Entra identity and show effective sensitivity/Purview access             |
@@ -156,7 +156,7 @@ chain is displayed.
 4. Okta currently supports JWT access token resolution from env/file and optional client-credentials token endpoint flow.
 5. `access_rules` map normalized groups/roles to an effective sensitivity ceiling and granted Purview roles.
 6. Governance checks enforce:
-  - OASF sensitivity tier <= effective ceiling
+  - [OASF](https://schema.oasf.outshift.com/) sensitivity tier <= effective ceiling
   - `allowed_consumers`, `allowed_entra_groups`, and `allowed_entra_roles` from governance overlay
   - `purview.required_roles_by_sensitivity` for data-plane access
 
@@ -186,7 +186,7 @@ gh aria install jgarverick/aria-policy-lookup-skill --target claude-desktop
 
 ```
 src/aria-auth-core/
-  Models/             → Shared config + OASF policy/record models
+  Models/             → Shared config + [OASF](https://schema.oasf.outshift.com/) policy/record models
   Services/           → Shared identity provider contracts, provider factory, governance/access policy
 src/aria-cli/
   Program.cs          → System.CommandLine root + command tree

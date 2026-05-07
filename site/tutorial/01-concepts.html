@@ -51,16 +51,22 @@
                 <nav id="toc" class="toc-panel" aria-label="Table of contents">
           <h2>On This Page</h2>
           <ul>
-          <li><a href="#aria-concepts">01 — ARIA Concepts</a>
+          <li><a href="#aria-concepts" id="toc-aria-concepts">01 — ARIA
+          Concepts</a>
           <ul>
-          <li><a href="#what-is-aria">What is ARIA?</a></li>
-          <li><a href="#the-four-layers">The Four Layers</a></li>
-          <li><a href="#the-five-entity-types">The Five Entity
-          Types</a></li>
-          <li><a href="#key-relationships">Key Relationships</a></li>
-          <li><a href="#the-sensitivity-inheritance-rule">The
-          Sensitivity Inheritance Rule</a></li>
-          <li><a href="#next-steps">Next Steps</a></li>
+          <li><a href="#what-is-aria" id="toc-what-is-aria">What is
+          ARIA?</a></li>
+          <li><a href="#the-four-layers" id="toc-the-four-layers">The
+          Four Layers</a></li>
+          <li><a href="#the-five-entity-types"
+          id="toc-the-five-entity-types">The Five Entity Types</a></li>
+          <li><a href="#key-relationships"
+          id="toc-key-relationships">Key Relationships</a></li>
+          <li><a href="#the-sensitivity-inheritance-rule"
+          id="toc-the-sensitivity-inheritance-rule">The Sensitivity
+          Inheritance Rule</a></li>
+          <li><a href="#next-steps" id="toc-next-steps">Next
+          Steps</a></li>
           </ul></li>
           </ul>
         </nav>
@@ -81,14 +87,17 @@
           <li><strong>Metamodel</strong> — What are these things and how
           do they relate?
           <ul>
-          <li>Five entity types classified by OASF</li>
+          <li>Five entity types classified by <a
+          href="https://schema.oasf.outshift.com/">OASF</a></li>
           <li>Relationship types with governance implications</li>
           <li>Lifecycle states with gated transitions</li>
           </ul></li>
           <li><strong>Marketplace</strong> — How do you publish,
           discover, and compose them?
           <ul>
-          <li>GitHub repos with OASF manifest sidecars</li>
+          <li>GitHub repos with <a
+          href="https://schema.oasf.outshift.com/">OASF</a> manifest
+          sidecars</li>
           <li>OCI registry for content-addressed artifact storage</li>
           <li>CI/CD pipelines for validation and publishing</li>
           </ul></li>
@@ -96,7 +105,8 @@
           control, and audit them?
           <ul>
           <li>Microsoft Purview for sensitivity labels and DLP</li>
-          <li>OASF governance overlay for policy-as-code</li>
+          <li><a href="https://schema.oasf.outshift.com/">OASF</a>
+          governance overlay for policy-as-code</li>
           <li>Sensitivity label inheritance through dependency
           graphs</li>
           </ul></li>
@@ -107,7 +117,8 @@
           platform-native installs</li>
           <li>Claude Desktop Extensions panel with enterprise
           allowlist</li>
-          <li>Cowork contextual discovery based on OASF domain
+          <li>Cowork contextual discovery based on <a
+          href="https://schema.oasf.outshift.com/">OASF</a> domain
           matching</li>
           <li>Web portal for browsing, filtering, and requesting
           access</li>
@@ -123,37 +134,43 @@
           <col style="width: 34%" />
           </colgroup>
           <thead>
-          <tr class="header">
+          <tr>
           <th>Entity</th>
           <th>What it is</th>
-          <th>OASF classification</th>
+          <th><a href="https://schema.oasf.outshift.com/">OASF</a>
+          classification</th>
           </tr>
           </thead>
           <tbody>
-          <tr class="odd">
+          <tr>
           <td><strong>Agent</strong></td>
           <td>An autonomous AI unit with identity and lifecycle</td>
-          <td>OASF Record (primary)</td>
+          <td><a href="https://schema.oasf.outshift.com/">OASF</a>
+          Record (primary)</td>
           </tr>
-          <tr class="even">
+          <tr>
           <td><strong>Skill</strong></td>
           <td>A reusable capability an agent can invoke</td>
-          <td>OASF Skill annotation</td>
+          <td><a href="https://schema.oasf.outshift.com/">OASF</a> Skill
+          annotation</td>
           </tr>
-          <tr class="odd">
+          <tr>
           <td><strong>Instruction</strong></td>
           <td>Behavioral configuration (prompts, guardrails)</td>
-          <td>OASF Module (prompt_bundle)</td>
+          <td><a href="https://schema.oasf.outshift.com/">OASF</a>
+          Module (prompt_bundle)</td>
           </tr>
-          <tr class="even">
+          <tr>
           <td><strong>Knowledge</strong></td>
           <td>Data corpus for grounding and retrieval</td>
-          <td>OASF Module (knowledge_base)</td>
+          <td><a href="https://schema.oasf.outshift.com/">OASF</a>
+          Module (knowledge_base)</td>
           </tr>
-          <tr class="odd">
+          <tr>
           <td><strong>Orchestration</strong></td>
           <td>Routing and composition logic</td>
-          <td>OASF Module (orchestration_config)</td>
+          <td><a href="https://schema.oasf.outshift.com/">OASF</a>
+          Module (orchestration_config)</td>
           </tr>
           </tbody>
           </table>

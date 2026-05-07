@@ -145,7 +145,7 @@ style: |
 
 ## Asset Registry for Intelligent Agents
 
-OASF Classification · GitHub Marketplace · Microsoft Purview Governance
+[OASF](https://schema.oasf.outshift.com/) Classification · GitHub Marketplace · Microsoft Purview Governance
 
 **Josh Garverick** | Chief Technical Architect, Xebia
 *April 2026*
@@ -197,7 +197,7 @@ Teams can't find, reuse, or safely compose AI assets across organizational bound
 ### Metamodel
 *What are these things?*
 
-Entity types, relationships, lifecycle states for AI primitives — classified via OASF
+Entity types, relationships, lifecycle states for AI primitives — classified via [OASF](https://schema.oasf.outshift.com/)
 
 </div>
 <div class="card card-accent">
@@ -213,7 +213,7 @@ Publish, discover, version, and compose AI assets via GitHub + OCI registry
 ### Governance
 *How do you control them?*
 
-Classify, label, enforce, and audit via Microsoft Purview + OASF overlay
+Classify, label, enforce, and audit via Microsoft Purview + [OASF](https://schema.oasf.outshift.com/) overlay
 
 </div>
 </div>
@@ -224,7 +224,7 @@ Classify, label, enforce, and audit via Microsoft Purview + OASF overlay
 
 <!-- _class: light -->
 
-# OASF: Open Agentic Schema Framework
+# [OASF](https://schema.oasf.outshift.com/): Open Agentic Schema Framework
 
 *The classification taxonomy for AI assets — inspired by OCSF, built by AGNTCY (Cisco Outshift)*
 
@@ -260,7 +260,7 @@ Classify, label, enforce, and audit via Microsoft Purview + OASF overlay
 
 *Analogous to TOGAF's Architecture Content Framework — but for AI building blocks*
 
-| Entity            | OASF Type            | Description                                    |
+| Entity            | [OASF](https://schema.oasf.outshift.com/) Type            | Description                                    |
 | ----------------- | -------------------- | ---------------------------------------------- |
 | **Agent**         | Record (primary)     | Autonomous AI unit with identity and lifecycle |
 | **Skill**         | Skill annotation     | Reusable capability (MCP, tools, APIs)         |
@@ -282,7 +282,7 @@ Every asset progresses through governed states — enforced by CI/CD and tracked
 
 | Transition             | Governance gate                                                     |
 | ---------------------- | ------------------------------------------------------------------- |
-| Draft → Review         | OASF schema validation passes; governance overlay present           |
+| Draft → Review         | [OASF](https://schema.oasf.outshift.com/) schema validation passes; governance overlay present           |
 | Review → Published     | CODEOWNERS approval; sensitivity ceiling check; eval thresholds met |
 | Published → Deprecated | Deprecation notice issued; consumer dependency scan completed       |
 | Deprecated → Archived  | All consumers migrated; Purview retention policy activated          |
@@ -318,7 +318,7 @@ aria-assets/
 
 <div class="card card-coral">
 
-**PR opened** — OASF schema + governance + ceiling check
+**PR opened** — [OASF](https://schema.oasf.outshift.com/) schema + governance + ceiling check
 
 </div>
 <div class="card card-teal">
@@ -463,8 +463,8 @@ OTEL telemetry + evaluations
 
 | Command        | Description                                             |
 | -------------- | ------------------------------------------------------- |
-| `aria search`  | Discover assets by OASF skill, domain, or keyword       |
-| `aria inspect` | Display OASF Record and governance overlay              |
+| `aria search`  | Discover assets by [OASF](https://schema.oasf.outshift.com/) skill, domain, or keyword       |
+| `aria inspect` | Display [OASF](https://schema.oasf.outshift.com/) Record and governance overlay              |
 | `aria audit`   | Validate sensitivity ceiling + consumer + dependencies  |
 | `aria install` | Pull OCI artifact, enforce governance, wire into target |
 | `aria list`    | List installed assets with version and sensitivity      |
@@ -512,7 +512,7 @@ OTEL telemetry + evaluations
 </div>
 <div class="card card-teal">
 
-**Cost inheritance** — orchestration cost = sum of composed agent costs, following the OASF dependency graph
+**Cost inheritance** — orchestration cost = sum of composed agent costs, following the [OASF](https://schema.oasf.outshift.com/) dependency graph
 
 </div>
 <div class="card card-accent">
@@ -557,7 +557,7 @@ A thin Catalog API that sits between OCI and end-user platforms:
 </div>
 <div class="card card-teal">
 
-**Cowork** — contextual suggestions based on OASF domain matching. Blocked assets are never surfaced.
+**Cowork** — contextual suggestions based on [OASF](https://schema.oasf.outshift.com/) domain matching. Blocked assets are never surfaced.
 
 </div>
 <div class="card card-accent">
@@ -574,7 +574,7 @@ A thin Catalog API that sits between OCI and end-user platforms:
 
 **01** AI assets need the same architectural rigor that TOGAF brought to enterprise IT. The metamodel is the foundation.
 
-**02** OASF provides a community-driven, extensible taxonomy purpose-built for classifying AI primitives.
+**02** [OASF](https://schema.oasf.outshift.com/) provides a community-driven, extensible taxonomy purpose-built for classifying AI primitives.
 
 **03** GitHub delivers the marketplace infrastructure — versioning, PR workflows, Actions, and OCI registry — with zero greenfield build.
 
@@ -590,6 +590,6 @@ A thin Catalog API that sits between OCI and end-user platforms:
 
 **Josh Garverick** | Chief Technical Architect, Xebia
 
-*ARIA · OASF · GitHub · Microsoft Purview*
+*ARIA · [OASF](https://schema.oasf.outshift.com/) · GitHub · Microsoft Purview*
 
 docs.agntcy.org/oasf | schema.oasf.outshift.com

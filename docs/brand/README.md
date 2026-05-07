@@ -28,7 +28,7 @@ Logo files and usage guidelines for the ARIA project.
 
 The ARIA mark represents the core concept of the framework:
 
-- **Hexagonal hub** — an OASF Record, the canonical data structure
+- **Hexagonal hub** — an [OASF](https://schema.oasf.outshift.com/) Record, the canonical data structure
 - **Outer ring** — the registry boundary (OCI, GitHub)
 - **"A" letterform** — ARIA identity
 - **Four satellite nodes** — the four relationship types radiating from

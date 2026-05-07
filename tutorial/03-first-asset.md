@@ -1,11 +1,11 @@
 # 03 — Your First Asset
 
-Create, govern, and publish an OASF-governed MCP skill from scratch.
+Create, govern, and publish an [OASF](https://schema.oasf.outshift.com/)-governed MCP skill from scratch.
 
 ## What you'll build
 
 An MCP server skill called `policy-lookup` that provides HR policy Q&A
-capabilities. You'll write the OASF Record, governance overlay, submit
+capabilities. You'll write the [OASF](https://schema.oasf.outshift.com/) Record, governance overlay, submit
 a PR, watch the validation workflow pass, and see it published as an OCI
 artifact.
 
@@ -22,7 +22,7 @@ gh repo create your-org/aria-policy-lookup-skill \
 cd aria-policy-lookup-skill
 ```
 
-## Step 2: Define the OASF Record
+## Step 2: Define the [OASF](https://schema.oasf.outshift.com/) Record
 
 Edit `oasf-record.json` to describe your skill:
 
@@ -58,7 +58,7 @@ Edit `oasf-record.json` to describe your skill:
 
 Key decisions:
 
-- **skills**: We declare `knowledge_retrieval/rag` (ID 30101) from the OASF
+- **skills**: We declare `knowledge_retrieval/rag` (ID 30101) from the [OASF](https://schema.oasf.outshift.com/)
   skill taxonomy. This makes the skill discoverable via `aria search --skill rag`.
 - **modules**: The `mcp_server` type with `transport: "stdio"` tells the
   `aria install` command how to wire this into Claude Desktop or VS Code.
@@ -134,15 +134,15 @@ chmod +x src/server.js
 ```bash
 git checkout -b feature/initial-asset
 git add .
-git commit -m "feat: initial OASF-governed policy lookup skill"
+git commit -m "feat: initial [OASF](https://schema.oasf.outshift.com/)-governed policy lookup skill"
 git push -u origin feature/initial-asset
 gh pr create --title "feat: policy-lookup skill v1.0.0" \
-  --body "Initial OASF-governed MCP server for HR policy Q&A"
+  --body "Initial [OASF](https://schema.oasf.outshift.com/)-governed MCP server for HR policy Q&A"
 ```
 
 ## Step 6: Watch the validation workflow
 
-Open the PR in GitHub. The `OASF Validate` workflow will trigger
+Open the PR in GitHub. The `[OASF](https://schema.oasf.outshift.com/) Validate` workflow will trigger
 automatically. It runs three checks:
 
 1. **Schema validation** — verifies `oasf-record.json` has all required
@@ -156,13 +156,13 @@ automatically. It runs three checks:
 
 If all checks pass, you'll see a green checkmark. The PR now requires
 CODEOWNERS review from the `ai-governance` team (for the governance overlay)
-and `ai-platform-engineering` (for the OASF record).
+and `ai-platform-engineering` (for the [OASF](https://schema.oasf.outshift.com/) record).
 
 ## Step 7: Merge and publish
 
 Once approved, merge the PR. This triggers two more workflows:
 
-1. **Publish OCI Artifact** — builds a Docker image containing the OASF
+1. **Publish OCI Artifact** — builds a Docker image containing the [OASF](https://schema.oasf.outshift.com/)
    record, governance overlay, and source code, then pushes it to your
    Azure Container Registry with a version tag and `latest`.
 
@@ -187,9 +187,9 @@ You should see tag `1.0.0` and `latest`.
 
 You created a governed AI asset that:
 
-- Has a machine-readable OASF Record declaring its capabilities
+- Has a machine-readable [OASF](https://schema.oasf.outshift.com/) Record declaring its capabilities
 - Has a governance overlay declaring its sensitivity and compliance posture
-- Was validated against the OASF schema before it could be merged
+- Was validated against the [OASF](https://schema.oasf.outshift.com/) schema before it could be merged
 - Required approval from the governance team
 - Was published as a content-addressed OCI artifact
 - Was registered in Microsoft Purview's Data Map
