@@ -476,6 +476,45 @@ The ARIA distribution gateway's web catalog is extended with a cost dashboard th
 - **Cost-per-interaction**: blended cost per user interaction across all underlying providers
 - **Optimization recommendations**: identify underutilized assets (high cost, low invocations) and over-provisioned resources
 
+# Operational Governance
+
+## API Contract Governance
+
+ARIA's distribution layer (catalog API and gateway endpoints) is maintained through a rigorous contract governance model that establishes a single source of truth and prevents silent spec/runtime divergence.
+
+### Contract Hierarchy
+
+**Authoritative Specifications** — Published OpenAPI 3.1.0 contracts in [`aria/docs/architecture/`](./):
+- `catalog-api.openapi.yaml` — Governed catalog and install API for direct asset discovery and installation
+- `distribution-gateway.openapi.yaml` — Runtime-oriented delivery gateway for channel-native bundling and access evaluation
+
+**Runtime Implementations** — Each repository implements and must strictly conform to the authoritative contract:
+- `aria-gateway` (Node.js/Express) — Implements catalog API and distribution gateway endpoints
+- `aria-cli` (C#/.NET) — Consumes catalog API endpoints
+- `aria-skills` (orchestrator) — Consumes distribution gateway endpoints
+
+**Generated OpenAPI** — Runtime-generated specs (`openapi.json`, `openapi.yaml`) are derived documentation for validation and tooling; they are not authoritative sources.
+
+### Change Workflow
+
+Contract changes follow a formal process:
+
+1. **RFC Issue** → Author files an RFC in `aria` repo describing motivation, proposed changes, and impact analysis.
+2. **Architecture Review** → ARIA Architecture Council reviews for consistency, best practices, and cross-repo impact.
+3. **Update Specification** → Approved RFC author updates the OpenAPI file in `aria/docs/architecture/`.
+4. **Implement in Runtime** → Each affected repo implements the contract changes and passes automated drift detection.
+5. **Validate Alignment** → Cross-repo contract sync confirms all implementations comply.
+
+### Enforcement
+
+- **CI Gates:** Every PR touching API routes triggers OpenAPI contract drift tests that fail if paths, methods, security schemes, or response codes diverge from the spec.
+- **Cross-Repo Sync:** Automated checks compare architecture specs against runtime OpenAPI for all services; failures block deployment of out-of-spec implementations.
+- **Exceptions:** Rare deviations (e.g., phased rollouts, emergencies) are logged in `.github/contract-exceptions.md` with Architecture approval and expiration dates.
+
+### Governance Document
+
+See [api-contract-governance.md](./api-contract-governance.md) for the complete model, RFC process, enforcement gates, and escalation procedures.
+
 # Implementation Roadmap
 
 | Phase        | Duration  | Deliverables                                                                                                                      | Success Criteria                                                                            |
