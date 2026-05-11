@@ -239,6 +239,7 @@ Maintain `docs/architecture/CHANGELOG.md` with entries for each contract change:
 - **Security Schemes:** All endpoints must declare `bearerAuth` or exempt security via `.security: []`
 - **Error Responses:** All endpoints must include `401 Unauthorized` and `403 Forbidden` when protected.
 - **Cross-Repo Linking:** All contract PRs must link affected issues in consumer repos.
+- **Current Cross-Repo Linkage:** Blocks `aria-gateway#28` (contract alignment) and `aria-gateway#29` (contract sync gate); related: `aria-gateway#26` (registry-backed catalog provider).
 
 ---
 
@@ -247,4 +248,3 @@ Maintain `docs/architecture/CHANGELOG.md` with entries for each contract change:
 - **Architecture Questions:** @aria-fx/architecture
 - **Consumer Integration Issues:** Per-repo engineering team (aria-cli, aria-gateway, aria-skills)
 - **Process Improvements:** ARIA Steering Committee
-
