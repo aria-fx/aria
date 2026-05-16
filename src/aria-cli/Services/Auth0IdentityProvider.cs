@@ -238,7 +238,8 @@ public sealed class Auth0IdentityProvider : IIdentityProvider
             if (claim.ValueKind == JsonValueKind.String)
                 return claim.GetString();
 
-            // Handle array claims (e.g., aud can be an array)
+            // Handle array claims (e.g., aud can be an array in Auth0)
+            // Returns the first string element from the array
             if (claim.ValueKind == JsonValueKind.Array)
             {
                 foreach (var item in claim.EnumerateArray())

@@ -357,7 +357,13 @@ public sealed class Auth0IdentityProviderTests
         var token = CreateTestJwt();
         var homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         if (string.IsNullOrWhiteSpace(homeDir))
-            homeDir = Environment.GetEnvironmentVariable("HOME") ?? Path.GetTempPath();
+            homeDir = Environment.GetEnvironmentVariable("HOME") ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(homeDir))
+        {
+            // Skip test if home directory cannot be determined
+            return;
+        }
 
         var testDir = Path.Combine(homeDir, ".aria-test-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(testDir);
