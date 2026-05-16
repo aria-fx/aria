@@ -1,7 +1,6 @@
 using System.Text;
 using System.Text.Json;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using Aria.Auth.Core.Models;
 using Aria.Auth.Core.Services;
 
