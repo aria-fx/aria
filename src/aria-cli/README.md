@@ -292,7 +292,7 @@ Run `aria whoami` to verify the resolved identity and access profile before runn
 - ✅ Okta adapter (experimental, supports JWT + client credentials)
 - ✅ Auth0 adapter (experimental, supports device flow + JWT + file-based tokens)
 - ✅ Claim normalization across all providers
-- ✅ Integration tests for each provider
+- ✅ Unit tests for each provider
 
 Future work:
 - Add provider capability matrix docs (token source, group claim behavior, role claim behavior, tenant mapping)
