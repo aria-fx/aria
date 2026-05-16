@@ -328,7 +328,7 @@ public sealed class Auth0IdentityProviderTests
     {
         Environment.SetEnvironmentVariable("AUTH0_ACCESS_TOKEN", null);
 
-        var handler = new SequenceHttpMessageHandler(_ =>
+        var handler = new SequenceHttpMessageHandler(request =>
             Task.FromResult(JsonResponse(HttpStatusCode.BadRequest, "{\"error\":\"invalid_request\",\"error_description\":\"client_id is required\"}", "Bad Request")));
 
         var provider = new Auth0IdentityProvider(new HttpClient(handler));
