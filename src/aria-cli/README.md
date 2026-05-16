@@ -267,7 +267,7 @@ All providers normalize identity claims to a consistent model:
 |----------|------------------|-----------------|----------------|-------------|
 | Entra    | `oid`            | `tid`           | `groups`       | `roles`, `scp` |
 | Okta     | `oid`/`uid`/`sub` | `tid`/configured issuer/`iss` | `groups`, `okta.groups` | `roles`, `permissions`, `scp`, `scope` |
-| Auth0    | `sub`/`oid`/`uid` | `aud`/configured domain/`iss` | `groups`, `https://aria.dev/groups` | `roles`, `permissions`, `scope` |
+| Auth0    | `sub`/`oid`/`uid` | `aud`/`iss`/configured domain | `groups`, `https://aria.dev/groups` | `roles`, `permissions`, `scope` |
 
 Each provider:
 - Tries multiple claim names to find identity (for compatibility across Auth0/Okta config variants)
