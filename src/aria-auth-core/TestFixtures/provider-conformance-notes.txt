@@ -17,3 +17,6 @@ Normalization rules validated by shared tests:
 - Group and role collections are case-insensitive sets.
 - Scope strings split on spaces and commas into normalized role entries.
 - Access policy evaluation uses only normalized groups/roles, not provider-specific claim names.
+- Array and scalar claim variants are both supported (for example: aud as array vs string, groups as array vs string).
+- Missing optional claims (for example userPrincipalName) do not break identity normalization.
+- Duplicate and case-variant group/role values collapse into a single case-insensitive set entry.

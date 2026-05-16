@@ -21,6 +21,24 @@
       }
     },
     {
+      "name": "entra-missing-upn-scp-only",
+      "provider": "entra",
+      "claims": {
+        "oid": "entra-user-004",
+        "tid": "entra-tenant-02",
+        "groups": ["finance-team", "readers"],
+        "scp": "Asset.Reader asset.read asset.list"
+      },
+      "expected": {
+        "provider": "entra",
+        "objectId": "entra-user-004",
+        "tenantId": "entra-tenant-02",
+        "userPrincipalName": null,
+        "groups": ["finance-team", "readers"],
+        "roles": ["Asset.Reader", "asset.read", "asset.list"]
+      }
+    },
+    {
       "name": "okta-basic",
       "provider": "okta",
       "claims": {
@@ -36,6 +54,24 @@
         "objectId": "okta-user-002",
         "tenantId": "https://example.okta.com",
         "userPrincipalName": "okta.user@aria.dev",
+        "groups": ["finance-team", "readers"],
+        "roles": ["Asset.Reader", "asset.read", "asset.list"]
+      }
+    },
+    {
+      "name": "okta-scalar-claims-mixed-separators",
+      "provider": "okta",
+      "claims": {
+        "sub": "okta-user-005",
+        "email": "okta.scalar@aria.dev",
+        "groups": "finance-team, readers",
+        "scope": "Asset.Reader asset.read,asset.list"
+      },
+      "expected": {
+        "provider": "okta",
+        "objectId": "okta-user-005",
+        "tenantId": "https://example.okta.com",
+        "userPrincipalName": "okta.scalar@aria.dev",
         "groups": ["finance-team", "readers"],
         "roles": ["Asset.Reader", "asset.read", "asset.list"]
       }
@@ -58,6 +94,44 @@
         "userPrincipalName": "auth0.user@aria.dev",
         "groups": ["finance-team", "readers"],
         "roles": ["Asset.Reader", "asset.read", "asset.list"]
+      }
+    },
+    {
+      "name": "auth0-scalar-claims-missing-upn",
+      "provider": "auth0",
+      "claims": {
+        "uid": "auth0-user-006",
+        "aud": "https://api.aria.dev",
+        "org_id": "finance-team",
+        "scope": "Asset.Reader,asset.read asset.list"
+      },
+      "expected": {
+        "provider": "auth0",
+        "objectId": "auth0-user-006",
+        "tenantId": "https://api.aria.dev",
+        "userPrincipalName": null,
+        "groups": ["finance-team"],
+        "roles": ["Asset.Reader", "asset.read", "asset.list"]
+      }
+    },
+    {
+      "name": "auth0-role-dedup-case-insensitive",
+      "provider": "auth0",
+      "claims": {
+        "sub": "auth0|user-007",
+        "aud": "https://api.aria.dev",
+        "email": "auth0.dedup@aria.dev",
+        "groups": ["finance-team", "Finance-Team"],
+        "permissions": ["Asset.Reader", "asset.reader"],
+        "scope": "asset.read asset.read"
+      },
+      "expected": {
+        "provider": "auth0",
+        "objectId": "auth0|user-007",
+        "tenantId": "https://api.aria.dev",
+        "userPrincipalName": "auth0.dedup@aria.dev",
+        "groups": ["finance-team"],
+        "roles": ["Asset.Reader", "asset.read"]
       }
     }
   ]
