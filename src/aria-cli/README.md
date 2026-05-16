@@ -174,7 +174,7 @@ Okta identity platform. Supports multiple token acquisition methods.
 - **Configuration**: `okta` section
 - **Token Acquisition** (tried in order):
   1. Environment variable (default: `OKTA_ACCESS_TOKEN`)
-  2. File-based token (`access_token_file`)
+  2. File-based token (`access_token_file`, supports `~` expansion)
   3. Client credentials flow to `token_endpoint` (requires `client_secret_env_var`)
 - **Groups/Roles**: Reads `groups`, `okta.groups`, `roles`, `permissions` claims; parses space/comma-separated scopes
 - **Tenant ID**: Configured `issuer` or resolved from token `tid`/`iss`
@@ -221,11 +221,11 @@ Auth0 identity platform. Supports interactive device flow for CLI and static tok
 - **Configuration**: `auth0` section
 - **Token Acquisition** (tried in order):
   1. Environment variable (`AUTH0_ACCESS_TOKEN`)
-  2. File-based token (`access_token_file`)
-  3. Device flow (requires `domain`, `client_id`, `audience`)
+  2. File-based token (`access_token_file`, supports `~` expansion)
+  3. Device flow (requires `domain` and `client_id`; `audience` is optional and defaults to `https://{domain}/api/v2/`)
 - **Device Flow**: Prompts user to visit browser URL and enter code; polls for token
 - **Groups/Roles**: Reads `groups`, `https://aria.dev/groups`, `roles`, `permissions`, `scope` claims; parses space/comma-separated scopes
-- **Tenant ID**: Configured `domain` or resolved from token `aud`/`iss`
+- **Tenant ID**: Configured `domain` or resolved from token `aud` (string or first array element)/`iss`
 
 **Configuration Example**:
 ```json
