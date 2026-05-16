@@ -26,7 +26,7 @@ public sealed class Auth0IdentityProvider : IIdentityProvider
         if (string.IsNullOrWhiteSpace(token))
         {
             throw new InvalidOperationException(
-                "Auth0 is enabled but no access token source is available. Provide Auth0 domain, client_id, and audience for device flow.");
+                "Auth0 is enabled but no access token source is available. Set AUTH0_ACCESS_TOKEN, configure AccessTokenFile, or provide Auth0 domain and client_id for device flow.");
         }
 
         return ParseJwtIdentity(token, auth0);
