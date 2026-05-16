@@ -327,9 +327,10 @@ public sealed class Auth0IdentityProviderTests
     public async Task GetIdentity_DeviceFlow_DeviceCodeError_Throws()
     {
         Environment.SetEnvironmentVariable("AUTH0_ACCESS_TOKEN", null);
+        var errorPayload = "{\"error\":\"invalid_request\",\"error_description\":\"client_id is required\"}";
 
         var handler = new SequenceHttpMessageHandler(request =>
-            Task.FromResult(JsonResponse(HttpStatusCode.BadRequest, "{\"error\":\"invalid_request\",\"error_description\":\"client_id is required\"}", "Bad Request")));
+            Task.FromResult(JsonResponse(HttpStatusCode.BadRequest, errorPayload, "Bad Request")));
 
         var provider = new Auth0IdentityProvider(new HttpClient(handler));
         var config = new AriaConfig
