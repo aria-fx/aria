@@ -19,12 +19,29 @@ namespace Aria.Cli.Services;
 /// </summary>
 public sealed class EntraAuthService : IIdentityProvider
 {
+    private readonly Func<AriaConfig, CancellationToken, Task<string>>? _tokenResolver;
+
+    public EntraAuthService()
+    {
+    }
+
+    public EntraAuthService(Func<AriaConfig, CancellationToken, Task<string>> tokenResolver)
+    {
+        _tokenResolver = tokenResolver ?? throw new ArgumentNullException(nameof(tokenResolver));
+    }
+
     public string Name => "entra";
 
     public async Task<ResolvedIdentity?> GetIdentityAsync(AriaConfig config)
     {
         if (config.Entra?.Enabled != true)
             return null;
+
+        if (_tokenResolver is not null)
+        {
+            var token = await _tokenResolver(config, CancellationToken.None);
+            return ParseJwtIdentity(token);
+        }
 
         var options = new DefaultAzureCredentialOptions();
         if (!string.IsNullOrWhiteSpace(config.Entra.TenantId))
@@ -37,11 +54,11 @@ public sealed class EntraAuthService : IIdentityProvider
             ? config.Entra.Scopes.ToArray()
             : new[] { "https://management.azure.com/.default" };
 
-        AccessToken token = await credential.GetTokenAsync(
+        AccessToken tokenResult = await credential.GetTokenAsync(
             new TokenRequestContext(scopes),
             CancellationToken.None);
 
-        return ParseJwtIdentity(token.Token);
+        return ParseJwtIdentity(tokenResult.Token);
     }
 
     private static ResolvedIdentity ParseJwtIdentity(string jwt)

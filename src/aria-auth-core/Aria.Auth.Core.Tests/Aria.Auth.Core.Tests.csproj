@@ -14,13 +14,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Aria.Cli.csproj" />
+    <ProjectReference Include="../Aria.Auth.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="../../aria-auth-core/TestFixtures/ProviderConformanceFixtures.cs" Link="Shared/ProviderConformanceFixtures.cs" />
-    <Content Include="../../aria-auth-core/TestFixtures/provider-conformance-fixtures.json" Link="provider-conformance-fixtures.json" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="../../aria-auth-core/TestFixtures/provider-conformance-notes.txt" Link="provider-conformance-notes.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Compile Include="../TestFixtures/ProviderConformanceFixtures.cs" Link="Shared/ProviderConformanceFixtures.cs" />
+    <Content Include="../TestFixtures/provider-conformance-fixtures.json" Link="provider-conformance-fixtures.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../TestFixtures/provider-conformance-notes.txt" Link="provider-conformance-notes.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

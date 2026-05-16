@@ -1,0 +1,64 @@
+{
+  "fixtures": [
+    {
+      "name": "entra-basic",
+      "provider": "entra",
+      "claims": {
+        "oid": "entra-user-001",
+        "tid": "entra-tenant-01",
+        "preferred_username": "entra.user@aria.dev",
+        "groups": ["finance-team", "readers"],
+        "roles": ["Asset.Reader"],
+        "scp": "asset.read asset.list"
+      },
+      "expected": {
+        "provider": "entra",
+        "objectId": "entra-user-001",
+        "tenantId": "entra-tenant-01",
+        "userPrincipalName": "entra.user@aria.dev",
+        "groups": ["finance-team", "readers"],
+        "roles": ["Asset.Reader", "asset.read", "asset.list"]
+      }
+    },
+    {
+      "name": "okta-basic",
+      "provider": "okta",
+      "claims": {
+        "uid": "okta-user-002",
+        "iss": "https://example.okta.com/oauth2/default",
+        "email": "okta.user@aria.dev",
+        "okta.groups": ["finance-team", "readers"],
+        "permissions": ["Asset.Reader"],
+        "scp": "asset.read asset.list"
+      },
+      "expected": {
+        "provider": "okta",
+        "objectId": "okta-user-002",
+        "tenantId": "https://example.okta.com",
+        "userPrincipalName": "okta.user@aria.dev",
+        "groups": ["finance-team", "readers"],
+        "roles": ["Asset.Reader", "asset.read", "asset.list"]
+      }
+    },
+    {
+      "name": "auth0-basic",
+      "provider": "auth0",
+      "claims": {
+        "sub": "auth0|user-003",
+        "aud": ["https://api.aria.dev", "https://example.auth0.com/userinfo"],
+        "email": "auth0.user@aria.dev",
+        "https://aria.dev/groups": ["finance-team", "readers"],
+        "permissions": ["Asset.Reader"],
+        "scope": "asset.read asset.list"
+      },
+      "expected": {
+        "provider": "auth0",
+        "objectId": "auth0|user-003",
+        "tenantId": "https://api.aria.dev",
+        "userPrincipalName": "auth0.user@aria.dev",
+        "groups": ["finance-team", "readers"],
+        "roles": ["Asset.Reader", "asset.read", "asset.list"]
+      }
+    }
+  ]
+}

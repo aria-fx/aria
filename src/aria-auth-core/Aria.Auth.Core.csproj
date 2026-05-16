@@ -25,4 +25,11 @@
     <None Include="CHANGELOG.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Aria.Auth.Core.Tests/**/*.cs" />
+    <Compile Remove="TestFixtures/**/*.cs" />
+    <None Include="Aria.Auth.Core.Tests/**/*.cs" />
+    <None Include="TestFixtures/**/*.cs" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,19 @@
+Provider conformance fixture notes
+
+Purpose:
+- Provide representative JWT fixtures for each supported provider.
+- Define expected normalized identity fields consumed by access policy evaluation.
+
+Expected normalized fields:
+- provider: provider name (entra, okta, auth0)
+- objectId: stable identity key used as fallback consumer id
+- tenantId: tenant/issuer/audience-derived boundary identifier
+- userPrincipalName: preferred username/email value for policy consumer id
+- groups: normalized set of group memberships
+- roles: normalized set of roles/scopes/permissions
+
+Normalization rules validated by shared tests:
+- Identity claims map to a common model regardless of provider-specific claim names.
+- Group and role collections are case-insensitive sets.
+- Scope strings split on spaces and commas into normalized role entries.
+- Access policy evaluation uses only normalized groups/roles, not provider-specific claim names.
