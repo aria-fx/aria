@@ -53,7 +53,7 @@ public sealed class Auth0IdentityProvider : IIdentityProvider
         // Try file-based token
         if (!string.IsNullOrWhiteSpace(auth0.AccessTokenFile))
         {
-            var expandedPath = ExpandTildePath(auth0.AccessTokenFile);
+            var expandedPath = PathHelper.ExpandTildePath(auth0.AccessTokenFile);
             if (File.Exists(expandedPath))
             {
                 var fileToken = (await File.ReadAllTextAsync(expandedPath)).Trim();
@@ -306,21 +306,4 @@ public sealed class Auth0IdentityProvider : IIdentityProvider
         root.TryGetProperty(name, out var prop) && prop.ValueKind == JsonValueKind.Number
             ? prop.GetInt32()
             : null;
-
-    private static string ExpandTildePath(string path)
-    {
-        if (string.IsNullOrWhiteSpace(path))
-            return path;
-
-        if (path.StartsWith("~/") || path == "~")
-        {
-            var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            if (string.IsNullOrWhiteSpace(home))
-                home = Environment.GetEnvironmentVariable("HOME") ?? string.Empty;
-
-            return path == "~" ? home : Path.Combine(home, path.Substring(2));
-        }
-
-        return path;
-    }
 }
