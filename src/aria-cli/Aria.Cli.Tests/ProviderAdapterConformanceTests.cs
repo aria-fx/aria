@@ -6,9 +6,9 @@ using Xunit;
 
 namespace Aria.Cli.Tests;
 
+[Collection("EnvironmentVariableTests")]
 public sealed class ProviderAdapterConformanceTests
 {
-    private static readonly SemaphoreSlim EnvironmentVariableLock = new(1, 1);
 
     [Fact]
     public async Task SharedFixtures_AllAdaptersProduceNormalizedIdentityContract()
@@ -59,7 +59,6 @@ public sealed class ProviderAdapterConformanceTests
 
     private static async Task<ResolvedIdentity?> ResolveOktaAsync(string token)
     {
-        await EnvironmentVariableLock.WaitAsync();
         var previousToken = Environment.GetEnvironmentVariable("OKTA_ACCESS_TOKEN");
         Environment.SetEnvironmentVariable("OKTA_ACCESS_TOKEN", token);
 
@@ -80,13 +79,11 @@ public sealed class ProviderAdapterConformanceTests
         finally
         {
             Environment.SetEnvironmentVariable("OKTA_ACCESS_TOKEN", previousToken);
-            EnvironmentVariableLock.Release();
         }
     }
 
     private static async Task<ResolvedIdentity?> ResolveAuth0Async(string token)
     {
-        await EnvironmentVariableLock.WaitAsync();
         var previousToken = Environment.GetEnvironmentVariable("AUTH0_ACCESS_TOKEN");
         Environment.SetEnvironmentVariable("AUTH0_ACCESS_TOKEN", token);
 
@@ -108,7 +105,12 @@ public sealed class ProviderAdapterConformanceTests
         finally
         {
             Environment.SetEnvironmentVariable("AUTH0_ACCESS_TOKEN", previousToken);
-            EnvironmentVariableLock.Release();
         }
     }
 }
+
+[CollectionDefinition("EnvironmentVariableTests", DisableParallelization = true)]
+public class EnvironmentVariableTestsCollection
+{
+}
+
