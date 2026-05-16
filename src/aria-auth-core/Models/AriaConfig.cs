@@ -129,6 +129,9 @@ public sealed record Auth0Config
 
     [JsonPropertyName("scopes")]
     public List<string> Scopes { get; init; } = [];
+
+    [JsonPropertyName("access_token_file")]
+    public string? AccessTokenFile { get; init; }
 }
 
 public sealed record AccessRule
