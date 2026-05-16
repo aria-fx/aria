@@ -51,11 +51,15 @@ public sealed class Auth0IdentityProvider : IIdentityProvider
             return envToken;
 
         // Try file-based token
-        if (!string.IsNullOrWhiteSpace(auth0.AccessTokenFile) && File.Exists(auth0.AccessTokenFile))
+        if (!string.IsNullOrWhiteSpace(auth0.AccessTokenFile))
         {
-            var fileToken = (await File.ReadAllTextAsync(auth0.AccessTokenFile)).Trim();
-            if (!string.IsNullOrWhiteSpace(fileToken))
-                return fileToken;
+            var expandedPath = ExpandTildePath(auth0.AccessTokenFile);
+            if (File.Exists(expandedPath))
+            {
+                var fileToken = (await File.ReadAllTextAsync(expandedPath)).Trim();
+                if (!string.IsNullOrWhiteSpace(fileToken))
+                    return fileToken;
+            }
         }
 
         // Use device flow if domain and client_id are configured
@@ -227,8 +231,22 @@ public sealed class Auth0IdentityProvider : IIdentityProvider
     {
         foreach (var name in names)
         {
-            if (root.TryGetProperty(name, out var claim) && claim.ValueKind == JsonValueKind.String)
+            if (!root.TryGetProperty(name, out var claim))
+                continue;
+
+            // Handle string claims
+            if (claim.ValueKind == JsonValueKind.String)
                 return claim.GetString();
+
+            // Handle array claims (e.g., aud can be an array)
+            if (claim.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var item in claim.EnumerateArray())
+                {
+                    if (item.ValueKind == JsonValueKind.String)
+                        return item.GetString();
+                }
+            }
         }
 
         return null;
@@ -288,4 +306,21 @@ public sealed class Auth0IdentityProvider : IIdentityProvider
         root.TryGetProperty(name, out var prop) && prop.ValueKind == JsonValueKind.Number
             ? prop.GetInt32()
             : null;
+
+    private static string ExpandTildePath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return path;
+
+        if (path.StartsWith("~/") || path == "~")
+        {
+            var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            if (string.IsNullOrWhiteSpace(home))
+                home = Environment.GetEnvironmentVariable("HOME") ?? string.Empty;
+
+            return path == "~" ? home : Path.Combine(home, path.Substring(2));
+        }
+
+        return path;
+    }
 }

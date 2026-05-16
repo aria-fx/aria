@@ -344,6 +344,48 @@ public sealed class OktaIdentityProviderTests
         }
     }
 
+    [Fact]
+    public async Task GetIdentity_TokenFromTildeExpandedFile_ParsesIdentity()
+    {
+        // Arrange
+        var token = CreateTestJwt();
+        var homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        if (string.IsNullOrWhiteSpace(homeDir))
+            homeDir = Environment.GetEnvironmentVariable("HOME") ?? Path.GetTempPath();
+
+        var testDir = Path.Combine(homeDir, ".aria-test-okta-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(testDir);
+        var tokenFile = Path.Combine(testDir, "okta-token.txt");
+        await File.WriteAllTextAsync(tokenFile, token);
+
+        try
+        {
+            var provider = new OktaIdentityProvider();
+            var relativePath = "~/" + Path.GetRelativePath(homeDir, tokenFile);
+            var config = new AriaConfig
+            {
+                Okta = new OktaConfig
+                {
+                    Enabled = true,
+                    Issuer = TestOktaIssuer,
+                    AccessTokenFile = relativePath
+                }
+            };
+
+            // Act
+            var result = await provider.GetIdentityAsync(config);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("user123", result.ObjectId);
+        }
+        finally
+        {
+            if (Directory.Exists(testDir))
+                Directory.Delete(testDir, true);
+        }
+    }
+
     private static string CreateTestJwt() =>
         CreateTestJwtWithClaims(new Dictionary<string, object>
         {

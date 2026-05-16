@@ -41,11 +41,15 @@ public sealed class OktaIdentityProvider : IIdentityProvider
         if (!string.IsNullOrWhiteSpace(envToken))
             return envToken;
 
-        if (!string.IsNullOrWhiteSpace(okta.AccessTokenFile) && File.Exists(okta.AccessTokenFile))
+        if (!string.IsNullOrWhiteSpace(okta.AccessTokenFile))
         {
-            var fileToken = (await File.ReadAllTextAsync(okta.AccessTokenFile)).Trim();
-            if (!string.IsNullOrWhiteSpace(fileToken))
-                return fileToken;
+            var expandedPath = ExpandTildePath(okta.AccessTokenFile);
+            if (File.Exists(expandedPath))
+            {
+                var fileToken = (await File.ReadAllTextAsync(expandedPath)).Trim();
+                if (!string.IsNullOrWhiteSpace(fileToken))
+                    return fileToken;
+            }
         }
 
         if (!string.IsNullOrWhiteSpace(okta.TokenEndpoint) && !string.IsNullOrWhiteSpace(okta.ClientId))
@@ -185,5 +189,22 @@ public sealed class OktaIdentityProvider : IIdentityProvider
         if (mod > 0)
             padded = padded.PadRight(padded.Length + (4 - mod), '=');
         return Convert.FromBase64String(padded);
+    }
+
+    private static string ExpandTildePath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return path;
+
+        if (path.StartsWith("~/") || path == "~")
+        {
+            var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            if (string.IsNullOrWhiteSpace(home))
+                home = Environment.GetEnvironmentVariable("HOME") ?? string.Empty;
+
+            return path == "~" ? home : Path.Combine(home, path.Substring(2));
+        }
+
+        return path;
     }
 }

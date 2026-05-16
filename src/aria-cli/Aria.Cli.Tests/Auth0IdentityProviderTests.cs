@@ -350,6 +350,87 @@ public sealed class Auth0IdentityProviderTests
         Assert.Contains("client_id is required", ex.Message, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public async Task GetIdentity_TokenFromTildeExpandedFile_ParsesIdentity()
+    {
+        // Arrange
+        var token = CreateTestJwt();
+        var homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        if (string.IsNullOrWhiteSpace(homeDir))
+            homeDir = Environment.GetEnvironmentVariable("HOME") ?? Path.GetTempPath();
+
+        var testDir = Path.Combine(homeDir, ".aria-test-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(testDir);
+        var tokenFile = Path.Combine(testDir, "auth0-token.txt");
+        await File.WriteAllTextAsync(tokenFile, token);
+
+        try
+        {
+            var provider = new Auth0IdentityProvider();
+            var relativePath = "~/" + Path.GetRelativePath(homeDir, tokenFile);
+            var config = new AriaConfig
+            {
+                Auth0 = new Auth0Config
+                {
+                    Enabled = true,
+                    Domain = TestAuth0Domain,
+                    ClientId = TestClientId,
+                    AccessTokenFile = relativePath
+                }
+            };
+
+            // Act
+            var result = await provider.GetIdentityAsync(config);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("user123", result.ObjectId);
+        }
+        finally
+        {
+            if (Directory.Exists(testDir))
+                Directory.Delete(testDir, true);
+        }
+    }
+
+    [Fact]
+    public async Task GetIdentity_TokenWithAudAsArray_ParsesTenantId()
+    {
+        // Arrange - Auth0 often returns aud as an array
+        var token = CreateTestJwtWithClaims(new Dictionary<string, object>
+        {
+            ["sub"] = "user-with-array-aud",
+            ["aud"] = new[] { "https://api.example.com", "https://api2.example.com" },
+            ["email"] = "user@example.com"
+        });
+        Environment.SetEnvironmentVariable("AUTH0_ACCESS_TOKEN", token);
+
+        try
+        {
+            var provider = new Auth0IdentityProvider();
+            var config = new AriaConfig
+            {
+                Auth0 = new Auth0Config
+                {
+                    Enabled = true,
+                    Domain = TestAuth0Domain
+                }
+            };
+
+            // Act
+            var result = await provider.GetIdentityAsync(config);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("user-with-array-aud", result.ObjectId);
+            Assert.Equal("https://api.example.com", result.TenantId); // First element of aud array
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("AUTH0_ACCESS_TOKEN", null);
+        }
+    }
+
     private static string CreateTestJwt() =>
         CreateTestJwtWithClaims(new Dictionary<string, object>
         {
@@ -369,14 +450,16 @@ public sealed class Auth0IdentityProviderTests
             ["typ"] = "JWT"
         };
 
-        // Create payload
-        var payload = new Dictionary<string, object>(claims)
-        {
-            ["iss"] = $"https://{TestAuth0Domain}/",
-            ["aud"] = "test-audience",
-            ["iat"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-            ["exp"] = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds()
-        };
+        // Create payload - only add defaults if not already in claims
+        var payload = new Dictionary<string, object>(claims);
+        if (!payload.ContainsKey("iss"))
+            payload["iss"] = $"https://{TestAuth0Domain}/";
+        if (!payload.ContainsKey("aud"))
+            payload["aud"] = "test-audience";
+        if (!payload.ContainsKey("iat"))
+            payload["iat"] = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        if (!payload.ContainsKey("exp"))
+            payload["exp"] = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds();
 
         // Encode
         var headerJson = JsonSerializer.Serialize(header);
