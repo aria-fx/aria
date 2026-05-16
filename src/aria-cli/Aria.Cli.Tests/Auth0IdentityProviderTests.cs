@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Aria.Cli.Tests;
 
+[Collection("EnvironmentVariableTests")]
 public sealed class Auth0IdentityProviderTests
 {
     private const string TestAuth0Domain = "example.auth0.com";

@@ -27,11 +27,15 @@ public sealed class ProviderAdapterConformanceTests
             Assert.Equal(fixture.Expected.TenantId, identity.TenantId);
             Assert.Equal(fixture.Expected.UserPrincipalName, identity.UserPrincipalName);
 
-            foreach (var group in fixture.Expected.Groups)
-                Assert.Contains(group, identity.Groups);
+            var expectedGroups = new HashSet<string>(fixture.Expected.Groups, StringComparer.OrdinalIgnoreCase);
+            var actualGroups = new HashSet<string>(identity.Groups, StringComparer.OrdinalIgnoreCase);
+            Assert.True(expectedGroups.SetEquals(actualGroups), 
+                $"Groups mismatch for fixture '{fixture.Provider}'. Expected: [{string.Join(", ", expectedGroups)}], Actual: [{string.Join(", ", actualGroups)}]");
 
-            foreach (var role in fixture.Expected.Roles)
-                Assert.Contains(role, identity.Roles);
+            var expectedRoles = new HashSet<string>(fixture.Expected.Roles, StringComparer.OrdinalIgnoreCase);
+            var actualRoles = new HashSet<string>(identity.Roles, StringComparer.OrdinalIgnoreCase);
+            Assert.True(expectedRoles.SetEquals(actualRoles), 
+                $"Roles mismatch for fixture '{fixture.Provider}'. Expected: [{string.Join(", ", expectedRoles)}], Actual: [{string.Join(", ", actualRoles)}]");
         }
     }
 
