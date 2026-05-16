@@ -84,7 +84,7 @@ public sealed class EntraAuthService : IIdentityProvider
         var scopes = GetClaim(root, "scp");
         if (!string.IsNullOrWhiteSpace(scopes))
         {
-            foreach (var scope in scopes.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            foreach (var scope in scopes.Split([' ', ','], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
                 roles.Add(scope);
         }
 
