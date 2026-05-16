@@ -115,15 +115,15 @@ Every entity in the metamodel is represented as an [OASF](https://schema.oasf.ou
 
 For an enterprise to successfully manage AI assets at scale, it needs capabilities across six domains.
 
-| Domain                           | Capabilities                                                                     | Maturity Indicator                                                   |
-| -------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Asset Inventory & Classification | Discover, catalog, and classify all AI primitives using a standardized taxonomy  | All AI assets registered with [OASF](https://schema.oasf.outshift.com/) Records                           |
-| Lifecycle Management             | Version, publish, deprecate, and archive with automated gating                   | Automated CI/CD validates [OASF](https://schema.oasf.outshift.com/) schema on every PR                    |
-| Composition & Orchestration      | Compose agents from skills and knowledge; resolve dependency chains              | Orchestration configs reference only published, validated primitives |
-| Governance & Compliance          | Apply sensitivity labels, enforce DLP, track lineage, maintain audit trails      | Purview labels auto-propagate through dependency graph               |
-| Discovery & Reuse                | Search, filter, and consume AI assets by skill taxonomy or domain                | Searchable registry with skill-based filtering active                |
-| Observability & Evaluation       | Monitor performance, track metrics, detect drift, surface violations             | OTEL telemetry + evaluation modules attached to published Records    |
-| AI FinOps & Cost Governance      | Track per-asset costs across providers, enforce budgets, rate limits, chargeback | Per-asset cost attribution with budget enforcement middleware active |
+| Domain | Capabilities | Maturity Indicator |
+|--------|-------------|-------------------|
+| Asset Inventory & Classification | Discover, catalog, and classify all AI primitives using a standardized taxonomy | All AI assets registered with OASF Records |
+| Lifecycle Management | Version, publish, deprecate, and archive with automated gating | Automated CI/CD validates OASF schema on every PR |
+| Composition & Orchestration | Compose agents from skills and knowledge; resolve dependency chains | Orchestration configs reference only published, validated primitives |
+| Governance & Compliance | Apply sensitivity labels, enforce DLP, track lineage, maintain audit trails | Purview labels auto-propagate through dependency graph |
+| Discovery & Reuse | Search, filter, and consume AI assets by skill taxonomy or domain | Searchable registry with skill-based filtering active |
+| Observability & Evaluation | Monitor performance, track metrics, detect drift, surface violations | OTEL telemetry + evaluation modules attached to published Records |
+| AI FinOps & Cost Governance | Track per-asset costs across providers, enforce budgets, rate limits, chargeback | Per-asset cost attribution with budget enforcement middleware active |
 
 # Reference Implementation: GitHub as ARIA Marketplace
 
@@ -429,16 +429,16 @@ Budget enforcement cascades: if Agent A's budget is $400/mo, it doesn't matter t
 
 ## Provider Integration Matrix
 
-| Provider                  | Usage API                               | Cost API              | Per-Asset Attribution    | Real-Time Metering         |
-| ------------------------- | --------------------------------------- | --------------------- | ------------------------ | -------------------------- |
-| Azure OpenAI / AI Foundry | Azure Monitor metrics                   | Azure Cost Management | Via resource tags        | Near-real-time via Monitor |
-| GitHub Copilot            | Copilot Metrics API (per-user, per-org) | GitHub Billing API    | Per-seat/per-org         | Daily aggregation          |
-| Anthropic Claude          | Usage API (tokens per key)              | Billing dashboard     | Per-API-key              | Per-request headers        |
-| OpenAI                    | Usage API (tokens per org)              | Organization billing  | Per-API-key              | Daily aggregation          |
-| Azure Container Apps      | Azure Monitor                           | Azure Cost Management | Via resource tags        | Near-real-time             |
-| AWS Lambda / Bedrock      | CloudWatch Metrics                      | AWS Cost Explorer     | Via cost allocation tags | Hourly aggregation         |
+| Provider | Usage API | Cost API | Per-Asset Attribution | Real-Time Metering |
+|----------|-----------|----------|----------------------|-------------------|
+| Azure OpenAI / AI Foundry | Azure Monitor metrics | Azure Cost Management | Via resource tags | Near-real-time via Monitor |
+| GitHub Copilot | Copilot Metrics API (per-user, per-org) | GitHub Billing API | Per-seat/per-org | Daily aggregation |
+| Anthropic Claude | Usage API (tokens per key) | Billing dashboard | Per-API-key | Per-request headers |
+| OpenAI | Usage API (tokens per org) | Organization billing | Per-API-key | Daily aggregation |
+| Azure Container Apps | Azure Monitor | Azure Cost Management | Via resource tags | Near-real-time |
+| AWS Lambda / Bedrock | CloudWatch Metrics | AWS Cost Explorer | Via cost allocation tags | Hourly aggregation |
 
-The cost collector normalizes all provider data into a common format using the [OASF](https://schema.oasf.outshift.com/) asset name as the join key, enabling cross-provider rollup per asset, per team, and per department.
+The cost collector normalizes all provider data into a common format using the OASF asset name as the join key, enabling cross-provider rollup per asset, per team, and per department.
 
 ## Budget Enforcement Middleware
 
@@ -476,59 +476,20 @@ The ARIA distribution gateway's web catalog is extended with a cost dashboard th
 - **Cost-per-interaction**: blended cost per user interaction across all underlying providers
 - **Optimization recommendations**: identify underutilized assets (high cost, low invocations) and over-provisioned resources
 
-# Operational Governance
-
-## API Contract Governance
-
-ARIA's distribution layer (catalog API and gateway endpoints) is maintained through a rigorous contract governance model that establishes a single source of truth and prevents silent spec/runtime divergence.
-
-### Contract Hierarchy
-
-**Authoritative Specifications** — Published OpenAPI 3.1.0 contracts in [`aria/docs/architecture/`](./):
-- `catalog-api.openapi.yaml` — Governed catalog and install API for direct asset discovery and installation
-- `distribution-gateway.openapi.yaml` — Runtime-oriented delivery gateway for channel-native bundling and access evaluation
-
-**Runtime Implementations** — Each repository implements and must strictly conform to the authoritative contract:
-- `aria-gateway` (Node.js/Express) — Implements catalog API and distribution gateway endpoints
-- `aria-cli` (C#/.NET) — Consumes catalog API endpoints
-- `aria-skills` (orchestrator) — Consumes distribution gateway endpoints
-
-**Generated OpenAPI** — Runtime-generated specs (`openapi.json`, `openapi.yaml`) are derived documentation for validation and tooling; they are not authoritative sources.
-
-### Change Workflow
-
-Contract changes follow a formal process:
-
-1. **RFC Issue** → Author files an RFC in `aria` repo describing motivation, proposed changes, and impact analysis.
-2. **Architecture Review** → ARIA Architecture Council reviews for consistency, best practices, and cross-repo impact.
-3. **Update Specification** → Approved RFC author updates the OpenAPI file in `aria/docs/architecture/`.
-4. **Implement in Runtime** → Each affected repo implements the contract changes and passes automated drift detection.
-5. **Validate Alignment** → Cross-repo contract sync confirms all implementations comply.
-
-### Enforcement
-
-- **CI Gates:** Every PR touching API routes triggers OpenAPI contract drift tests that fail if paths, methods, security schemes, or response codes diverge from the spec.
-- **Cross-Repo Sync:** Automated checks compare architecture specs against runtime OpenAPI for all services; failures block deployment of out-of-spec implementations.
-- **Exceptions:** Rare deviations (e.g., phased rollouts, emergencies) are logged in `.github/contract-exceptions.md` with Architecture approval and expiration dates.
-
-### Governance Document
-
-See [api-contract-governance.md](./api-contract-governance.md) for the complete model, RFC process, enforcement gates, and escalation procedures.
-
 # Implementation Roadmap
 
-| Phase        | Duration  | Deliverables                                                                                                                      | Success Criteria                                                                            |
-| ------------ | --------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Foundation   | 4–6 weeks | [OASF](https://schema.oasf.outshift.com/) server, governance overlay schema, GitHub template, validation Action                                                        | First asset registered with valid [OASF](https://schema.oasf.outshift.com/) Record                                               |
-| Marketplace  | 6–8 weeks | OCI publish pipeline, Agent Directory, discovery channels, CODEOWNERS                                                             | Teams discover and consume assets through registry                                          |
-| Purview      | 6–8 weeks | Label mapping, purview-sync Action, Data Map lineage, sensitivity propagation                                                     | Labels auto-propagate through dependency graphs                                             |
-| Distribution | 6–8 weeks | Catalog API, governance gateway, .mcpb packager, Claude Desktop enterprise integration, web catalog portal                        | Non-technical users browse and install governed skills from Claude Desktop Extensions panel |
-| AI FinOps    | 6–8 weeks | Cost governance overlay extension, cost collector skill, budget enforcement middleware, provider API integrations, cost dashboard | Per-asset cost attribution across providers with budget enforcement active                  |
-| Runtime      | 4–6 weeks | DLP enforcement, DSPM dashboards, insider risk, audit logging                                                                     | Compliance team generates AI audit reports                                                  |
-| Scale        | Ongoing   | Cross-team adoption, Cowork contextual discovery, eval framework, EU AI Act templates, federated directory                        | All production AI assets governed through ARIA                                              |
+| Phase | Duration | Deliverables | Success Criteria |
+|-------|----------|-------------|-----------------|
+| Foundation | 4–6 weeks | OASF server, governance overlay schema, GitHub template, validation Action | First asset registered with valid OASF Record |
+| Marketplace | 6–8 weeks | OCI publish pipeline, Agent Directory, discovery channels, CODEOWNERS | Teams discover and consume assets through registry |
+| Purview | 6–8 weeks | Label mapping, purview-sync Action, Data Map lineage, sensitivity propagation | Labels auto-propagate through dependency graphs |
+| Distribution | 6–8 weeks | Catalog API, governance gateway, .mcpb packager, Claude Desktop enterprise integration, web catalog portal | Non-technical users browse and install governed skills from Claude Desktop Extensions panel |
+| AI FinOps | 6–8 weeks | Cost governance overlay extension, cost collector skill, budget enforcement middleware, provider API integrations, cost dashboard | Per-asset cost attribution across providers with budget enforcement active |
+| Runtime | 4–6 weeks | DLP enforcement, DSPM dashboards, insider risk, audit logging | Compliance team generates AI audit reports |
+| Scale | Ongoing | Cross-team adoption, Cowork contextual discovery, eval framework, EU AI Act templates, federated directory | All production AI assets governed through ARIA |
 
 # Conclusion
 
-Enterprise AI is at an inflection point. ARIA addresses the three questions every enterprise leader asks about AI adoption: "Are we allowed to use this?" (governance), "Can we afford to use this?" (AI FinOps), and "How do our people access it?" (distribution). The combination of [OASF](https://schema.oasf.outshift.com/) for classification, GitHub for marketplace operations, Microsoft Purview for governance, a distribution gateway for end-user consumption, and a cost governance framework for financial accountability creates a practical, implementable architecture that transforms AI asset management from ad hoc artifact accumulation into a governed, discoverable, composable, and economically sustainable ecosystem.
+Enterprise AI is at an inflection point. ARIA addresses the three questions every enterprise leader asks about AI adoption: "Are we allowed to use this?" (governance), "Can we afford to use this?" (AI FinOps), and "How do our people access it?" (distribution). The combination of OASF for classification, GitHub for marketplace operations, Microsoft Purview for governance, a distribution gateway for end-user consumption, and a cost governance framework for financial accountability creates a practical, implementable architecture that transforms AI asset management from ad hoc artifact accumulation into a governed, discoverable, composable, and economically sustainable ecosystem.
 
-The key insight is that governance, cost controls, and user experience must all be embedded in the same workflow. For developers, the [OASF](https://schema.oasf.outshift.com/) Record and governance overlay — including budget caps and rate limits — are part of every pull request. For business users, the same controls run transparently behind Claude Desktop's Extensions panel. For finance teams, per-asset cost attribution flows automatically from provider billing APIs through the [OASF](https://schema.oasf.outshift.com/) dependency graph. The governed path is the easiest path, the most cost-transparent path, and the most compliant path — which is what actually gets adoption at scale.
+The key insight is that governance, cost controls, and user experience must all be embedded in the same workflow. For developers, the OASF Record and governance overlay — including budget caps and rate limits — are part of every pull request. For business users, the same controls run transparently behind Claude Desktop's Extensions panel. For finance teams, per-asset cost attribution flows automatically from provider billing APIs through the OASF dependency graph. The governed path is the easiest path, the most cost-transparent path, and the most compliant path — which is what actually gets adoption at scale.

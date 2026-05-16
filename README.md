@@ -158,10 +158,10 @@ demo script with exact commands and talking points.
 
 Primary workflows and automation assets:
 
-- `/.github/workflows/aria-auth-core-ci.yml`
-- `/.github/workflows/aria-auth-core-publish.yml`
-- `/.github/workflows/aria-cli-publish-packages.yml`
-- `/.github/workflows/pages-microsite.yml`
+- `.github/workflows/aria-auth-core-ci.yml`
+- `.github/workflows/aria-auth-core-publish.yml`
+- `.github/workflows/aria-cli-publish-packages.yml`
+- `.github/workflows/pages-microsite.yml`
 
 ## The ARIA Framework
 
