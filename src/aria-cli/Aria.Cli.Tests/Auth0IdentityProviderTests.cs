@@ -1,5 +1,7 @@
 using System.Text;
 using System.Text.Json;
+using System.Net;
+using System.Net.Http;
 using Aria.Auth.Core.Models;
 using Aria.Cli.Services;
 using Xunit;
@@ -276,6 +278,77 @@ public sealed class Auth0IdentityProviderTests
         }
     }
 
+    [Fact]
+    public async Task GetIdentity_DeviceFlow_AuthorizationPendingThenSuccess_ReturnsIdentity()
+    {
+        Environment.SetEnvironmentVariable("AUTH0_ACCESS_TOKEN", null);
+        var token = CreateTestJwt();
+
+        var requests = new List<(string Url, string Body)>();
+        var handler = new SequenceHttpMessageHandler(async request =>
+        {
+            var body = request.Content is null ? string.Empty : await request.Content.ReadAsStringAsync();
+            requests.Add((request.RequestUri?.ToString() ?? string.Empty, body));
+
+            return requests.Count switch
+            {
+                1 => JsonResponse(HttpStatusCode.OK,
+                    "{\"device_code\":\"device-code-123\",\"user_code\":\"ABCD-1234\",\"verification_uri\":\"https://example.auth0.com/activate\",\"expires_in\":10,\"interval\":0}"),
+                2 => JsonResponse(HttpStatusCode.BadRequest, "{\"error\":\"authorization_pending\"}"),
+                3 => JsonResponse(HttpStatusCode.OK, $"{{\"access_token\":\"{token}\"}}"),
+                _ => throw new InvalidOperationException("Unexpected request sequence.")
+            };
+        });
+
+        var provider = new Auth0IdentityProvider(new HttpClient(handler));
+        var config = new AriaConfig
+        {
+            Auth0 = new Auth0Config
+            {
+                Enabled = true,
+                Domain = TestAuth0Domain,
+                ClientId = TestClientId
+            }
+        };
+
+        var result = await provider.GetIdentityAsync(config);
+
+        Assert.NotNull(result);
+        Assert.Equal("user123", result.ObjectId);
+        Assert.Equal(3, requests.Count);
+        Assert.EndsWith("/oauth/device/code", requests[0].Url, StringComparison.Ordinal);
+        Assert.EndsWith("/oauth/token", requests[1].Url, StringComparison.Ordinal);
+        Assert.EndsWith("/oauth/token", requests[2].Url, StringComparison.Ordinal);
+        Assert.Contains("client_id=test-client-id", requests[0].Body, StringComparison.Ordinal);
+        Assert.Contains("grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code", requests[1].Body, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task GetIdentity_DeviceFlow_DeviceCodeError_Throws()
+    {
+        Environment.SetEnvironmentVariable("AUTH0_ACCESS_TOKEN", null);
+
+        var handler = new SequenceHttpMessageHandler(_ =>
+            Task.FromResult(JsonResponse(HttpStatusCode.BadRequest, "{\"error\":\"invalid_request\",\"error_description\":\"client_id is required\"}", "Bad Request")));
+
+        var provider = new Auth0IdentityProvider(new HttpClient(handler));
+        var config = new AriaConfig
+        {
+            Auth0 = new Auth0Config
+            {
+                Enabled = true,
+                Domain = TestAuth0Domain,
+                ClientId = TestClientId
+            }
+        };
+
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => provider.GetIdentityAsync(config));
+
+        Assert.Contains("device code request failed", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Bad Request", ex.Message, StringComparison.Ordinal);
+        Assert.Contains("client_id is required", ex.Message, StringComparison.Ordinal);
+    }
+
     private static string CreateTestJwt() =>
         CreateTestJwtWithClaims(new Dictionary<string, object>
         {
@@ -324,5 +397,25 @@ public sealed class Auth0IdentityProviderTests
             .Replace("+", "-")
             .Replace("/", "_")
             .TrimEnd('=');
+    }
+
+    private static HttpResponseMessage JsonResponse(HttpStatusCode statusCode, string json, string? reasonPhrase = null)
+    {
+        var response = new HttpResponseMessage(statusCode)
+        {
+            Content = new StringContent(json, Encoding.UTF8, "application/json")
+        };
+
+        if (!string.IsNullOrWhiteSpace(reasonPhrase))
+            response.ReasonPhrase = reasonPhrase;
+
+        return response;
+    }
+
+    private sealed class SequenceHttpMessageHandler(Func<HttpRequestMessage, Task<HttpResponseMessage>> responseFactory)
+        : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
+            responseFactory(request);
     }
 }

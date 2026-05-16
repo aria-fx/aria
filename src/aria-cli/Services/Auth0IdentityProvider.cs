@@ -12,7 +12,18 @@ namespace Aria.Cli.Services;
 /// </summary>
 public sealed class Auth0IdentityProvider : IIdentityProvider
 {
-    private static readonly HttpClient _httpClient = new();
+    private static readonly HttpClient SharedHttpClient = new();
+    private readonly HttpClient _httpClient;
+
+    public Auth0IdentityProvider()
+        : this(SharedHttpClient)
+    {
+    }
+
+    public Auth0IdentityProvider(HttpClient httpClient)
+    {
+        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+    }
 
     public string Name => "auth0";
 
@@ -32,7 +43,7 @@ public sealed class Auth0IdentityProvider : IIdentityProvider
         return ParseJwtIdentity(token, auth0);
     }
 
-    private static async Task<string?> ResolveAccessTokenAsync(Auth0Config auth0)
+    private async Task<string?> ResolveAccessTokenAsync(Auth0Config auth0)
     {
         // Try environment variable first
         var envToken = Environment.GetEnvironmentVariable("AUTH0_ACCESS_TOKEN");
@@ -56,7 +67,7 @@ public sealed class Auth0IdentityProvider : IIdentityProvider
         return null;
     }
 
-    private static async Task<string?> RequestDeviceFlowTokenAsync(Auth0Config auth0)
+    private async Task<string?> RequestDeviceFlowTokenAsync(Auth0Config auth0)
     {
         var domain = auth0.Domain!;
         var clientId = auth0.ClientId!;
