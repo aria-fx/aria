@@ -148,29 +148,155 @@ chain is displayed.
 }
 ```
 
-### Entra-Based Authorization Model
+### Authentication Providers
+
+`aria` supports multiple identity providers for resolving user identity and access policies. Configure the provider using `auth.provider` in `~/.aria/config.json`.
+
+#### Entra (Default)
+
+Microsoft Entra ID (formerly Azure AD). Resolves identity via `DefaultAzureCredential` (supports managed identity, service principal, user login).
+
+- **Configuration**: `entra` section
+- **Scopes**: Configurable (default: Azure management API)
+- **Groups/Roles**: Reads `groups` and `roles`/`scp` claims from token
+- **Tenant ID**: Resolved from token `tid` claim
+
+```bash
+auth.provider = "entra"
+auth.enable_experimental_providers = false
+```
+
+#### Okta (Experimental)
+
+Okta identity platform. Supports multiple token acquisition methods.
+
+- **Enable**: Set `auth.enable_experimental_providers = true`
+- **Configuration**: `okta` section
+- **Token Acquisition** (tried in order):
+  1. Environment variable (default: `OKTA_ACCESS_TOKEN`)
+  2. File-based token (`access_token_file`)
+  3. Client credentials flow to `token_endpoint` (requires `client_secret_env_var`)
+- **Groups/Roles**: Reads `groups`, `okta.groups`, `roles`, `permissions` claims; parses space/comma-separated scopes
+- **Tenant ID**: Configured `issuer` or resolved from token `tid`/`iss`
+
+**Configuration Example**:
+```json
+{
+  "auth": {
+    "provider": "okta",
+    "enable_experimental_providers": true
+  },
+  "okta": {
+    "enabled": true,
+    "issuer": "https://your-org.okta.com/oauth2/default",
+    "client_id": "your-okta-client-id",
+    "scopes": ["openid", "profile", "groups"],
+    "access_token_env_var": "OKTA_ACCESS_TOKEN",
+    "access_token_file": "~/.aria/okta-token.txt",
+    "token_endpoint": "https://your-org.okta.com/oauth2/default/v1/token",
+    "client_secret_env_var": "OKTA_CLIENT_SECRET"
+  }
+}
+```
+
+**Usage**:
+```bash
+# Provide token via environment variable
+export OKTA_ACCESS_TOKEN=<your-jwt>
+aria whoami
+
+# Or provide token in file for CI/CD
+aria whoami
+
+# Or use client credentials flow (will request token automatically)
+export OKTA_CLIENT_SECRET=<your-secret>
+aria whoami
+```
+
+#### Auth0 (Experimental)
+
+Auth0 identity platform. Supports interactive device flow for CLI and static tokens for CI/CD.
+
+- **Enable**: Set `auth.enable_experimental_providers = true`
+- **Configuration**: `auth0` section
+- **Token Acquisition** (tried in order):
+  1. Environment variable (`AUTH0_ACCESS_TOKEN`)
+  2. File-based token (`access_token_file`)
+  3. Device flow (requires `domain`, `client_id`, `audience`)
+- **Device Flow**: Prompts user to visit browser URL and enter code; polls for token
+- **Groups/Roles**: Reads `groups`, `https://aria.dev/groups`, `roles`, `permissions`, `scope` claims; parses space/comma-separated scopes
+- **Tenant ID**: Configured `domain` or resolved from token `aud`/`iss`
+
+**Configuration Example**:
+```json
+{
+  "auth": {
+    "provider": "auth0",
+    "enable_experimental_providers": true
+  },
+  "auth0": {
+    "enabled": true,
+    "domain": "your-tenant.us.auth0.com",
+    "client_id": "your-auth0-client-id",
+    "audience": "https://api.example.com",
+    "scopes": ["openid", "profile", "read:assets", "offline_access"],
+    "access_token_file": "~/.aria/auth0-token.txt"
+  }
+}
+```
+
+**Usage**:
+```bash
+# Interactive device flow (first-time setup)
+aria whoami
+# Output: Visit https://your-tenant.us.auth0.com/activate?user_code=XXXX
+
+# Provide token via environment variable (CI/CD)
+export AUTH0_ACCESS_TOKEN=<your-jwt>
+aria whoami
+
+# Or provide token in file
+aria whoami
+```
+
+#### Claim Normalization
+
+All providers normalize identity claims to a consistent model:
+
+| Provider | Object ID Claim  | Tenant ID Claim | Groups Claims  | Roles Claims |
+|----------|------------------|-----------------|----------------|-------------|
+| Entra    | `oid`            | `tid`           | `groups`       | `roles`, `scp` |
+| Okta     | `oid`/`uid`/`sub` | `tid`/configured issuer/`iss` | `groups`, `okta.groups` | `roles`, `permissions`, `scp`, `scope` |
+| Auth0    | `sub`/`oid`/`uid` | `aud`/configured domain/`iss` | `groups`, `https://aria.dev/groups` | `roles`, `permissions`, `scope` |
+
+Each provider:
+- Tries multiple claim names to find identity (for compatibility across Auth0/Okta config variants)
+- Supports array claims and space/comma-separated string values for groups/roles
+- Normalizes to `HashSet<string>` for consistent access rule evaluation
+
+Run `aria whoami` to verify the resolved identity and access profile before running `aria audit` or `aria install`.
+
+### Authorization and Access Rules
 
 1. `aria` resolves `auth.provider` and uses the matching identity adapter (`entra`, `okta`, `auth0`).
-2. Entra (default) acquires a token via `DefaultAzureCredential` and reads claims (`oid`, `tid`, `groups`, `roles`/`scp`).
-3. Experimental providers (`okta`, `auth0`) require `auth.enable_experimental_providers=true`.
-4. Okta currently supports JWT access token resolution from env/file and optional client-credentials token endpoint flow.
-5. `access_rules` map normalized groups/roles to an effective sensitivity ceiling and granted Purview roles.
-6. Governance checks enforce:
+2. The adapter extracts normalized identity: ObjectId, TenantId, UserPrincipalName, Groups, Roles.
+3. `access_rules` map normalized groups/roles to an effective sensitivity ceiling and granted Purview roles.
+4. Governance checks enforce:
   - [OASF](https://schema.oasf.outshift.com/) sensitivity tier <= effective ceiling
   - `allowed_consumers`, `allowed_entra_groups`, and `allowed_entra_roles` from governance overlay
   - `purview.required_roles_by_sensitivity` for data-plane access
 
-Run `aria whoami` to verify the resolved identity and access profile before running `aria audit` or `aria install`.
+### Auth Adapter Implementation Status
 
-### Auth Adapter TODOs
+- ✅ Entra adapter (first-class, production-ready)
+- ✅ Okta adapter (experimental, supports JWT + client credentials)
+- ✅ Auth0 adapter (experimental, supports device flow + JWT + file-based tokens)
+- ✅ Claim normalization across all providers
+- ✅ Integration tests for each provider
 
-Entra is first-class today, but the auth layer now has an adapter seam to support additional identity providers.
-
-- TODO: Add `auth.provider` config selector (for example: `entra`, `okta`, `auth0`, `ping`).
-- TODO: Implement `IIdentityProvider` adapters for Okta/Auth0/Ping with claim normalization into the shared identity model.
-- TODO: Normalize group and role claim names per provider to a common shape before access rule evaluation.
-- TODO: Add integration tests for each provider adapter using representative JWT payloads.
-- TODO: Add provider capability matrix in docs (token source, group claim behavior, role claim behavior, tenant mapping).
+Future work:
+- Add provider capability matrix docs (token source, group claim behavior, role claim behavior, tenant mapping)
+- Support additional providers (Ping Identity, custom OIDC, SAML)
 
 ## GitHub CLI Extension
 

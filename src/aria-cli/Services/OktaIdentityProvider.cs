@@ -104,7 +104,16 @@ public sealed class OktaIdentityProvider : IIdentityProvider
         if (parts.Length < 2)
             throw new InvalidOperationException("Okta access token is not a JWT. Provide a JWT access token.");
 
-        var payloadJson = Encoding.UTF8.GetString(Base64UrlDecode(parts[1]));
+        string payloadJson;
+        try
+        {
+            payloadJson = Encoding.UTF8.GetString(Base64UrlDecode(parts[1]));
+        }
+        catch (FormatException ex)
+        {
+            throw new InvalidOperationException("Okta access token has invalid base64 encoding.", ex);
+        }
+
         using var payload = JsonDocument.Parse(payloadJson);
         var root = payload.RootElement;
 
