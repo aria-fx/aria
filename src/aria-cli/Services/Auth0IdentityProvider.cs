@@ -79,7 +79,17 @@ public sealed class Auth0IdentityProvider : IIdentityProvider
         var devicePayload = await deviceResponse.Content.ReadAsStringAsync();
 
         if (!deviceResponse.IsSuccessStatusCode)
-            throw new InvalidOperationException($"Auth0 device code request failed: {(int)deviceResponse.StatusCode}");
+        {
+            var message = $"Auth0 device code request failed: {(int)deviceResponse.StatusCode}";
+
+            if (!string.IsNullOrWhiteSpace(deviceResponse.ReasonPhrase))
+                message += $" ({deviceResponse.ReasonPhrase})";
+
+            if (!string.IsNullOrWhiteSpace(devicePayload))
+                message += $". Response: {devicePayload}";
+
+            throw new InvalidOperationException(message);
+        }
 
         using var deviceDoc = JsonDocument.Parse(devicePayload);
         var deviceRoot = deviceDoc.RootElement;
