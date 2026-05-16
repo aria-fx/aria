@@ -8,12 +8,12 @@ By the end of this module you'll have:
 
 - A **Microsoft Purview Account** with system-assigned managed identity
 - An **Azure Key Vault** storing sensitivity tier configuration
-- A **Storage Account** for OASF lineage metadata and governance overlays
+- A **Storage Account** for [OASF](https://schema.oasf.outshift.com/) lineage metadata and governance overlays
 - An **Azure Container Registry** for OCI artifact storage
-- A **GitHub template repository** with OASF manifests, CODEOWNERS, and three Actions workflows
+- A **GitHub template repository** with [OASF](https://schema.oasf.outshift.com/) manifests, CODEOWNERS, and three Actions workflows
 - A **sample agent repository** bootstrapped from the template
 - Three **GitHub teams** (AI Platform, AI Governance, AI Consumers) with scoped permissions
-- **Branch protection** requiring OASF validation to pass before merge
+- **Branch protection** requiring [OASF](https://schema.oasf.outshift.com/) validation to pass before merge
 
 ## Prerequisites
 
@@ -121,7 +121,7 @@ Open the template repo in your browser. You should see:
 
 ```
 aria-asset-template/
-├── oasf-record.json          ← OASF Record stub (needs customization)
+├── oasf-record.json          ← [OASF](https://schema.oasf.outshift.com/) Record stub (needs customization)
 ├── oasf-governance.json      ← Governance overlay stub
 ├── src/README.md
 ├── tests/README.md
@@ -137,7 +137,7 @@ aria-asset-template/
 
 The branch protection on `main` requires:
 
-- The `validate` status check to pass (OASF schema validation)
+- The `validate` status check to pass ([OASF](https://schema.oasf.outshift.com/) schema validation)
 - At least one CODEOWNERS approval
 - Stale reviews dismissed on new pushes
 
@@ -158,7 +158,7 @@ The Key Vault stores two secrets:
 
 ### github-marketplace
 
-This module creates the template repository with all OASF manifest stubs
+This module creates the template repository with all [OASF](https://schema.oasf.outshift.com/) manifest stubs
 and workflows pre-configured. The CODEOWNERS file routes governance overlay
 changes to the `ai-governance` team and workflow changes to `ai-platform`.
 
@@ -173,7 +173,7 @@ assets land as OCI artifacts. Purview is granted `AcrPull` access so it
 can scan the registry and catalog AI assets in the Data Map.
 
 A schema version reference blob is seeded into the schema storage account,
-defining required fields for both the OASF Record and governance overlay.
+defining required fields for both the [OASF](https://schema.oasf.outshift.com/) Record and governance overlay.
 
 ## Cleanup
 

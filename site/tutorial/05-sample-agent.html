@@ -51,51 +51,67 @@
                 <nav id="toc" class="toc-panel" aria-label="Table of contents">
           <h2>On This Page</h2>
           <ul>
-          <li><a href="#sample-agent">05 — Sample Agent</a>
+          <li><a href="#sample-agent" id="toc-sample-agent">05 — Sample
+          Agent</a>
           <ul>
-          <li><a href="#what-youll-see">What you’ll see</a></li>
-          <li><a href="#prerequisites">Prerequisites</a></li>
-          <li><a href="#step-1-configure-environment">Step 1: Configure
+          <li><a href="#what-youll-see" id="toc-what-youll-see">What
+          you’ll see</a></li>
+          <li><a href="#prerequisites"
+          id="toc-prerequisites">Prerequisites</a></li>
+          <li><a href="#step-1-configure-environment"
+          id="toc-step-1-configure-environment">Step 1: Configure
           environment</a></li>
-          <li><a href="#step-2-inspect-the-oasf-manifests">Step 2:
-          Inspect the OASF manifests</a></li>
-          <li><a href="#step-3-build-and-run">Step 3: Build and
-          run</a></li>
-          <li><a href="#step-4-test-governance-enforcement">Step 4: Test
+          <li><a href="#step-2-inspect-the-oasf-manifests"
+          id="toc-step-2-inspect-the-oasf-manifests">Step 2: Inspect the
+          OASF manifests</a></li>
+          <li><a href="#step-3-build-and-run"
+          id="toc-step-3-build-and-run">Step 3: Build and run</a></li>
+          <li><a href="#step-4-test-governance-enforcement"
+          id="toc-step-4-test-governance-enforcement">Step 4: Test
           governance enforcement</a>
           <ul>
-          <li><a href="#allowed-internal-data-below-ceiling">Allowed:
-          internal data (below ceiling)</a></li>
-          <li><a href="#allowed-confidential-data-at-ceiling">Allowed:
+          <li><a href="#allowed-internal-data-below-ceiling"
+          id="toc-allowed-internal-data-below-ceiling">Allowed: internal
+          data (below ceiling)</a></li>
+          <li><a href="#allowed-confidential-data-at-ceiling"
+          id="toc-allowed-confidential-data-at-ceiling">Allowed:
           confidential data (at ceiling)</a></li>
-          <li><a href="#blocked-restricted-data-above-ceiling">Blocked:
+          <li><a href="#blocked-restricted-data-above-ceiling"
+          id="toc-blocked-restricted-data-above-ceiling">Blocked:
           restricted data (above ceiling)</a></li>
-          <li><a href="#other-prompts-to-try">Other prompts to
-          try</a></li>
+          <li><a href="#other-prompts-to-try"
+          id="toc-other-prompts-to-try">Other prompts to try</a></li>
           </ul></li>
-          <li><a href="#step-5-understand-the-middleware-pipeline">Step
-          5: Understand the middleware pipeline</a></li>
-          <li><a href="#step-6-run-the-tests">Step 6: Run the
-          tests</a></li>
-          <li><a href="#step-7-inspect-the-telemetry">Step 7: Inspect
-          the telemetry</a></li>
-          <li><a href="#key-code-to-study">Key code to study</a></li>
-          <li><a href="#next-steps">Next Steps</a></li>
+          <li><a href="#step-5-understand-the-middleware-pipeline"
+          id="toc-step-5-understand-the-middleware-pipeline">Step 5:
+          Understand the middleware pipeline</a></li>
+          <li><a href="#step-6-run-the-tests"
+          id="toc-step-6-run-the-tests">Step 6: Run the tests</a></li>
+          <li><a href="#step-7-inspect-the-telemetry"
+          id="toc-step-7-inspect-the-telemetry">Step 7: Inspect the
+          telemetry</a></li>
+          <li><a href="#key-code-to-study"
+          id="toc-key-code-to-study">Key code to study</a></li>
+          <li><a href="#next-steps" id="toc-next-steps">Next
+          Steps</a></li>
           </ul></li>
           </ul>
         </nav>
         
         <article class="doc-article">
           <h1 id="sample-agent">05 — Sample Agent</h1>
-          <p>Run the OASF-governed HR onboarding assistant and see
-          governance enforcement in action.</p>
+          <p>Run the <a
+          href="https://schema.oasf.outshift.com/">OASF</a>-governed HR
+          onboarding assistant and see governance enforcement in
+          action.</p>
           <h2 id="what-youll-see">What you’ll see</h2>
           <ul>
-          <li>OASF Record and governance overlay validated at
-          startup</li>
+          <li><a href="https://schema.oasf.outshift.com/">OASF</a>
+          Record and governance overlay validated at startup</li>
           <li>Purview middleware evaluating DLP policies on every
           interaction</li>
-          <li>OASF governance middleware checking consumer identity</li>
+          <li><a href="https://schema.oasf.outshift.com/">OASF</a>
+          governance middleware checking consumer identity</li>
           <li>Sensitivity ceiling enforcement blocking access to
           restricted data</li>
           <li>OpenTelemetry traces tagged with ARIA governance
@@ -121,7 +137,8 @@
           tool-level sensitivity checks work independently of the
           LLM.</p>
           <h2 id="step-2-inspect-the-oasf-manifests">Step 2: Inspect the
-          OASF manifests</h2>
+          <a href="https://schema.oasf.outshift.com/">OASF</a>
+          manifests</h2>
           <p>Before running, look at the two manifest files that govern
           this agent:</p>
           <div class="sourceCode" id="cb2"><pre
@@ -159,14 +176,14 @@
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> Oasf.Sample.Agent</span></code></pre></div>
           <p>Watch the startup logs. You should see:</p>
           <pre><code>info: Oasf.Sample.Agent.Services.OasfGovernanceService
-  Loading OASF Record from oasf-record.json
+  Loading [OASF](https://schema.oasf.outshift.com/) Record from oasf-record.json
   Loading Governance Overlay from oasf-governance.json
-  OASF validation passed
-  OASF governance initialized: Asset=aria.dev/agents/onboarding-assistant v2.1.0,
+  [OASF](https://schema.oasf.outshift.com/) validation passed
+  [OASF](https://schema.oasf.outshift.com/) governance initialized: Asset=aria.dev/agents/onboarding-assistant v2.1.0,
     Sensitivity=confidential, Ceiling=confidential, Frameworks=[SOC2, GDPR]</code></pre>
           <p>Then the agent banner:</p>
           <pre><code>╔══════════════════════════════════════════════════════════════╗
-║  OASF-Governed HR Onboarding Agent                         ║
+║  [OASF](https://schema.oasf.outshift.com/)-Governed HR Onboarding Agent                         ║
 ║  Asset: aria.dev/agents/onboarding-assistant              ║
 ║  Version: 2.1.0                                            ║
 ║  Sensitivity: confidential                                 ║
@@ -239,7 +256,8 @@ You&gt; What&#39;s the onboarding checklist for the Marketing department?</code>
           <li>Sensitivity tier ordering (public &lt; internal &lt; …
           &lt; restricted)</li>
           <li>Ceiling comparison logic (exceeds vs. within)</li>
-          <li>OASF Record deserialization</li>
+          <li><a href="https://schema.oasf.outshift.com/">OASF</a>
+          Record deserialization</li>
           <li>Governance overlay deserialization</li>
           <li>Consumer allow-list semantics (empty = open access)</li>
           </ul>
@@ -248,38 +266,42 @@ You&gt; What&#39;s the onboarding checklist for the Marketing department?</code>
           <p>If you have an OpenTelemetry collector running, you’ll see
           traces with these ARIA-specific attributes:</p>
           <table>
+          <colgroup>
+          <col style="width: 42%" />
+          <col style="width: 57%" />
+          </colgroup>
           <thead>
-          <tr class="header">
+          <tr>
           <th>Attribute</th>
           <th>Example value</th>
           </tr>
           </thead>
           <tbody>
-          <tr class="odd">
+          <tr>
           <td><code>oasf.asset.name</code></td>
           <td><code>aria.dev/agents/onboarding-assistant</code></td>
           </tr>
-          <tr class="even">
+          <tr>
           <td><code>oasf.asset.version</code></td>
           <td><code>2.1.0</code></td>
           </tr>
-          <tr class="odd">
+          <tr>
           <td><code>oasf.sensitivity_tier</code></td>
           <td><code>confidential</code></td>
           </tr>
-          <tr class="even">
+          <tr>
           <td><code>oasf.audit_level</code></td>
           <td><code>full</code></td>
           </tr>
-          <tr class="odd">
+          <tr>
           <td><code>oasf.consumer.id</code></td>
           <td><code>hr-team</code></td>
           </tr>
-          <tr class="even">
+          <tr>
           <td><code>oasf.consumer.allowed</code></td>
           <td><code>true</code></td>
           </tr>
-          <tr class="odd">
+          <tr>
           <td><code>oasf.compliance_frameworks</code></td>
           <td><code>SOC2,GDPR</code></td>
           </tr>
@@ -291,34 +313,36 @@ You&gt; What&#39;s the onboarding checklist for the Marketing department?</code>
           <h2 id="key-code-to-study">Key code to study</h2>
           <table>
           <colgroup>
-          <col style="width: 31%" />
-          <col style="width: 68%" />
+          <col style="width: 45%" />
+          <col style="width: 54%" />
           </colgroup>
           <thead>
-          <tr class="header">
+          <tr>
           <th>File</th>
           <th>What it does</th>
           </tr>
           </thead>
           <tbody>
-          <tr class="odd">
+          <tr>
           <td><code>Services/OasfGovernanceService.cs</code></td>
           <td>Loads + validates manifests at startup</td>
           </tr>
-          <tr class="even">
+          <tr>
           <td><code>Middleware/OasfGovernanceMiddleware.cs</code></td>
           <td>Consumer validation + OTEL tags</td>
           </tr>
-          <tr class="odd">
+          <tr>
           <td><code>Tools/OnboardingTools.cs</code></td>
           <td>Sensitivity ceiling check in
           <code>LookupPolicy</code></td>
           </tr>
-          <tr class="even">
+          <tr>
           <td><code>Models/OasfModels.cs</code></td>
-          <td>Strongly-typed OASF Record + Governance types</td>
+          <td>Strongly-typed <a
+          href="https://schema.oasf.outshift.com/">OASF</a> Record +
+          Governance types</td>
           </tr>
-          <tr class="odd">
+          <tr>
           <td><code>Program.cs</code></td>
           <td>Agent construction with dual middleware pipeline</td>
           </tr>

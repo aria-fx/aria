@@ -51,24 +51,30 @@
                 <nav id="toc" class="toc-panel" aria-label="Table of contents">
           <h2>On This Page</h2>
           <ul>
-          <li><a href="#conference-demo-script">07 — Conference Demo
+          <li><a href="#conference-demo-script"
+          id="toc-conference-demo-script">07 — Conference Demo
           Script</a>
           <ul>
-          <li><a href="#setup-before-going-on-stage">Setup (before going
-          on stage)</a></li>
-          <li><a href="#demo-flow">Demo Flow</a>
+          <li><a href="#setup-before-going-on-stage"
+          id="toc-setup-before-going-on-stage">Setup (before going on
+          stage)</a></li>
+          <li><a href="#demo-flow" id="toc-demo-flow">Demo Flow</a>
           <ul>
-          <li><a href="#act-1-the-problem-2-min">Act 1: “The problem” (2
+          <li><a href="#act-1-the-problem-2-min"
+          id="toc-act-1-the-problem-2-min">Act 1: “The problem” (2
           min)</a></li>
-          <li><a href="#act-2-the-marketplace-3-min">Act 2: “The
-          marketplace” (3 min)</a></li>
-          <li><a href="#act-3-the-package-manager-3-min">Act 3: “The
-          package manager” (3 min)</a></li>
-          <li><a href="#act-4-governance-in-action-2-min">Act 4:
-          “Governance in action” (2 min)</a></li>
+          <li><a href="#act-2-the-marketplace-3-min"
+          id="toc-act-2-the-marketplace-3-min">Act 2: “The marketplace”
+          (3 min)</a></li>
+          <li><a href="#act-3-the-package-manager-3-min"
+          id="toc-act-3-the-package-manager-3-min">Act 3: “The package
+          manager” (3 min)</a></li>
+          <li><a href="#act-4-governance-in-action-2-min"
+          id="toc-act-4-governance-in-action-2-min">Act 4: “Governance
+          in action” (2 min)</a></li>
           </ul></li>
-          <li><a href="#key-lines-to-deliver">Key Lines to
-          Deliver</a></li>
+          <li><a href="#key-lines-to-deliver"
+          id="toc-key-lines-to-deliver">Key Lines to Deliver</a></li>
           </ul></li>
           </ul>
         </nav>
@@ -102,8 +108,9 @@
           with has agents, MCP servers, prompt libraries, and RAG
           pipelines scattered across teams with no inventory, no
           governance, and no way to discover what already exists.”</p>
-          <p><strong>Show:</strong> The OASF Record and governance
-          overlay files side by side.</p>
+          <p><strong>Show:</strong> The <a
+          href="https://schema.oasf.outshift.com/">OASF</a> Record and
+          governance overlay files side by side.</p>
           <div class="sourceCode" id="cb2"><pre
           class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show what an AI asset looks like in ARIA</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> src/sample-agent/Oasf.Sample.Agent/oasf-record.json <span class="kw">|</span> <span class="ex">jq</span> .</span>
@@ -111,7 +118,8 @@
           <h3 id="act-2-the-marketplace-3-min">Act 2: “The marketplace”
           (3 min)</h3>
           <p><strong>Talking point:</strong> “ARIA uses GitHub as the
-          marketplace. Every AI asset gets an OASF manifest, a
+          marketplace. Every AI asset gets an <a
+          href="https://schema.oasf.outshift.com/">OASF</a> manifest, a
           governance overlay, and three GitHub Actions workflows that
           enforce policy on every PR.”</p>
           <p><strong>Show:</strong> The template repo structure and the
@@ -132,13 +140,13 @@
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> search <span class="at">--skill</span> <span class="st">&quot;knowledge_retrieval/rag&quot;</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect an asset before installing</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> inspect ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> inspect ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Audit governance — this one passes</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> audit ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 <span class="at">--ceiling</span> confidential</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 <span class="at">--ceiling</span> confidential</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Audit governance — this one FAILS (ceiling too low)</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> audit ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 <span class="at">--ceiling</span> public</span></code></pre></div>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--project</span> src/aria-cli <span class="at">--</span> audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 <span class="at">--ceiling</span> public</span></code></pre></div>
           <h3 id="act-4-governance-in-action-2-min">Act 4: “Governance
           in action” (2 min)</h3>
           <p><strong>Talking point:</strong> “The governance isn’t just
@@ -155,15 +163,19 @@
           <h2 id="key-lines-to-deliver">Key Lines to Deliver</h2>
           <ul>
           <li>“ARIA is TOGAF for AI assets — a metamodel, a marketplace,
-          and a governance layer.”</li>
-          <li>“The OASF Record and governance overlay travel with the
-          asset — in every PR, in every OCI artifact, in every
-          runtime.”</li>
-          <li>“Governance is a natural consequence of building, not an
-          afterthought.”</li>
+          a governance layer, and a distribution gateway.”</li>
+          <li>“The <a href="https://schema.oasf.outshift.com/">OASF</a>
+          Record and governance overlay travel with the asset — in every
+          PR, in every OCI artifact, in every runtime.”</li>
+          <li>“For developers, governance is in the PR. For end users,
+          governance is invisible — they just see a curated Extensions
+          panel in Claude Desktop.”</li>
           <li>“The sensitivity ceiling check that runs in CI is the same
-          check that runs at runtime in the agent middleware. One rule,
-          enforced everywhere.”</li>
+          check that runs at runtime in the agent middleware, and the
+          same check that runs when someone clicks ‘Add to Claude.’ One
+          rule, enforced everywhere.”</li>
+          <li>“The governed path is the easiest path. That’s what gets
+          compliance at scale.”</li>
           </ul>
         </article>
       </main>

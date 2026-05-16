@@ -10,13 +10,13 @@ make clean && make all
 
 # Pre-warm the .NET builds
 dotnet build src/sample-agent/Oasf.Sample.sln -v quiet
-dotnet build src/apm-cli/Apm.Cli.csproj -v quiet
+dotnet build src/aria-cli/Aria.Cli.csproj -v quiet
 
 # Open VS Code with the repo
 code .
 
 # Have these terminals ready:
-# Terminal 1: apm CLI demo
+# Terminal 1: aria CLI demo
 # Terminal 2: sample agent demo
 # Terminal 3: Marp preview (optional)
 ```
@@ -29,7 +29,7 @@ code .
 prompt libraries, and RAG pipelines scattered across teams with no inventory,
 no governance, and no way to discover what already exists."
 
-**Show:** The OASF Record and governance overlay files side by side.
+**Show:** The [OASF](https://schema.oasf.outshift.com/) Record and governance overlay files side by side.
 
 ```bash
 # Show what an AI asset looks like in ARIA
@@ -40,7 +40,7 @@ cat src/sample-agent/Oasf.Sample.Agent/oasf-governance.json | jq .
 ### Act 2: "The marketplace" (3 min)
 
 **Talking point:** "ARIA uses GitHub as the marketplace. Every AI asset
-gets an OASF manifest, a governance overlay, and three GitHub Actions
+gets an [OASF](https://schema.oasf.outshift.com/) manifest, a governance overlay, and three GitHub Actions
 workflows that enforce policy on every PR."
 
 **Show:** The template repo structure and the CI/CD pipeline.
@@ -56,20 +56,20 @@ cat src/terraform/workflows/oasf-validate.yml
 ### Act 3: "The package manager" (3 min)
 
 **Talking point:** "Once assets are in the registry, teams need to consume
-them. The apm CLI bridges the marketplace to your runtime."
+them. The aria CLI bridges the marketplace to your runtime."
 
 ```bash
 # Search for skills
-dotnet run --project src/apm-cli -- search --skill "knowledge_retrieval/rag"
+dotnet run --project src/aria-cli -- search --skill "knowledge_retrieval/rag"
 
 # Inspect an asset before installing
-dotnet run --project src/apm-cli -- inspect ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0
+dotnet run --project src/aria-cli -- inspect ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0
 
 # Audit governance — this one passes
-dotnet run --project src/apm-cli -- audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 --ceiling confidential
+dotnet run --project src/aria-cli -- audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 --ceiling confidential
 
 # Audit governance — this one FAILS (ceiling too low)
-dotnet run --project src/apm-cli -- audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 --ceiling public
+dotnet run --project src/aria-cli -- audit ghcr.io/xebia/aria-assets/onboarding-assistant:2.1.0 --ceiling public
 ```
 
 ### Act 4: "Governance in action" (2 min)
@@ -90,7 +90,7 @@ dotnet run --project src/sample-agent/Oasf.Sample.Agent
 ## Key Lines to Deliver
 
 - "ARIA is TOGAF for AI assets — a metamodel, a marketplace, a governance layer, and a distribution gateway."
-- "The OASF Record and governance overlay travel with the asset — in every PR, in every OCI artifact, in every runtime."
+- "The [OASF](https://schema.oasf.outshift.com/) Record and governance overlay travel with the asset — in every PR, in every OCI artifact, in every runtime."
 - "For developers, governance is in the PR. For end users, governance is invisible — they just see a curated Extensions panel in Claude Desktop."
 - "The sensitivity ceiling check that runs in CI is the same check that runs at runtime in the agent middleware, and the same check that runs when someone clicks 'Add to Claude.' One rule, enforced everywhere."
 - "The governed path is the easiest path. That's what gets compliance at scale."

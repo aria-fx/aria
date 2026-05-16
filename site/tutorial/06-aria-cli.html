@@ -51,28 +51,37 @@
                 <nav id="toc" class="toc-panel" aria-label="Table of contents">
           <h2>On This Page</h2>
           <ul>
-          <li><a href="#aria-cli">06 — ARIA CLI</a>
+          <li><a href="#aria-cli" id="toc-aria-cli">06 — ARIA CLI</a>
           <ul>
-          <li><a href="#what-youll-do">What you’ll do</a></li>
-          <li><a href="#step-1-build-the-cli">Step 1: Build the
-          CLI</a></li>
-          <li><a href="#step-2-initialize-configuration">Step 2:
-          Initialize configuration</a></li>
-          <li><a href="#step-3-search-for-assets">Step 3: Search for
+          <li><a href="#what-youll-do" id="toc-what-youll-do">What
+          you’ll do</a></li>
+          <li><a href="#step-1-build-the-cli"
+          id="toc-step-1-build-the-cli">Step 1: Build the CLI</a></li>
+          <li><a href="#step-2-initialize-configuration"
+          id="toc-step-2-initialize-configuration">Step 2: Initialize
+          configuration</a></li>
+          <li><a href="#step-3-search-for-assets"
+          id="toc-step-3-search-for-assets">Step 3: Search for
           assets</a></li>
-          <li><a href="#step-4-inspect-an-asset">Step 4: Inspect an
+          <li><a href="#step-4-inspect-an-asset"
+          id="toc-step-4-inspect-an-asset">Step 4: Inspect an
           asset</a></li>
-          <li><a href="#step-5-audit-governance">Step 5: Audit
+          <li><a href="#step-5-audit-governance"
+          id="toc-step-5-audit-governance">Step 5: Audit
           governance</a></li>
-          <li><a href="#step-6-install-to-a-target">Step 6: Install to a
+          <li><a href="#step-6-install-to-a-target"
+          id="toc-step-6-install-to-a-target">Step 6: Install to a
           target</a></li>
-          <li><a href="#step-7-list-installed-assets">Step 7: List
-          installed assets</a></li>
-          <li><a href="#how-the-install-targets-work">How the install
-          targets work</a></li>
-          <li><a href="#github-cli-extension">GitHub CLI
-          extension</a></li>
-          <li><a href="#next-steps">Next Steps</a></li>
+          <li><a href="#step-7-list-installed-assets"
+          id="toc-step-7-list-installed-assets">Step 7: List installed
+          assets</a></li>
+          <li><a href="#how-the-install-targets-work"
+          id="toc-how-the-install-targets-work">How the install targets
+          work</a></li>
+          <li><a href="#github-cli-extension"
+          id="toc-github-cli-extension">GitHub CLI extension</a></li>
+          <li><a href="#next-steps" id="toc-next-steps">Next
+          Steps</a></li>
           </ul></li>
           </ul>
         </nav>
@@ -85,8 +94,12 @@
           <ul>
           <li>Initialize the aria CLI with your consumer identity and
           registry</li>
-          <li>Search for assets by OASF skill taxonomy</li>
-          <li>Inspect an asset’s OASF Record and governance overlay</li>
+          <li>Search for assets by <a
+          href="https://schema.oasf.outshift.com/">OASF</a> skill
+          taxonomy</li>
+          <li>Inspect an asset’s <a
+          href="https://schema.oasf.outshift.com/">OASF</a> Record and
+          governance overlay</li>
           <li>Audit governance compliance before installing</li>
           <li>Install an MCP skill into Claude Desktop</li>
           <li>See governance blocking an over-classified install</li>
@@ -100,15 +113,15 @@
           class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> <span class="at">--help</span></span></code></pre></div>
           <p>Output:</p>
           <pre><code>Description:
-  aria — ARIA Package Manager for OASF-governed AI assets
+  aria — ARIA Package Manager for [OASF](https://schema.oasf.outshift.com/)-governed AI assets
 
 Usage:
   aria [command] [options]
 
 Commands:
   init       Initialize aria configuration in ~/.aria/config.json
-  search     Discover AI assets by OASF skill, domain, or keyword
-  inspect    Display OASF Record and governance overlay for an asset
+  search     Discover AI assets by [OASF](https://schema.oasf.outshift.com/) skill, domain, or keyword
+  inspect    Display [OASF](https://schema.oasf.outshift.com/) Record and governance overlay for an asset
   audit      Validate governance compliance before install
   install    Pull and install an AI asset into a target runtime
   list       List installed AI assets</code></pre>
@@ -162,13 +175,17 @@ Commands:
 │ aria.dev/knowledge/hr-policies          │ 3.0.0   │ knowledge_base│ rag  │ HR policy knowledge...  │
 └──────────────────────────────────────────┴─────────┴───────────────┴──────┴──────────────────────────┘</code></pre>
           <h2 id="step-4-inspect-an-asset">Step 4: Inspect an asset</h2>
-          <p>Before installing, inspect the full OASF metadata:</p>
+          <p>Before installing, inspect the full <a
+          href="https://schema.oasf.outshift.com/">OASF</a>
+          metadata:</p>
           <div class="sourceCode" id="cb9"><pre
           class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> inspect ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0</span></code></pre></div>
           <p>This displays two panels:</p>
           <ul>
-          <li><strong>OASF Record</strong> — name, version, skills,
-          domains, modules, authors</li>
+          <li><strong><a
+          href="https://schema.oasf.outshift.com/">OASF</a>
+          Record</strong> — name, version, skills, domains, modules,
+          authors</li>
           <li><strong>Governance Overlay</strong> — sensitivity tier,
           classifications, ceiling, approval chain, allowed consumers,
           compliance frameworks</li>
@@ -207,7 +224,7 @@ Commands:
           <p>The install flow:</p>
           <pre><code>aria install ghcr.io/jgarverick/aria-assets/policy-lookup-skill:1.0.0 → claude-desktop
 
-1. Fetching OASF metadata...
+1. Fetching [OASF](https://schema.oasf.outshift.com/) metadata...
    Asset: aria.dev/skills/policy-lookup v1.0.0
 2. Validating governance...
    ✓ Sensitivity: internal ≤ confidential
@@ -243,29 +260,31 @@ Commands:
           <p>The CLI uses pluggable adapters for different runtimes:</p>
           <table>
           <colgroup>
-          <col style="width: 38%" />
-          <col style="width: 61%" />
+          <col style="width: 10%" />
+          <col style="width: 89%" />
           </colgroup>
           <thead>
-          <tr class="header">
+          <tr>
           <th>Target</th>
           <th>What it does</th>
           </tr>
           </thead>
           <tbody>
-          <tr class="odd">
+          <tr>
           <td><strong>claude-desktop</strong></td>
-          <td>Reads the OASF module descriptor, generates a
+          <td>Reads the <a
+          href="https://schema.oasf.outshift.com/">OASF</a> module
+          descriptor, generates a
           <code>claude_desktop_config.json</code> entry with command,
           args, and transport, then writes it to the Claude Desktop
           config path</td>
           </tr>
-          <tr class="even">
+          <tr>
           <td><strong>vscode</strong></td>
           <td>Similar to Claude Desktop but targets
           <code>.vscode/mcp.json</code> in the workspace</td>
           </tr>
-          <tr class="odd">
+          <tr>
           <td><strong>agent-framework</strong></td>
           <td>For MCP modules, registers as a tool provider. For agent
           Records, registers as a remote A2A endpoint using the

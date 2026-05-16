@@ -51,29 +51,37 @@
                 <nav id="toc" class="toc-panel" aria-label="Table of contents">
           <h2>On This Page</h2>
           <ul>
-          <li><a href="#purview-integration">04 — Purview
-          Integration</a>
+          <li><a href="#purview-integration"
+          id="toc-purview-integration">04 — Purview Integration</a>
           <ul>
-          <li><a href="#what-youll-configure">What you’ll
-          configure</a></li>
-          <li><a href="#prerequisites">Prerequisites</a></li>
+          <li><a href="#what-youll-configure"
+          id="toc-what-youll-configure">What you’ll configure</a></li>
+          <li><a href="#prerequisites"
+          id="toc-prerequisites">Prerequisites</a></li>
+          <li><a href="#step-1-map-sensitivity-tiers-to-purview-labels"
+          id="toc-step-1-map-sensitivity-tiers-to-purview-labels">Step
+          1: Map sensitivity tiers to Purview labels</a></li>
           <li><a
-          href="#step-1-map-sensitivity-tiers-to-purview-labels">Step 1:
-          Map sensitivity tiers to Purview labels</a></li>
-          <li><a
-          href="#step-2-register-ai-asset-entity-type-in-data-map">Step
+          href="#step-2-register-ai-asset-entity-type-in-data-map"
+          id="toc-step-2-register-ai-asset-entity-type-in-data-map">Step
           2: Register AI asset entity type in Data Map</a></li>
-          <li><a href="#step-3-register-relationship-types">Step 3:
-          Register relationship types</a></li>
-          <li><a href="#step-4-configure-dlp-policies">Step 4: Configure
-          DLP policies</a></li>
+          <li><a href="#step-3-register-relationship-types"
+          id="toc-step-3-register-relationship-types">Step 3: Register
+          relationship types</a></li>
+          <li><a href="#step-4-configure-dlp-policies"
+          id="toc-step-4-configure-dlp-policies">Step 4: Configure DLP
+          policies</a></li>
           <li><a
-          href="#step-5-update-governance-overlays-with-label-ids">Step
+          href="#step-5-update-governance-overlays-with-label-ids"
+          id="toc-step-5-update-governance-overlays-with-label-ids">Step
           5: Update governance overlays with label IDs</a></li>
-          <li><a href="#step-6-verify-lineage-in-purview">Step 6: Verify
+          <li><a href="#step-6-verify-lineage-in-purview"
+          id="toc-step-6-verify-lineage-in-purview">Step 6: Verify
           lineage in Purview</a></li>
-          <li><a href="#ongoing-governance">Ongoing governance</a></li>
-          <li><a href="#next-steps">Next Steps</a></li>
+          <li><a href="#ongoing-governance"
+          id="toc-ongoing-governance">Ongoing governance</a></li>
+          <li><a href="#next-steps" id="toc-next-steps">Next
+          Steps</a></li>
           </ul></li>
           </ul>
         </nav>
@@ -115,7 +123,7 @@
           <col style="width: 17%" />
           </colgroup>
           <thead>
-          <tr class="header">
+          <tr>
           <th>ARIA Tier</th>
           <th>Purview Label</th>
           <th>Color</th>
@@ -123,31 +131,31 @@
           </tr>
           </thead>
           <tbody>
-          <tr class="odd">
+          <tr>
           <td><code>public</code></td>
           <td>Public</td>
           <td>Green</td>
           <td>Open data, no restrictions</td>
           </tr>
-          <tr class="even">
+          <tr>
           <td><code>internal</code></td>
           <td>Internal</td>
           <td>Blue</td>
           <td>Internal use, not for external sharing</td>
           </tr>
-          <tr class="odd">
+          <tr>
           <td><code>confidential</code></td>
           <td>Confidential</td>
           <td>Orange</td>
           <td>Business-sensitive, need-to-know</td>
           </tr>
-          <tr class="even">
+          <tr>
           <td><code>highly_confidential</code></td>
           <td>Highly Confidential</td>
           <td>Red</td>
           <td>Restricted access, regulated data</td>
           </tr>
-          <tr class="odd">
+          <tr>
           <td><code>restricted</code></td>
           <td>Restricted</td>
           <td>Dark Red</td>
@@ -177,7 +185,7 @@
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--body</span> <span class="st">&#39;{</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;entityDefs&quot;: [{</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="st">      &quot;name&quot;: &quot;oasf_ai_asset&quot;,</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">      &quot;description&quot;: &quot;OASF-classified AI asset registered through ARIA&quot;,</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">      &quot;description&quot;: &quot;[OASF](https://schema.oasf.outshift.com/)-classified AI asset registered through ARIA&quot;,</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="st">      &quot;superTypes&quot;: [&quot;DataSet&quot;],</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="st">      &quot;serviceType&quot;: &quot;ARIA&quot;,</span></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="st">      &quot;attributeDefs&quot;: [</span></span>
@@ -189,7 +197,7 @@
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="st">        {</span></span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="st">          &quot;name&quot;: &quot;oasf_version&quot;,</span></span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="st">          &quot;typeName&quot;: &quot;string&quot;,</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="st">          &quot;description&quot;: &quot;OASF Record version&quot;</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="st">          &quot;description&quot;: &quot;[OASF](https://schema.oasf.outshift.com/) Record version&quot;</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="st">        },</span></span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="st">        {</span></span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="st">          &quot;name&quot;: &quot;asset_type&quot;,</span></span>

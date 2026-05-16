@@ -1,7 +1,7 @@
-# OASF-Governed Agent Sample — Microsoft Agent Framework + Purview
+# [OASF](https://schema.oasf.outshift.com/)-Governed Agent Sample — Microsoft Agent Framework + Purview
 
 This sample demonstrates the ARIA reference architecture as a working
-C# runtime. It bootstraps an HR onboarding agent with OASF governance
+C# runtime. It bootstraps an HR onboarding agent with [OASF](https://schema.oasf.outshift.com/) governance
 validation, consumer allow-list checks, and Purview policy integration
 using Microsoft Agent Framework 1.3 APIs.
 
@@ -11,12 +11,12 @@ using Microsoft Agent Framework 1.3 APIs.
 
 | Concept                 | Implementation                                                                           |
 | ----------------------- | ---------------------------------------------------------------------------------------- |
-| **OASF Record**         | `oasf-record.json` — skills, domains, modules, locators declared per OASF schema         |
+| **[OASF](https://schema.oasf.outshift.com/) Record**         | `oasf-record.json` — skills, domains, modules, locators declared per [OASF](https://schema.oasf.outshift.com/) schema         |
 | **Governance Overlay**  | `oasf-governance.json` — sensitivity tier, DLP classification, consumer allow-list       |
 | **Purview DLP**         | `WithPurview(...)` on `AIAgentBuilder` — policy-aware middleware in the agent pipeline   |
-| **OASF Enforcement**    | `OasfGovernanceMiddleware` helper — consumer allow-list + OASF telemetry tags            |
+| **[OASF](https://schema.oasf.outshift.com/) Enforcement**    | `OasfGovernanceMiddleware` helper — consumer allow-list + [OASF](https://schema.oasf.outshift.com/) telemetry tags            |
 | **Sensitivity Ceiling** | `OnboardingTools.LookupPolicy()` — blocks access to data above the agent's declared tier |
-| **OTEL Observability**  | OASF activity tags emitted during governance checks                                      |
+| **OTEL Observability**  | [OASF](https://schema.oasf.outshift.com/) activity tags emitted during governance checks                                      |
 | **Startup Validation**  | `OasfGovernanceService` — mirrors the `oasf-validate` GitHub Action at runtime           |
 
 ### Runtime Flow
@@ -25,7 +25,7 @@ using Microsoft Agent Framework 1.3 APIs.
 Input → OasfGovernanceMiddleware helper → AIAgent (WithPurview) → LLM response
      ↓                               ↓
    Consumer allow-list               Purview content policy evaluation
-   OASF telemetry tags               Compliance-aware response pipeline
+   [OASF](https://schema.oasf.outshift.com/) telemetry tags               Compliance-aware response pipeline
 ```
 
 ### Sensitivity Ceiling in Action
@@ -82,14 +82,14 @@ src/sample-agent/
 ├── Oasf.Sample.Agent/
 │   ├── Program.cs                       # Interactive runtime: OpenAI + AIAgent + Purview
 │   ├── Middleware/
-│   │   └── OasfGovernanceMiddleware.cs # Consumer allow-list checks + OASF telemetry
+│   │   └── OasfGovernanceMiddleware.cs # Consumer allow-list checks + [OASF](https://schema.oasf.outshift.com/) telemetry
 │   ├── Models/
-│   │   └── OasfModels.cs                # Strongly-typed OASF Record + Governance Overlay
+│   │   └── OasfModels.cs                # Strongly-typed [OASF](https://schema.oasf.outshift.com/) Record + Governance Overlay
 │   ├── Services/
 │   │   └── OasfGovernanceService.cs     # Startup validation + runtime policy provider
 │   ├── Tools/
 │   │   └── OnboardingTools.cs           # Reference tool implementations with ceiling checks
-│   ├── oasf-record.json                 # OASF Record manifest
+│   ├── oasf-record.json                 # [OASF](https://schema.oasf.outshift.com/) Record manifest
 │   ├── oasf-governance.json             # Governance overlay
 │   └── appsettings.json                 # Logging configuration
 └── Oasf.Sample.Agent.Tests/
@@ -109,9 +109,9 @@ src/sample-agent/
 - `WithPurview(...)` — injects Purview policy enforcement into the agent pipeline
 - `PurviewSettings` — configures app identity, tenant, and policy behavior
 
-### OASF Governance
+### [OASF](https://schema.oasf.outshift.com/) Governance
 
-- `OasfGovernanceService` — loads and validates OASF Record + Governance Overlay
-- `OasfGovernanceMiddleware` — enforces consumer allow-lists and emits OASF telemetry
+- `OasfGovernanceService` — loads and validates [OASF](https://schema.oasf.outshift.com/) Record + Governance Overlay
+- `OasfGovernanceMiddleware` — enforces consumer allow-lists and emits [OASF](https://schema.oasf.outshift.com/) telemetry
 - `SensitivityTiers` — ordered tier model for inheritance ceiling checks
 - Tool-level sensitivity gating reference in `OnboardingTools.LookupPolicy()`

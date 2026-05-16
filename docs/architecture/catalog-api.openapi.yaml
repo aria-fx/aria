@@ -1,0 +1,382 @@
+openapi: 3.1.0
+info:
+  title: ARIA Catalog API
+  version: 1.0.0
+  summary: Governed catalog and install API for ARIA assets.
+  description: |
+    The Catalog API provides discovery, governance-aware filtering, manifest retrieval,
+    install orchestration, and access-request workflows for ARIA assets.
+servers:
+  - url: https://api.aria.example.com
+    description: Production
+  - url: https://api-staging.aria.example.com
+    description: Staging
+security:
+  - bearerAuth: []
+tags:
+  - name: Catalog
+  - name: Install
+  - name: Access
+paths:
+  /catalog/assets:
+    get:
+      tags: [ Catalog ]
+      operationId: listCatalogAssets
+      summary: List assets visible to the caller.
+      description: Returns only assets the authenticated user is authorized to view.
+      parameters:
+        - $ref: "#/components/parameters/skill"
+        - $ref: "#/components/parameters/domain"
+        - $ref: "#/components/parameters/search"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/pageSize"
+      responses:
+        "200":
+          description: Paginated asset results.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssetListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /catalog/assets/{name}/versions:
+    get:
+      tags: [ Catalog ]
+      operationId: listAssetVersions
+      summary: List versions for an asset.
+      parameters:
+        - $ref: "#/components/parameters/name"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/pageSize"
+      responses:
+        "200":
+          description: Version list.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VersionListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /catalog/assets/{name}/{version}/manifest:
+    get:
+      tags: [ Catalog ]
+      operationId: getAssetManifest
+      summary: Get OASF (https://schema.oasf.outshift.com/) record and governance overlay.
+      parameters:
+        - $ref: "#/components/parameters/name"
+        - $ref: "#/components/parameters/version"
+      responses:
+        "200":
+          description: Asset manifest payload.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssetManifestResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /catalog/assets/{name}/{version}/install:
+    post:
+      tags: [ Install ]
+      operationId: installAsset
+      summary: Request governed install to a target runtime.
+      parameters:
+        - $ref: "#/components/parameters/name"
+        - $ref: "#/components/parameters/version"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InstallRequest"
+      responses:
+        "202":
+          description: Install accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InstallResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/ForbiddenWithReason"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /catalog/assets/{name}/{version}/request-access:
+    post:
+      tags: [ Access ]
+      operationId: requestAssetAccess
+      summary: Initiate approval workflow for blocked access.
+      parameters:
+        - $ref: "#/components/parameters/name"
+        - $ref: "#/components/parameters/version"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccessRequest"
+      responses:
+        "202":
+          description: Approval request created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessRequestResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    name:
+      name: name
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Canonical ARIA asset name.
+      example: xebia.com/agents/onboarding-assistant
+    version:
+      name: version
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Semantic version.
+      example: 2.1.0
+    skill:
+      name: skill
+      in: query
+      required: false
+      schema:
+        type: string
+      description: OASF (https://schema.oasf.outshift.com/) skill taxonomy filter.
+      example: knowledge_retrieval/rag
+    domain:
+      name: domain
+      in: query
+      required: false
+      schema:
+        type: string
+      description: OASF (https://schema.oasf.outshift.com/) domain filter.
+      example: human_resources
+    search:
+      name: q
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Free-text search term.
+    page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    pageSize:
+      name: pageSize
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+  responses:
+    BadRequest:
+      description: Invalid request payload.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Missing or invalid authentication.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ForbiddenWithReason:
+      description: Access denied by governance policy.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/ErrorResponse"
+              - type: object
+                properties:
+                  reason:
+                    $ref: "#/components/schemas/GovernanceBlockReason"
+  schemas:
+    AssetSummary:
+      type: object
+      required: [ name, latestVersion, title, sensitivityTier ]
+      properties:
+        name:
+          type: string
+        latestVersion:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        domains:
+          type: array
+          items:
+            type: string
+        sensitivityTier:
+          type: string
+          enum: [ public, internal, confidential, highly_confidential ]
+        trustBadge:
+          type: string
+          example: Approved by IT Security
+    AssetListResponse:
+      type: object
+      required: [ items, page, pageSize, total ]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssetSummary"
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+    VersionSummary:
+      type: object
+      required: [ version, status, publishedAt ]
+      properties:
+        version:
+          type: string
+        status:
+          type: string
+          enum: [ draft, review, published, deprecated, archived ]
+        publishedAt:
+          type: string
+          format: date-time
+    VersionListResponse:
+      type: object
+      required: [ name, items ]
+      properties:
+        name:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/VersionSummary"
+    AssetManifestResponse:
+      type: object
+      required: [ record, governance ]
+      properties:
+        record:
+          type: object
+          additionalProperties: true
+          description: OASF (https://schema.oasf.outshift.com/) record payload.
+        governance:
+          type: object
+          additionalProperties: true
+          description: Governance overlay payload.
+    InstallRequest:
+      type: object
+      required: [ target ]
+      properties:
+        target:
+          type: string
+          enum: [ claude_desktop, vscode, cowork, web_portal, aria_cli ]
+        clientRequestId:
+          type: string
+        parameters:
+          type: object
+          additionalProperties:
+            type: string
+          description: Runtime-specific install parameters.
+    InstallResponse:
+      type: object
+      required: [ installId, status ]
+      properties:
+        installId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [ accepted, in_progress ]
+        estimatedReadyAt:
+          type: string
+          format: date-time
+    AccessRequest:
+      type: object
+      required: [ justification ]
+      properties:
+        justification:
+          type: string
+          minLength: 8
+        ticketSystem:
+          type: string
+          enum: [ teams, servicenow, email, webhook ]
+          default: teams
+    AccessRequestResponse:
+      type: object
+      required: [ requestId, status, approvalChain ]
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [ submitted, pending ]
+        approvalChain:
+          type: array
+          items:
+            type: string
+    GovernanceBlockReason:
+      type: object
+      required: [ code, message ]
+      properties:
+        code:
+          type: string
+          enum: [ consumer_not_allowed, sensitivity_ceiling_exceeded, dependency_violation ]
+        message:
+          type: string
+        requiredApprovals:
+          type: array
+          items:
+            type: string
+        actionUrl:
+          type: string
+          format: uri
+    ErrorResponse:
+      type: object
+      required: [ errorCode, message ]
+      properties:
+        errorCode:
+          type: string
+        message:
+          type: string
+        correlationId:
+          type: string

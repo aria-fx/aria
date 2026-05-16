@@ -10,7 +10,7 @@ companion document and conference deck.
 |-------|-----------|----------|
 | **Governance** | Purview Account, Key Vault, Storage (lineage), Role Assignments, Managed Identity | `azurerm` |
 | **Marketplace** | GitHub Org repos (template + sample assets), Branch Protection, CODEOWNERS, Actions Workflows, Secrets, Teams | `github` |
-| **Validation** | Container Registry (GHCR/ACR), OASF validation Action, purview-sync Action | `azurerm` + `github` |
+| **Validation** | Container Registry (GHCR/ACR), [OASF](https://schema.oasf.outshift.com/) validation Action, purview-sync Action | `azurerm` + `github` |
 
 ## Directory Structure
 
@@ -23,7 +23,7 @@ terraform-ref-impl/
 ├── modules/
 │   ├── azure-governance/        # Purview, Key Vault, Storage, RBAC
 │   ├── github-marketplace/      # Repos, teams, branch protection, workflows
-│   └── oasf-validation/         # ACR, OASF schema validation resources
+│   └── oasf-validation/         # ACR, [OASF](https://schema.oasf.outshift.com/) schema validation resources
 ├── workflows/                   # GitHub Actions workflow templates
 │   ├── oasf-validate.yml
 │   ├── publish.yml
@@ -54,8 +54,8 @@ terraform apply plan.tfplan
 ### Azure
 - Resource Group for AI governance
 - Microsoft Purview Account with System-Assigned Managed Identity
-- Azure Key Vault for OASF governance secrets
-- Storage Account for lineage metadata and OASF artifacts
+- Azure Key Vault for [OASF](https://schema.oasf.outshift.com/) governance secrets
+- Storage Account for lineage metadata and [OASF](https://schema.oasf.outshift.com/) artifacts
 - Azure Container Registry for OCI artifact storage
 - Role assignments granting Purview access to scan storage and ACR
 - Private DNS zones (optional, for production hardening)
@@ -64,7 +64,7 @@ terraform apply plan.tfplan
 - AI Asset template repository with standardized structure
 - Sample agent repository bootstrapped from template
 - GitHub Teams (AI Platform, AI Governance, AI Consumers)
-- Branch protection rules enforcing OASF validation
+- Branch protection rules enforcing [OASF](https://schema.oasf.outshift.com/) validation
 - GitHub Actions secrets for Azure integration
 - CODEOWNERS file mapping governance roles
-- Pre-configured workflow files for OASF validate, publish, and Purview sync
+- Pre-configured workflow files for [OASF](https://schema.oasf.outshift.com/) validate, publish, and Purview sync

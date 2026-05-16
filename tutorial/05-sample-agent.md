@@ -1,13 +1,13 @@
 # 05 — Sample Agent
 
-Run the OASF-governed HR onboarding assistant and see governance
+Run the [OASF](https://schema.oasf.outshift.com/)-governed HR onboarding assistant and see governance
 enforcement in action.
 
 ## What you'll see
 
-- OASF Record and governance overlay validated at startup
+- [OASF](https://schema.oasf.outshift.com/) Record and governance overlay validated at startup
 - Purview middleware evaluating DLP policies on every interaction
-- OASF governance middleware checking consumer identity
+- [OASF](https://schema.oasf.outshift.com/) governance middleware checking consumer identity
 - Sensitivity ceiling enforcement blocking access to restricted data
 - OpenTelemetry traces tagged with ARIA governance metadata
 
@@ -31,7 +31,7 @@ If you don't have Azure OpenAI access yet, you can still explore the
 governance code — the startup validation and tool-level sensitivity
 checks work independently of the LLM.
 
-## Step 2: Inspect the OASF manifests
+## Step 2: Inspect the [OASF](https://schema.oasf.outshift.com/) manifests
 
 Before running, look at the two manifest files that govern this agent:
 
@@ -70,10 +70,10 @@ Watch the startup logs. You should see:
 
 ```
 info: Oasf.Sample.Agent.Services.OasfGovernanceService
-  Loading OASF Record from oasf-record.json
+  Loading [OASF](https://schema.oasf.outshift.com/) Record from oasf-record.json
   Loading Governance Overlay from oasf-governance.json
-  OASF validation passed
-  OASF governance initialized: Asset=aria.dev/agents/onboarding-assistant v2.1.0,
+  [OASF](https://schema.oasf.outshift.com/) validation passed
+  [OASF](https://schema.oasf.outshift.com/) governance initialized: Asset=aria.dev/agents/onboarding-assistant v2.1.0,
     Sensitivity=confidential, Ceiling=confidential, Frameworks=[SOC2, GDPR]
 ```
 
@@ -81,7 +81,7 @@ Then the agent banner:
 
 ```
 ╔══════════════════════════════════════════════════════════════╗
-║  OASF-Governed HR Onboarding Agent                         ║
+║  [OASF](https://schema.oasf.outshift.com/)-Governed HR Onboarding Agent                         ║
 ║  Asset: aria.dev/agents/onboarding-assistant              ║
 ║  Version: 2.1.0                                            ║
 ║  Sensitivity: confidential                                 ║
@@ -174,7 +174,7 @@ The tests verify:
 
 - Sensitivity tier ordering (public < internal < ... < restricted)
 - Ceiling comparison logic (exceeds vs. within)
-- OASF Record deserialization
+- [OASF](https://schema.oasf.outshift.com/) Record deserialization
 - Governance overlay deserialization
 - Consumer allow-list semantics (empty = open access)
 
@@ -203,7 +203,7 @@ like "which agents accessed confidential data in the last 24 hours?"
 | `Services/OasfGovernanceService.cs`      | Loads + validates manifests at startup           |
 | `Middleware/OasfGovernanceMiddleware.cs` | Consumer validation + OTEL tags                  |
 | `Tools/OnboardingTools.cs`               | Sensitivity ceiling check in `LookupPolicy`      |
-| `Models/OasfModels.cs`                   | Strongly-typed OASF Record + Governance types    |
+| `Models/OasfModels.cs`                   | Strongly-typed [OASF](https://schema.oasf.outshift.com/) Record + Governance types    |
 | `Program.cs`                             | Agent construction with dual middleware pipeline |
 
 ## Next Steps

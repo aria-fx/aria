@@ -51,39 +51,53 @@
                 <nav id="toc" class="toc-panel" aria-label="Table of contents">
           <h2>On This Page</h2>
           <ul>
-          <li><a href="#your-first-asset">03 — Your First Asset</a>
+          <li><a href="#your-first-asset" id="toc-your-first-asset">03 —
+          Your First Asset</a>
           <ul>
-          <li><a href="#what-youll-build">What you’ll build</a></li>
-          <li><a href="#step-1-create-a-new-repo-from-the-template">Step
-          1: Create a new repo from the template</a></li>
-          <li><a href="#step-2-define-the-oasf-record">Step 2: Define
-          the OASF Record</a></li>
-          <li><a href="#step-3-define-the-governance-overlay">Step 3:
-          Define the governance overlay</a></li>
-          <li><a href="#step-4-implement-the-skill">Step 4: Implement
-          the skill</a></li>
-          <li><a href="#step-5-submit-a-pr">Step 5: Submit a PR</a></li>
-          <li><a href="#step-6-watch-the-validation-workflow">Step 6:
-          Watch the validation workflow</a></li>
-          <li><a href="#step-7-merge-and-publish">Step 7: Merge and
+          <li><a href="#what-youll-build" id="toc-what-youll-build">What
+          you’ll build</a></li>
+          <li><a href="#step-1-create-a-new-repo-from-the-template"
+          id="toc-step-1-create-a-new-repo-from-the-template">Step 1:
+          Create a new repo from the template</a></li>
+          <li><a href="#step-2-define-the-oasf-record"
+          id="toc-step-2-define-the-oasf-record">Step 2: Define the OASF
+          Record</a></li>
+          <li><a href="#step-3-define-the-governance-overlay"
+          id="toc-step-3-define-the-governance-overlay">Step 3: Define
+          the governance overlay</a></li>
+          <li><a href="#step-4-implement-the-skill"
+          id="toc-step-4-implement-the-skill">Step 4: Implement the
+          skill</a></li>
+          <li><a href="#step-5-submit-a-pr"
+          id="toc-step-5-submit-a-pr">Step 5: Submit a PR</a></li>
+          <li><a href="#step-6-watch-the-validation-workflow"
+          id="toc-step-6-watch-the-validation-workflow">Step 6: Watch
+          the validation workflow</a></li>
+          <li><a href="#step-7-merge-and-publish"
+          id="toc-step-7-merge-and-publish">Step 7: Merge and
           publish</a></li>
-          <li><a href="#step-8-verify-publication">Step 8: Verify
+          <li><a href="#step-8-verify-publication"
+          id="toc-step-8-verify-publication">Step 8: Verify
           publication</a></li>
-          <li><a href="#what-just-happened">What just happened</a></li>
-          <li><a href="#next-steps">Next Steps</a></li>
+          <li><a href="#what-just-happened"
+          id="toc-what-just-happened">What just happened</a></li>
+          <li><a href="#next-steps" id="toc-next-steps">Next
+          Steps</a></li>
           </ul></li>
           </ul>
         </nav>
         
         <article class="doc-article">
           <h1 id="your-first-asset">03 — Your First Asset</h1>
-          <p>Create, govern, and publish an OASF-governed MCP skill from
-          scratch.</p>
+          <p>Create, govern, and publish an <a
+          href="https://schema.oasf.outshift.com/">OASF</a>-governed MCP
+          skill from scratch.</p>
           <h2 id="what-youll-build">What you’ll build</h2>
           <p>An MCP server skill called <code>policy-lookup</code> that
-          provides HR policy Q&amp;A capabilities. You’ll write the OASF
-          Record, governance overlay, submit a PR, watch the validation
-          workflow pass, and see it published as an OCI artifact.</p>
+          provides HR policy Q&amp;A capabilities. You’ll write the <a
+          href="https://schema.oasf.outshift.com/">OASF</a> Record,
+          governance overlay, submit a PR, watch the validation workflow
+          pass, and see it published as an OCI artifact.</p>
           <h2 id="step-1-create-a-new-repo-from-the-template">Step 1:
           Create a new repo from the template</h2>
           <p>In your GitHub org, click “Use this template” on
@@ -94,8 +108,8 @@
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--private</span> <span class="dt">\</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--clone</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> aria-policy-lookup-skill</span></code></pre></div>
-          <h2 id="step-2-define-the-oasf-record">Step 2: Define the OASF
-          Record</h2>
+          <h2 id="step-2-define-the-oasf-record">Step 2: Define the <a
+          href="https://schema.oasf.outshift.com/">OASF</a> Record</h2>
           <p>Edit <code>oasf-record.json</code> to describe your
           skill:</p>
           <div class="sourceCode" id="cb2"><pre
@@ -129,8 +143,9 @@
           <p>Key decisions:</p>
           <ul>
           <li><strong>skills</strong>: We declare
-          <code>knowledge_retrieval/rag</code> (ID 30101) from the OASF
-          skill taxonomy. This makes the skill discoverable via
+          <code>knowledge_retrieval/rag</code> (ID 30101) from the <a
+          href="https://schema.oasf.outshift.com/">OASF</a> skill
+          taxonomy. This makes the skill discoverable via
           <code>aria search --skill rag</code>.</li>
           <li><strong>modules</strong>: The <code>mcp_server</code> type
           with <code>transport: "stdio"</code> tells the
@@ -207,13 +222,14 @@
           <div class="sourceCode" id="cb5"><pre
           class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout <span class="at">-b</span> feature/initial-asset</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add .</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;feat: initial OASF-governed policy lookup skill&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;feat: initial [OASF](https://schema.oasf.outshift.com/)-governed policy lookup skill&quot;</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push <span class="at">-u</span> origin feature/initial-asset</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> pr create <span class="at">--title</span> <span class="st">&quot;feat: policy-lookup skill v1.0.0&quot;</span> <span class="dt">\</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--body</span> <span class="st">&quot;Initial OASF-governed MCP server for HR policy Q&amp;A&quot;</span></span></code></pre></div>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--body</span> <span class="st">&quot;Initial [OASF](https://schema.oasf.outshift.com/)-governed MCP server for HR policy Q&amp;A&quot;</span></span></code></pre></div>
           <h2 id="step-6-watch-the-validation-workflow">Step 6: Watch
           the validation workflow</h2>
-          <p>Open the PR in GitHub. The <code>OASF Validate</code>
+          <p>Open the PR in GitHub. The
+          <code>[OASF](https://schema.oasf.outshift.com/) Validate</code>
           workflow will trigger automatically. It runs three checks:</p>
           <ol type="1">
           <li><p><strong>Schema validation</strong> — verifies
@@ -232,17 +248,19 @@
           <p>If all checks pass, you’ll see a green checkmark. The PR
           now requires CODEOWNERS review from the
           <code>ai-governance</code> team (for the governance overlay)
-          and <code>ai-platform-engineering</code> (for the OASF
-          record).</p>
+          and <code>ai-platform-engineering</code> (for the <a
+          href="https://schema.oasf.outshift.com/">OASF</a> record).</p>
           <h2 id="step-7-merge-and-publish">Step 7: Merge and
           publish</h2>
           <p>Once approved, merge the PR. This triggers two more
           workflows:</p>
           <ol type="1">
           <li><p><strong>Publish OCI Artifact</strong> — builds a Docker
-          image containing the OASF record, governance overlay, and
-          source code, then pushes it to your Azure Container Registry
-          with a version tag and <code>latest</code>.</p></li>
+          image containing the <a
+          href="https://schema.oasf.outshift.com/">OASF</a> record,
+          governance overlay, and source code, then pushes it to your
+          Azure Container Registry with a version tag and
+          <code>latest</code>.</p></li>
           <li><p><strong>Purview Sync</strong> — reads the governance
           overlay, applies the Purview sensitivity label, updates the
           Data Map with a new AI asset entity, and creates lineage edges
@@ -262,12 +280,14 @@
           <h2 id="what-just-happened">What just happened</h2>
           <p>You created a governed AI asset that:</p>
           <ul>
-          <li>Has a machine-readable OASF Record declaring its
-          capabilities</li>
+          <li>Has a machine-readable <a
+          href="https://schema.oasf.outshift.com/">OASF</a> Record
+          declaring its capabilities</li>
           <li>Has a governance overlay declaring its sensitivity and
           compliance posture</li>
-          <li>Was validated against the OASF schema before it could be
-          merged</li>
+          <li>Was validated against the <a
+          href="https://schema.oasf.outshift.com/">OASF</a> schema
+          before it could be merged</li>
           <li>Required approval from the governance team</li>
           <li>Was published as a content-addressed OCI artifact</li>
           <li>Was registered in Microsoft Purview’s Data Map</li>

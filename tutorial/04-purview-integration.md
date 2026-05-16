@@ -48,7 +48,7 @@ az rest --method POST \
   --body '{
     "entityDefs": [{
       "name": "oasf_ai_asset",
-      "description": "OASF-classified AI asset registered through ARIA",
+      "description": "[OASF](https://schema.oasf.outshift.com/)-classified AI asset registered through ARIA",
       "superTypes": ["DataSet"],
       "serviceType": "ARIA",
       "attributeDefs": [
@@ -60,7 +60,7 @@ az rest --method POST \
         {
           "name": "oasf_version",
           "typeName": "string",
-          "description": "OASF Record version"
+          "description": "[OASF](https://schema.oasf.outshift.com/) Record version"
         },
         {
           "name": "asset_type",
