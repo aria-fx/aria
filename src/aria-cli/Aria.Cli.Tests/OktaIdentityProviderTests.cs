@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Aria.Cli.Tests;
 
+[Collection("EnvironmentVariableTests")]
 public sealed class OktaIdentityProviderTests
 {
     private const string TestOktaIssuer = "https://example.okta.com";
