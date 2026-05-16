@@ -285,7 +285,7 @@ public sealed class Auth0IdentityProviderTests
         var token = CreateTestJwt();
 
         var requests = new List<(string Url, string Body)>();
-        var handler = new SequenceHttpMessageHandler(async request =>
+        var handler = new SequenceHttpMessageHandler(async (request, _) =>
         {
             var body = request.Content is null ? string.Empty : await request.Content.ReadAsStringAsync();
             requests.Add((request.RequestUri?.ToString() ?? string.Empty, body));
@@ -329,7 +329,7 @@ public sealed class Auth0IdentityProviderTests
         Environment.SetEnvironmentVariable("AUTH0_ACCESS_TOKEN", null);
         var errorPayload = "{\"error\":\"invalid_request\",\"error_description\":\"client_id is required\"}";
 
-        var handler = new SequenceHttpMessageHandler(request =>
+        var handler = new SequenceHttpMessageHandler((request, _) =>
             Task.FromResult(JsonResponse(HttpStatusCode.BadRequest, errorPayload, "Bad Request")));
 
         var provider = new Auth0IdentityProvider(new HttpClient(handler));
@@ -413,10 +413,13 @@ public sealed class Auth0IdentityProviderTests
         return response;
     }
 
-    private sealed class SequenceHttpMessageHandler(Func<HttpRequestMessage, Task<HttpResponseMessage>> responseFactory)
+    private sealed class SequenceHttpMessageHandler(Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> responseFactory)
         : HttpMessageHandler
     {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
-            responseFactory(request);
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return responseFactory(request, cancellationToken);
+        }
     }
 }
