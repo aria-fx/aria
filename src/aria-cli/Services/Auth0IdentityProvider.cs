@@ -66,7 +66,7 @@ public sealed class Auth0IdentityProvider : IIdentityProvider
             : "openid profile email offline_access";
 
         // Step 1: Request device code
-        var deviceCodeUrl = $"https://{domain}/oauth/device_code";
+        var deviceCodeUrl = $"https://{domain}/oauth/device/code";
         using var deviceRequest = new HttpRequestMessage(HttpMethod.Post, deviceCodeUrl);
         deviceRequest.Content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
