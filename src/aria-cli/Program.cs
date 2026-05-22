@@ -74,9 +74,17 @@ bool TryNormalizeRegistry(string candidate, out string normalized, out string er
 
     if (trimmed.StartsWith("~", StringComparison.Ordinal) || Path.IsPathRooted(trimmed) || trimmed.StartsWith(".", StringComparison.Ordinal))
     {
-        normalized = Path.GetFullPath(PathHelper.ExpandTildePath(trimmed))
-            .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        return true;
+        try
+        {
+            normalized = Path.GetFullPath(PathHelper.ExpandTildePath(trimmed))
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            return true;
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            error = $"Registry path is invalid: {ex.Message}";
+            return false;
+        }
     }
 
     if (trimmed.Contains(' '))
