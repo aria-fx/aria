@@ -1,0 +1,78 @@
+name: Skill Lifecycle Sequential Rollout Guard
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  issues: write
+
+jobs:
+  enforce-sequential-checklist:
+    if: >-
+      github.event.issue.title ==
+      'Execution Plan: Skill Lifecycle Sequential Rollout (No Parallelism)'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate checklist completion order
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = issue.body || "";
+            const lines = body.split(/\r?\n/);
+
+            const steps = [];
+            for (const line of lines) {
+              const match = line.match(/^- \[([ xX])\] (\d+)\./);
+              if (match) {
+                steps.push({
+                  number: Number.parseInt(match[2], 10),
+                  checked: match[1].toLowerCase() === "x",
+                  line
+                });
+              }
+            }
+
+            if (steps.length === 0) {
+              core.info("No ordered checklist steps found; skipping.");
+              return;
+            }
+
+            steps.sort((a, b) => a.number - b.number);
+
+            let violation = null;
+            let seenUnchecked = false;
+
+            for (const step of steps) {
+              if (!step.checked) {
+                seenUnchecked = true;
+                continue;
+              }
+
+              if (seenUnchecked) {
+                violation = step;
+                break;
+              }
+            }
+
+            if (!violation) {
+              core.info("Checklist completion order is valid.");
+              return;
+            }
+
+            const message = [
+              "⚠️ Sequential rollout rule violation detected.",
+              "",
+              `Step ${violation.number} is marked complete before an earlier step is complete.`,
+              "Per this tracker's enforcement rule, each step is eligible only after the previous step is closed."
+            ].join("\n");
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: message
+            });
+
+            core.setFailed("Checklist steps were completed out of order.");
