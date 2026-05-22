@@ -63,7 +63,13 @@ public sealed class OciRegistryService : IGovernanceOverlayResolver
     public async Task<GovernanceOverlayFetchResult> FetchGovernanceWithStateAsync(string ociReference)
     {
         var localPath = ResolveLocalPath(ociReference, "oasf-governance.json");
-        if (localPath == null || !File.Exists(localPath))
+        if (localPath == null)
+            return new GovernanceOverlayFetchResult(
+                null,
+                RegistryGovernanceStates.GovernanceUnreachable,
+                $"Could not resolve governance overlay path for OCI reference '{ociReference}'.");
+
+        if (!File.Exists(localPath))
             return new GovernanceOverlayFetchResult(null, RegistryGovernanceStates.Ungoverned, null);
 
         try
