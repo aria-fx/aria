@@ -18,6 +18,18 @@ namespace Aria.Cli.Services;
 /// </summary>
 public sealed class OciRegistryService : IGovernanceOverlayResolver
 {
+    private readonly Func<RegistrySearchRequest, CancellationToken, Task<RegistrySearchResponse>> _registrySearchClient;
+
+    public OciRegistryService()
+        : this(DefaultRegistrySearchClientAsync)
+    {
+    }
+
+    public OciRegistryService(Func<RegistrySearchRequest, CancellationToken, Task<RegistrySearchResponse>> registrySearchClient)
+    {
+        _registrySearchClient = registrySearchClient;
+    }
+
     /// <summary>
     /// Fetch the OASF Record from an OCI artifact reference.
     /// </summary>
@@ -82,64 +94,62 @@ public sealed class OciRegistryService : IGovernanceOverlayResolver
     /// <summary>
     /// Search registries for assets matching OASF skill/domain criteria.
     /// </summary>
-    public Task<List<OasfRecord>> SearchAsync(
+    public async Task<List<OasfRecord>> SearchAsync(
         string? skill = null,
         string? domain = null,
         string? keyword = null,
         IEnumerable<string>? registries = null)
     {
-        // Production: query Agent Directory Service (ADS) or
-        // GitHub API with topic-based filtering
-        // GET /orgs/{org}/packages?package_type=container&q=oasf-skill-{skill}
+        var result = await SearchDetailedAsync(skill, domain, keyword, registries);
+        return result.Records.ToList();
+    }
 
-        // Demo: return sample results
-        var results = new List<OasfRecord>
+    public async Task<RegistrySearchAggregateResult> SearchDetailedAsync(
+        string? skill = null,
+        string? domain = null,
+        string? keyword = null,
+        IEnumerable<string>? registries = null,
+        CancellationToken cancellationToken = default)
+    {
+        var normalizedRegistries = registries?
+            .Where(r => !string.IsNullOrWhiteSpace(r))
+            .Select(r => r.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList() ?? [];
+
+        if (normalizedRegistries.Count == 0)
+            return new RegistrySearchAggregateResult([], []);
+
+        var discoveryTasks = normalizedRegistries.Select(async registry =>
         {
-            new()
+            try
             {
-                Name = "aria.dev/agents/onboarding-assistant",
-                Version = "2.1.0",
-                SchemaVersion = "1.0.0",
-                Description = "HR onboarding agent with policy Q&A and document generation",
-                Skills = [new(30101, "knowledge_retrieval/rag"), new(10201, "nlp/nlg/text_completion")],
-                Domains = [new("human_resources/onboarding")],
-                Authors = ["Josh Garverick <josh.garverick@aria.dev>"]
-            },
-            new()
-            {
-                Name = "aria.dev/skills/policy-lookup",
-                Version = "1.0.0",
-                SchemaVersion = "1.0.0",
-                Description = "MCP server for HR policy knowledge base lookup",
-                Skills = [new(30101, "knowledge_retrieval/rag")],
-                Domains = [new("human_resources")],
-                Modules = [new() { Type = "mcp_server", Transport = "stdio" }],
-                Authors = ["Josh Garverick <josh.garverick@aria.dev>"]
-            },
-            new()
-            {
-                Name = "aria.dev/knowledge/hr-policies",
-                Version = "3.0.0",
-                SchemaVersion = "1.0.0",
-                Description = "HR policy knowledge base with PTO, benefits, and compensation data",
-                Skills = [new(30101, "knowledge_retrieval/rag")],
-                Domains = [new("human_resources")],
-                Modules = [new() { Type = "knowledge_base" }],
-                Authors = ["HR Team <hr@aria.dev>"]
+                var response = await _registrySearchClient(new RegistrySearchRequest(registry, skill, domain, keyword), cancellationToken);
+                return response;
             }
-        };
+            catch (Exception ex)
+            {
+                return new RegistrySearchResponse(registry, [], ex.Message);
+            }
+        });
 
-        // Filter by skill
-        if (skill != null)
-            results = results.Where(r =>
-                r.Skills.Any(s => s.Name.Contains(skill, StringComparison.OrdinalIgnoreCase))).ToList();
+        var responses = await Task.WhenAll(discoveryTasks);
+        var diagnostics = responses
+            .Select(r => new RegistrySearchDiagnostic(r.Registry, r.Error, r.Records.Count))
+            .ToList();
 
-        // Filter by domain
-        if (domain != null)
-            results = results.Where(r =>
-                r.Domains.Any(d => d.Name.Contains(domain, StringComparison.OrdinalIgnoreCase))).ToList();
+        var dedupedRecords = responses
+            .Where(r => r.Error == null)
+            .SelectMany(r => r.Records)
+            .OrderBy(r => r.Name, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(r => r.Version, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(r => CanonicalRefKey(r), StringComparer.OrdinalIgnoreCase)
+            .ThenBy(r => r.Description, StringComparer.OrdinalIgnoreCase)
+            .GroupBy(CanonicalAssetKey, StringComparer.OrdinalIgnoreCase)
+            .Select(g => g.First())
+            .ToList();
 
-        return Task.FromResult(results);
+        return new RegistrySearchAggregateResult(dedupedRecords, diagnostics);
     }
 
     private static string? ResolveLocalPath(string ociReference, string fileName)
@@ -165,4 +175,91 @@ public sealed class OciRegistryService : IGovernanceOverlayResolver
 
         return null;
     }
+
+    private static string CanonicalAssetKey(OasfRecord record) =>
+        $"{record.Name}|{record.Version}|{CanonicalRefKey(record)}";
+
+    private static string CanonicalRefKey(OasfRecord record) =>
+        record.Modules
+            .Select(m => m.Ref)
+            .FirstOrDefault(r => !string.IsNullOrWhiteSpace(r))
+        ?? record.Locators
+            .SelectMany(l => l.Urls)
+            .FirstOrDefault(u => !string.IsNullOrWhiteSpace(u))
+        ?? string.Empty;
+
+    private static bool MatchesFilters(OasfRecord record, string? skill, string? domain, string? keyword)
+    {
+        if (!string.IsNullOrWhiteSpace(skill) &&
+            !record.Skills.Any(s => s.Name.Contains(skill, StringComparison.OrdinalIgnoreCase)))
+            return false;
+
+        if (!string.IsNullOrWhiteSpace(domain) &&
+            !record.Domains.Any(d => d.Name.Contains(domain, StringComparison.OrdinalIgnoreCase)))
+            return false;
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            var matchesKeyword =
+                record.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+                record.Description.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+                record.Skills.Any(s => s.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase)) ||
+                record.Domains.Any(d => d.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+
+            if (!matchesKeyword)
+                return false;
+        }
+
+        return true;
+    }
+
+    private static async Task<RegistrySearchResponse> DefaultRegistrySearchClientAsync(RegistrySearchRequest request, CancellationToken cancellationToken)
+    {
+        var registryPath = ResolveRegistryPath(request.Registry);
+        if (registryPath == null || !Directory.Exists(registryPath))
+            return new RegistrySearchResponse(request.Registry, [], $"Registry unavailable or unsupported: {request.Registry}");
+
+        var results = new List<OasfRecord>();
+        var recordFiles = Directory.GetFiles(registryPath, "oasf-record.json", SearchOption.AllDirectories)
+            .OrderBy(path => path, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var filePath in recordFiles)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var json = await File.ReadAllTextAsync(filePath, cancellationToken);
+            var record = JsonSerializer.Deserialize<OasfRecord>(json);
+            if (record == null)
+                continue;
+
+            if (MatchesFilters(record, request.Skill, request.Domain, request.Keyword))
+                results.Add(record);
+        }
+
+        return new RegistrySearchResponse(request.Registry, results, null);
+    }
+
+    private static string? ResolveRegistryPath(string registry)
+    {
+        if (string.IsNullOrWhiteSpace(registry))
+            return null;
+
+        if (Uri.TryCreate(registry, UriKind.Absolute, out var uri) && uri.IsFile)
+            return uri.LocalPath;
+
+        if (Directory.Exists(registry))
+            return registry;
+
+        return null;
+    }
 }
+
+public sealed record RegistrySearchRequest(string Registry, string? Skill, string? Domain, string? Keyword);
+
+public sealed record RegistrySearchResponse(string Registry, IReadOnlyList<OasfRecord> Records, string? Error);
+
+public sealed record RegistrySearchDiagnostic(string Registry, string? Error, int ResultCount);
+
+public sealed record RegistrySearchAggregateResult(
+    IReadOnlyList<OasfRecord> Records,
+    IReadOnlyList<RegistrySearchDiagnostic> Diagnostics);
