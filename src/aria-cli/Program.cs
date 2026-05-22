@@ -98,13 +98,14 @@ bool TryNormalizeRegistry(string candidate, out string normalized, out string er
     }
 
     var host = inferred.Host.ToLowerInvariant();
+    var port = inferred.IsDefaultPort ? "" : $":{inferred.Port}";
     if (!host.Contains('.') && !host.Equals("localhost", StringComparison.OrdinalIgnoreCase))
     {
         error = "Registry URL is invalid. Host name is missing.";
         return false;
     }
 
-    normalized = $"{host}{inferred.AbsolutePath}".TrimEnd('/');
+    normalized = $"{host}{port}{inferred.AbsolutePath}".TrimEnd('/');
     return true;
 }
 
