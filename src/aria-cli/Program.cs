@@ -46,6 +46,9 @@ async Task<EffectiveAccessContext?> ResolveAccessAsync(AriaConfig config)
     }
 }
 
+RegistrySourcePolicyConfig ResolveSourcePolicy(AriaConfig config, string registry) =>
+    RegistryPolicyEvaluator.ResolvePolicy(config, registry);
+
 // ═══════════════════════════════════════════════════════════
 // ROOT COMMAND
 // ═══════════════════════════════════════════════════════════
@@ -78,7 +81,12 @@ searchCommand.SetHandler(async (string? skill, string? domain, string? keyword, 
         return;
     }
 
-    var searchResult = await registry.SearchDetailedAsync(skill, domain, keyword, config.Registries);
+    var searchResult = await registry.SearchDetailedAsync(
+        skill,
+        domain,
+        keyword,
+        config.Registries,
+        config.RegistryPolicies);
     var failedRegistries = searchResult.Diagnostics.Where(d => d.Error != null).ToList();
 
     if (verbose)
@@ -118,21 +126,36 @@ searchCommand.SetHandler(async (string? skill, string? domain, string? keyword, 
     var table = new Table()
         .AddColumn("Name")
         .AddColumn("Version")
+        .AddColumn("Source")
+        .AddColumn("Governance")
         .AddColumn("Type")
         .AddColumn("Skills")
         .AddColumn("Description")
         .Border(TableBorder.Rounded);
 
-    foreach (var r in results)
+    foreach (var selected in searchResult.SelectedAssets)
     {
+        var r = selected.Record;
         var moduleType = r.Modules.FirstOrDefault()?.Type ?? "agent";
         var skills = string.Join(", ", r.Skills.Select(s => s.Name.Split('/').Last()));
+        var governanceMarkup = selected.GovernanceState switch
+        {
+            RegistryGovernanceStates.Governed => "[green]governed[/]",
+            RegistryGovernanceStates.Ungoverned => "[yellow]ungoverned[/]",
+            _ => "[red]governance_unreachable[/]"
+        };
+
         table.AddRow(
             $"[bold]{r.Name}[/]",
             r.Version,
+            Markup.Escape(selected.Registry),
+            governanceMarkup,
             $"[cyan]{moduleType}[/]",
             skills,
             r.Description.Length > 50 ? r.Description[..50] + "..." : r.Description);
+
+        if (selected.IsAmbiguous && selected.ResolutionReason != null)
+            AnsiConsole.MarkupLine($"[yellow]⚠ {Markup.Escape(r.Name)}: {Markup.Escape(selected.ResolutionReason)}[/]");
     }
 
     AnsiConsole.Write(table);
@@ -257,25 +280,49 @@ auditCommand.SetHandler(async (string reference, string? ceiling) =>
     AnsiConsole.MarkupLine($"[dim]Consumer: {access.ConsumerId} | Ceiling: {access.SensitivityCeiling}[/]\n");
 
     var record = await registry.FetchRecordAsync(reference);
-    var gov = await registry.FetchGovernanceAsync(reference);
+    var sourceRegistry = RegistryPolicyEvaluator.ResolveRegistryFromReference(reference, config.Registries) ?? "<unspecified>";
+    var sourcePolicy = ResolveSourcePolicy(config, sourceRegistry);
+    var governanceFetch = await registry.FetchGovernanceWithStateAsync(reference);
+    var gov = governanceFetch.Overlay;
+    var sourcePolicyDecision = RegistryPolicyEvaluator.EvaluateInstallPolicy(
+        sourcePolicy,
+        governanceFetch.GovernanceState,
+        access.SensitivityCeiling);
 
-    if (record == null || gov == null)
+    if (record == null)
     {
-        AnsiConsole.MarkupLine("[red]Could not fetch OASF metadata.[/]");
+        AnsiConsole.MarkupLine("[red]Could not fetch OASF Record.[/]");
         return;
     }
 
-    var results = await governance.AuditAsync(config, record, gov, registry, access);
+    if (!sourcePolicyDecision.Allowed)
+    {
+        AnsiConsole.MarkupLine($"[red]✗ {sourcePolicyDecision.Reason}[/]");
+        AnsiConsole.MarkupLine($"[dim]Source: {sourceRegistry} | governance: {sourcePolicyDecision.GovernanceState}[/]");
+        return;
+    }
+
+    var results = gov != null
+        ? await governance.AuditAsync(config, record, gov, registry, access)
+        : [new GovernanceResult(true, sourcePolicyDecision.Reason)];
 
     var passed = results.All(r => r.Allowed);
 
     if (passed)
     {
         AnsiConsole.MarkupLine("[green]✓ All governance checks passed[/]");
-        AnsiConsole.MarkupLine($"  Asset tier: [cyan]{gov.Governance.SensitivityTier}[/]");
+        AnsiConsole.MarkupLine($"  Source: [cyan]{sourceRegistry}[/]");
+        AnsiConsole.MarkupLine($"  Governance state: [cyan]{sourcePolicyDecision.GovernanceState}[/]");
+        if (gov != null)
+            AnsiConsole.MarkupLine($"  Asset tier: [cyan]{gov.Governance.SensitivityTier}[/]");
+        else
+            AnsiConsole.MarkupLine($"  Policy reason: [cyan]{Markup.Escape(sourcePolicyDecision.Reason)}[/]");
         AnsiConsole.MarkupLine($"  Your ceiling: [cyan]{access.SensitivityCeiling}[/]");
         AnsiConsole.MarkupLine($"  Consumer: [cyan]{access.ConsumerId}[/]");
-        AnsiConsole.MarkupLine($"  Frameworks: [cyan]{string.Join(", ", gov.Governance.ComplianceFrameworks)}[/]");
+        if (gov != null)
+            AnsiConsole.MarkupLine($"  Frameworks: [cyan]{string.Join(", ", gov.Governance.ComplianceFrameworks)}[/]");
+        if (!string.IsNullOrWhiteSpace(governanceFetch.Error))
+            AnsiConsole.MarkupLine($"  [yellow]Governance fetch detail: {Markup.Escape(governanceFetch.Error)}[/]");
     }
     else
     {
@@ -313,7 +360,10 @@ installCommand.SetHandler(async (string reference, string target) =>
     // Step 1: Fetch metadata
     AnsiConsole.MarkupLine("[dim]1. Fetching OASF metadata...[/]");
     var record = await registry.FetchRecordAsync(reference);
-    var gov = await registry.FetchGovernanceAsync(reference);
+    var sourceRegistry = RegistryPolicyEvaluator.ResolveRegistryFromReference(reference, config.Registries) ?? "<unspecified>";
+    var sourcePolicy = ResolveSourcePolicy(config, sourceRegistry);
+    var governanceFetch = await registry.FetchGovernanceWithStateAsync(reference);
+    var gov = governanceFetch.Overlay;
 
     if (record == null)
     {
@@ -325,6 +375,17 @@ installCommand.SetHandler(async (string reference, string target) =>
 
     // Step 2: Governance check
     AnsiConsole.MarkupLine("[dim]2. Validating governance...[/]");
+    var sourcePolicyDecision = RegistryPolicyEvaluator.EvaluateInstallPolicy(
+        sourcePolicy,
+        governanceFetch.GovernanceState,
+        access.SensitivityCeiling);
+    if (!sourcePolicyDecision.Allowed)
+    {
+        AnsiConsole.MarkupLine($"[red]   ✗ {sourcePolicyDecision.Reason}[/]");
+        AnsiConsole.MarkupLine($"   [dim]Source: {sourceRegistry} | governance: {sourcePolicyDecision.GovernanceState}[/]");
+        return;
+    }
+
     if (gov != null)
     {
         var result = governance.ValidateInstall(config, gov, access);
@@ -333,12 +394,19 @@ installCommand.SetHandler(async (string reference, string target) =>
             AnsiConsole.MarkupLine($"[red]   ✗ {result.Reason}[/]");
             return;
         }
+        AnsiConsole.MarkupLine($"   [green]✓[/] Source: {sourceRegistry} ({sourcePolicy.TrustTier})");
+        AnsiConsole.MarkupLine($"   [green]✓[/] Governance state: {sourcePolicyDecision.GovernanceState}");
+        AnsiConsole.MarkupLine($"   [green]✓[/] Policy reason: {Markup.Escape(sourcePolicyDecision.Reason)}");
         AnsiConsole.MarkupLine($"   [green]✓[/] Sensitivity: {gov.Governance.SensitivityTier} ≤ {access.SensitivityCeiling}");
         AnsiConsole.MarkupLine($"   [green]✓[/] Consumer '{access.ConsumerId}' is authorized");
     }
     else
     {
-        AnsiConsole.MarkupLine("   [yellow]⚠ No governance overlay found — installing without policy checks[/]");
+        AnsiConsole.MarkupLine($"   [green]✓[/] Source: {sourceRegistry} ({sourcePolicy.TrustTier})");
+        AnsiConsole.MarkupLine($"   [green]✓[/] Governance state: {sourcePolicyDecision.GovernanceState}");
+        AnsiConsole.MarkupLine($"   [green]✓[/] Policy reason: {Markup.Escape(sourcePolicyDecision.Reason)}");
+        if (!string.IsNullOrWhiteSpace(governanceFetch.Error))
+            AnsiConsole.MarkupLine($"   [yellow]⚠ Governance fetch detail: {Markup.Escape(governanceFetch.Error)}[/]");
     }
 
     // Step 3: Pull artifact
@@ -452,6 +520,15 @@ initCommand.SetHandler(async () =>
         ConsumerId = "my-team",
         SensitivityCeiling = "confidential",
         Registries = ["ghcr.io/my-org/aria-assets"],
+        RegistryPolicies = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["ghcr.io/my-org/aria-assets"] = new()
+            {
+                TrustTier = "internal_governed",
+                RequireGovernanceOverlay = true,
+                Priority = 100
+            }
+        },
         Targets = new()
         {
             ["claude-desktop"] = new()

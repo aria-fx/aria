@@ -61,7 +61,8 @@ dotnet run --project src/aria-cli/Aria.Cli.csproj -- install ghcr.io/jgarverick/
 ## Multi-registry search behavior
 
 - `aria search` fans out discovery to each configured entry in `registries`.
-- Results are merged and deduplicated by canonical asset key (`name` + `version` + module ref/locator).
+- Search output includes source registry and governance state (`governed`, `ungoverned`, `governance_unreachable`).
+- Results are merged and deduplicated by canonical asset key (`name` + `version` + module ref/locator), preferring the highest `registry_policies.<source>.priority`.
 - Output order is deterministic for stable UX and CI assertions.
 - If one registry fails, results from healthy registries still return.
 - Use `aria search --verbose` to see per-registry diagnostics (status, counts, and errors).
@@ -96,6 +97,19 @@ chain is displayed.
   "consumer_id": "hr-team",
   "sensitivity_ceiling": "confidential",
   "registries": ["ghcr.io/jgarverick/aria-assets"],
+  "registry_policies": {
+    "ghcr.io/jgarverick/aria-assets": {
+      "trust_tier": "internal_governed",
+      "require_governance_overlay": true,
+      "priority": 100
+    },
+    "ghcr.io/public/aria-assets": {
+      "trust_tier": "public_curated",
+      "require_governance_overlay": false,
+      "max_sensitivity_if_ungoverned": "internal",
+      "priority": 10
+    }
+  },
   "targets": {
     "claude-desktop": {
       "config_path": "~/Library/Application Support/Claude/claude_desktop_config.json"
@@ -294,6 +308,7 @@ Run `aria whoami` to verify the resolved identity and access profile before runn
   - [OASF](https://schema.oasf.outshift.com/) sensitivity tier <= effective ceiling
   - `allowed_consumers`, `allowed_entra_groups`, and `allowed_entra_roles` from governance overlay
   - `purview.required_roles_by_sensitivity` for data-plane access
+  - Per-source registry policy (`trust_tier`, `require_governance_overlay`, `max_sensitivity_if_ungoverned`, `priority`)
 
 ### Auth Adapter Implementation Status
 

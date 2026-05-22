@@ -56,14 +56,28 @@ public sealed class OciRegistryService : IGovernanceOverlayResolver
     /// </summary>
     public async Task<OasfGovernanceOverlay?> FetchGovernanceAsync(string ociReference)
     {
+        var result = await FetchGovernanceWithStateAsync(ociReference);
+        return result.Overlay;
+    }
+
+    public async Task<GovernanceOverlayFetchResult> FetchGovernanceWithStateAsync(string ociReference)
+    {
         var localPath = ResolveLocalPath(ociReference, "oasf-governance.json");
-        if (localPath != null && File.Exists(localPath))
+        if (localPath == null || !File.Exists(localPath))
+            return new GovernanceOverlayFetchResult(null, RegistryGovernanceStates.Ungoverned, null);
+
+        try
         {
             var json = await File.ReadAllTextAsync(localPath);
-            return JsonSerializer.Deserialize<OasfGovernanceOverlay>(json);
+            var overlay = JsonSerializer.Deserialize<OasfGovernanceOverlay>(json);
+            return overlay != null
+                ? new GovernanceOverlayFetchResult(overlay, RegistryGovernanceStates.Governed, null)
+                : new GovernanceOverlayFetchResult(null, RegistryGovernanceStates.GovernanceUnreachable, "Failed to deserialize governance overlay.");
         }
-
-        return null;
+        catch (Exception ex)
+        {
+            return new GovernanceOverlayFetchResult(null, RegistryGovernanceStates.GovernanceUnreachable, ex.Message);
+        }
     }
 
     /// <summary>
@@ -109,6 +123,7 @@ public sealed class OciRegistryService : IGovernanceOverlayResolver
         string? domain = null,
         string? keyword = null,
         IEnumerable<string>? registries = null,
+        IDictionary<string, RegistrySourcePolicyConfig>? registryPolicies = null,
         CancellationToken cancellationToken = default)
     {
         var normalizedRegistries = registries?
@@ -118,7 +133,7 @@ public sealed class OciRegistryService : IGovernanceOverlayResolver
             .ToList() ?? [];
 
         if (normalizedRegistries.Count == 0)
-            return new RegistrySearchAggregateResult([], []);
+            return new RegistrySearchAggregateResult([], [], []);
 
         var discoveryTasks = normalizedRegistries.Select(async registry =>
         {
@@ -133,27 +148,41 @@ public sealed class OciRegistryService : IGovernanceOverlayResolver
             }
             catch (Exception ex)
             {
-                return new RegistrySearchResponse(registry, [], ex.Message);
+                return new RegistrySearchResponse(registry, Array.Empty<RegistrySearchAsset>(), ex.Message);
             }
         });
 
         var responses = await Task.WhenAll(discoveryTasks);
+        var policyMap = normalizedRegistries.ToDictionary(
+            r => r,
+            r => registryPolicies != null && registryPolicies.TryGetValue(r, out var configured)
+                ? configured
+                : new RegistrySourcePolicyConfig(),
+            StringComparer.OrdinalIgnoreCase);
         var diagnostics = responses
-            .Select(r => new RegistrySearchDiagnostic(r.Registry, r.Error, r.Records.Count))
+            .Select(r => new RegistrySearchDiagnostic(r.Registry, r.Error, r.Assets.Count))
             .ToList();
 
-        var dedupedRecords = responses
+        var selectedAssets = responses
             .Where(r => r.Error == null)
-            .SelectMany(r => r.Records)
-            .OrderBy(r => r.Name, StringComparer.OrdinalIgnoreCase)
-            .ThenBy(r => r.Version, StringComparer.OrdinalIgnoreCase)
-            .ThenBy(r => CanonicalRefKey(r), StringComparer.OrdinalIgnoreCase)
-            .ThenBy(r => r.Description, StringComparer.OrdinalIgnoreCase)
-            .GroupBy(CanonicalAssetKey, StringComparer.OrdinalIgnoreCase)
-            .Select(g => g.First())
+            .SelectMany(r => r.Assets.Select(asset => new RegistrySearchAssetCandidate(
+                asset.Record,
+                r.Registry,
+                asset.GovernanceState,
+                asset.GovernanceError,
+                policyMap[r.Registry])))
+            .GroupBy(c => CanonicalAssetKey(c.Record), StringComparer.OrdinalIgnoreCase)
+            .Select(SelectPreferredCandidate)
+            .OrderBy(a => a.Record.Name, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(a => a.Record.Version, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(a => CanonicalRefKey(a.Record), StringComparer.OrdinalIgnoreCase)
+            .ThenBy(a => a.Record.Description, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        return new RegistrySearchAggregateResult(dedupedRecords, diagnostics);
+        return new RegistrySearchAggregateResult(
+            selectedAssets.Select(a => a.Record).ToList(),
+            diagnostics,
+            selectedAssets);
     }
 
     private static string? ResolveLocalPath(string ociReference, string fileName)
@@ -182,6 +211,29 @@ public sealed class OciRegistryService : IGovernanceOverlayResolver
 
     private static string CanonicalAssetKey(OasfRecord record) =>
         $"{record.Name}|{record.Version}|{CanonicalRefKey(record)}";
+
+    private static RegistrySearchAssetCandidate SelectPreferredCandidate(IGrouping<string, RegistrySearchAssetCandidate> candidates)
+    {
+        var ordered = candidates
+            .OrderByDescending(c => c.Policy.Priority)
+            .ThenBy(c => c.Registry, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(c => c.GovernanceState, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var winner = ordered[0];
+        var tiedWinners = ordered.Where(c => c.Policy.Priority == winner.Policy.Priority).ToList();
+        if (tiedWinners.Count == 1)
+            return winner with { ResolutionReason = $"Selected by highest priority ({winner.Policy.Priority})." };
+
+        var tieBreakWinner = tiedWinners
+            .OrderBy(c => c.Registry, StringComparer.OrdinalIgnoreCase)
+            .First();
+        return tieBreakWinner with
+        {
+            IsAmbiguous = true,
+            ResolutionReason = $"Ambiguous priorities ({winner.Policy.Priority}) across: {string.Join(", ", tiedWinners.Select(t => t.Registry))}. Explicit source selection required."
+        };
+    }
 
     private static string CanonicalRefKey(OasfRecord record) =>
         record.Modules
@@ -221,9 +273,9 @@ public sealed class OciRegistryService : IGovernanceOverlayResolver
     {
         var registryPath = ResolveRegistryPath(request.Registry);
         if (registryPath == null || !Directory.Exists(registryPath))
-            return new RegistrySearchResponse(request.Registry, [], $"Registry unavailable or unsupported: {request.Registry}");
+            return new RegistrySearchResponse(request.Registry, Array.Empty<RegistrySearchAsset>(), $"Registry unavailable or unsupported: {request.Registry}");
 
-        var results = new List<OasfRecord>();
+        var results = new List<RegistrySearchAsset>();
         var recordFiles = Directory.GetFiles(registryPath, "oasf-record.json", SearchOption.AllDirectories)
             .OrderBy(path => path, StringComparer.OrdinalIgnoreCase);
 
@@ -237,7 +289,25 @@ public sealed class OciRegistryService : IGovernanceOverlayResolver
                 continue;
 
             if (MatchesFilters(record, request.Skill, request.Domain, request.Keyword))
-                results.Add(record);
+            {
+                var governancePath = Path.Combine(Path.GetDirectoryName(filePath)!, "oasf-governance.json");
+                if (!File.Exists(governancePath))
+                {
+                    results.Add(new RegistrySearchAsset(record, RegistryGovernanceStates.Ungoverned));
+                    continue;
+                }
+
+                try
+                {
+                    var governanceJson = await File.ReadAllTextAsync(governancePath, cancellationToken);
+                    _ = JsonSerializer.Deserialize<OasfGovernanceOverlay>(governanceJson);
+                    results.Add(new RegistrySearchAsset(record, RegistryGovernanceStates.Governed));
+                }
+                catch (Exception ex)
+                {
+                    results.Add(new RegistrySearchAsset(record, RegistryGovernanceStates.GovernanceUnreachable, ex.Message));
+                }
+            }
         }
 
         return new RegistrySearchResponse(request.Registry, results, null);
@@ -260,10 +330,35 @@ public sealed class OciRegistryService : IGovernanceOverlayResolver
 
 public sealed record RegistrySearchRequest(string Registry, string? Skill, string? Domain, string? Keyword);
 
-public sealed record RegistrySearchResponse(string Registry, IReadOnlyList<OasfRecord> Records, string? Error);
+public sealed record GovernanceOverlayFetchResult(OasfGovernanceOverlay? Overlay, string GovernanceState, string? Error);
+
+public sealed record RegistrySearchAsset(OasfRecord Record, string GovernanceState, string? GovernanceError = null);
+
+public sealed record RegistrySearchResponse(string Registry, IReadOnlyList<RegistrySearchAsset> Assets, string? Error)
+{
+    public RegistrySearchResponse(string registry, IReadOnlyList<OasfRecord> records, string? error)
+        : this(
+            registry,
+            records
+                .Select(r => new RegistrySearchAsset(r, RegistryGovernanceStates.Ungoverned))
+                .ToList(),
+            error)
+    {
+    }
+}
 
 public sealed record RegistrySearchDiagnostic(string Registry, string? Error, int ResultCount);
 
 public sealed record RegistrySearchAggregateResult(
     IReadOnlyList<OasfRecord> Records,
-    IReadOnlyList<RegistrySearchDiagnostic> Diagnostics);
+    IReadOnlyList<RegistrySearchDiagnostic> Diagnostics,
+    IReadOnlyList<RegistrySearchAssetCandidate> SelectedAssets);
+
+public sealed record RegistrySearchAssetCandidate(
+    OasfRecord Record,
+    string Registry,
+    string GovernanceState,
+    string? GovernanceError,
+    RegistrySourcePolicyConfig Policy,
+    bool IsAmbiguous = false,
+    string? ResolutionReason = null);
