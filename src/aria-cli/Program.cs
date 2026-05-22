@@ -93,7 +93,7 @@ searchCommand.SetHandler(async (string? skill, string? domain, string? keyword, 
         foreach (var diagnostic in searchResult.Diagnostics)
         {
             diagnosticsTable.AddRow(
-                diagnostic.Registry,
+                Markup.Escape(diagnostic.Registry),
                 diagnostic.Error == null ? "[green]ok[/]" : "[yellow]error[/]",
                 diagnostic.ResultCount.ToString(),
                 diagnostic.Error == null ? "-" : Markup.Escape(diagnostic.Error));
