@@ -943,8 +943,7 @@ registryRemoveCommand.SetHandler(async (string nameOrUrl) =>
         .Where(kvp => !string.Equals(kvp.Key, existingRegistry, StringComparison.OrdinalIgnoreCase))
         .ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.OrdinalIgnoreCase);
     var aliases = config.RegistryAliases
-        .Where(kvp => !string.Equals(kvp.Value, existingRegistry, StringComparison.OrdinalIgnoreCase) &&
-                      !string.Equals(kvp.Key, nameOrUrl, StringComparison.OrdinalIgnoreCase))
+        .Where(kvp => !string.Equals(kvp.Value, existingRegistry, StringComparison.OrdinalIgnoreCase))
         .ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.OrdinalIgnoreCase);
     var defaultRegistry = string.Equals(config.DefaultRegistry, existingRegistry, StringComparison.OrdinalIgnoreCase)
         ? registries.FirstOrDefault()
