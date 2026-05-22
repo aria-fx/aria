@@ -63,14 +63,51 @@ var searchCommand = new Command("search", "Discover AI assets by OASF skill, dom
 var skillOption = new Option<string?>("--skill", "OASF skill taxonomy filter (e.g. knowledge_retrieval/rag)");
 var domainOption = new Option<string?>("--domain", "OASF domain filter (e.g. human_resources)");
 var keywordOption = new Option<string?>("--keyword", "Free-text keyword search");
+var searchVerboseOption = new Option<bool>("--verbose", "Show per-registry discovery diagnostics");
 searchCommand.AddOption(skillOption);
 searchCommand.AddOption(domainOption);
 searchCommand.AddOption(keywordOption);
+searchCommand.AddOption(searchVerboseOption);
 
-searchCommand.SetHandler(async (string? skill, string? domain, string? keyword) =>
+searchCommand.SetHandler(async (string? skill, string? domain, string? keyword, bool verbose) =>
 {
     var config = LoadConfig();
-    var results = await registry.SearchAsync(skill, domain, keyword, config.Registries);
+    if (!config.Registries.Any(r => !string.IsNullOrWhiteSpace(r)))
+    {
+        AnsiConsole.MarkupLine("[red]No registries configured. Run `aria init` or update ~/.aria/config.json with at least one registry.[/]");
+        return;
+    }
+
+    var searchResult = await registry.SearchDetailedAsync(skill, domain, keyword, config.Registries);
+    var failedRegistries = searchResult.Diagnostics.Where(d => d.Error != null).ToList();
+
+    if (verbose)
+    {
+        var diagnosticsTable = new Table()
+            .AddColumn("Registry")
+            .AddColumn("Status")
+            .AddColumn("Results")
+            .AddColumn("Details")
+            .Border(TableBorder.Rounded);
+
+        foreach (var diagnostic in searchResult.Diagnostics)
+        {
+            diagnosticsTable.AddRow(
+                Markup.Escape(diagnostic.Registry),
+                diagnostic.Error == null ? "[green]ok[/]" : "[yellow]error[/]",
+                diagnostic.ResultCount.ToString(),
+                diagnostic.Error == null ? "-" : Markup.Escape(diagnostic.Error));
+        }
+
+        AnsiConsole.Write(diagnosticsTable);
+        AnsiConsole.WriteLine();
+    }
+    else if (failedRegistries.Count > 0)
+    {
+        AnsiConsole.MarkupLine("[yellow]Some registries were unavailable. Re-run with --verbose for per-registry diagnostics.[/]");
+    }
+
+    var results = searchResult.Records;
 
     if (results.Count == 0)
     {
@@ -100,7 +137,7 @@ searchCommand.SetHandler(async (string? skill, string? domain, string? keyword) 
 
     AnsiConsole.Write(table);
     AnsiConsole.MarkupLine($"\n[dim]{results.Count} asset(s) found[/]");
-}, skillOption, domainOption, keywordOption);
+}, skillOption, domainOption, keywordOption, searchVerboseOption);
 
 rootCommand.AddCommand(searchCommand);
 

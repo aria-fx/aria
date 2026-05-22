@@ -58,6 +58,15 @@ dotnet run --project src/aria-cli/Aria.Cli.csproj -- install ghcr.io/jgarverick/
 dotnet run --project src/aria-cli/Aria.Cli.csproj -- install ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 --target agent-framework
 ```
 
+## Multi-registry search behavior
+
+- `aria search` fans out discovery to each configured entry in `registries`.
+- Results are merged and deduplicated by canonical asset key (`name` + `version` + module ref/locator).
+- Output order is deterministic for stable UX and CI assertions.
+- If one registry fails, results from healthy registries still return.
+- Use `aria search --verbose` to see per-registry diagnostics (status, counts, and errors).
+- If no registries are configured, `aria search` prints guidance to run `aria init` or update `~/.aria/config.json`.
+
 ## Install as Global Tool
 
 ```bash
