@@ -127,6 +127,10 @@ public sealed class OciRegistryService : IGovernanceOverlayResolver
                 var response = await _registrySearchClient(new RegistrySearchRequest(registry, skill, domain, keyword), cancellationToken);
                 return response;
             }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 return new RegistrySearchResponse(registry, [], ex.Message);
