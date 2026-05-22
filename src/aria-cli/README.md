@@ -22,6 +22,7 @@ agent runtime and governed by policy."
 | `aria install <ref>` | Pull OCI artifact, enforce governance, install to target runtime                 |
 | `aria whoami`        | Resolve Entra identity and show effective sensitivity/Purview access             |
 | `aria list`          | List installed assets with version, sensitivity, and target                      |
+| `aria registry ...`  | Manage registry sources (`list/add/remove/update/set-default/validate`)          |
 
 ## Install Targets
 
@@ -68,6 +69,24 @@ dotnet run --project src/aria-cli/Aria.Cli.csproj -- install ghcr.io/jgarverick/
 - Use `aria search --verbose` to see per-registry diagnostics (status, counts, and errors).
 - If no registries are configured, `aria search` prints guidance to run `aria init` or update `~/.aria/config.json`.
 
+Registry source management commands (aligned with multi-registry discovery in [aria-fx/aria#14](https://github.com/aria-fx/aria/issues/14)):
+
+```bash
+# Show configured registries (human or JSON output)
+aria registry list
+aria registry list --json
+
+# Add/update/remove registry sources
+aria registry add ghcr.io/my-org/aria-assets --name internal --default
+aria registry update internal --url ghcr.io/my-org/aria-assets-v2
+aria registry remove internal
+
+# Set default + validate one/all registries
+aria registry set-default ghcr.io/public/aria-assets
+aria registry validate
+aria registry validate --json
+```
+
 ## Install as Global Tool
 
 ```bash
@@ -97,6 +116,11 @@ chain is displayed.
   "consumer_id": "hr-team",
   "sensitivity_ceiling": "confidential",
   "registries": ["ghcr.io/jgarverick/aria-assets", "ghcr.io/public/aria-assets"],
+  "default_registry": "ghcr.io/jgarverick/aria-assets",
+  "registry_aliases": {
+    "internal": "ghcr.io/jgarverick/aria-assets",
+    "public": "ghcr.io/public/aria-assets"
+  },
   "registry_policies": {
     "ghcr.io/jgarverick/aria-assets": {
       "trust_tier": "internal_governed",

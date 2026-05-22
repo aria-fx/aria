@@ -124,7 +124,8 @@ Commands:
   inspect    Display [OASF](https://schema.oasf.outshift.com/) Record and governance overlay for an asset
   audit      Validate governance compliance before install
   install    Pull and install an AI asset into a target runtime
-  list       List installed AI assets</code></pre>
+  list       List installed AI assets
+  registry   Manage configured registry sources</code></pre>
           <h2 id="step-2-initialize-configuration">Step 2: Initialize
           configuration</h2>
           <div class="sourceCode" id="cb4"><pre
@@ -155,6 +156,14 @@ Commands:
           <p>The <code>consumer_id</code> identifies your team for
           allow-list checks. The <code>sensitivity_ceiling</code> sets
           the maximum classification you’re authorized to install.</p>
+          <p>To manage registries without hand-editing config files (see
+          multi-registry work in
+          <a href="https://github.com/aria-fx/aria/issues/14">aria-fx/aria#14</a>),
+          use:</p>
+          <div class="sourceCode" id="cb6b"><pre
+          class="sourceCode bash"><code class="sourceCode bash"><span id="cb6b-1"><a href="#cb6b-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> registry list</span>
+<span id="cb6b-2"><a href="#cb6b-2" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> registry add ghcr.io/my-org/aria-assets <span class="at">--name</span> internal <span class="at">--default</span></span>
+<span id="cb6b-3"><a href="#cb6b-3" aria-hidden="true" tabindex="-1"></a><span class="ex">dotnet</span> run <span class="at">--</span> registry validate <span class="at">--json</span></span></code></pre></div>
           <h2 id="step-3-search-for-assets">Step 3: Search for
           assets</h2>
           <div class="sourceCode" id="cb7"><pre
