@@ -13,6 +13,10 @@ public sealed record AriaConfig
     [JsonPropertyName("registries")]
     public List<string> Registries { get; init; } = ["ghcr.io"];
 
+    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
+    [JsonPropertyName("registry_policies")]
+    public Dictionary<string, RegistrySourcePolicyConfig> RegistryPolicies { get; init; } = new(StringComparer.OrdinalIgnoreCase);
+
     [JsonPropertyName("targets")]
     public Dictionary<string, TargetConfig> Targets { get; init; } = new();
 

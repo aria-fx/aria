@@ -14,7 +14,7 @@ public sealed class OciRegistryServiceSearchIntegrationTests
         var service = new OciRegistryService((request, _) =>
         {
             calls.Add(request);
-            return Task.FromResult(new RegistrySearchResponse(request.Registry, [], null));
+            return Task.FromResult(new RegistrySearchResponse(request.Registry, Array.Empty<RegistrySearchAsset>(), null));
         });
 
         var config = new AriaConfig
@@ -40,15 +40,15 @@ public sealed class OciRegistryServiceSearchIntegrationTests
     {
         var service = new OciRegistryService((request, _) =>
         {
-            List<OasfRecord> records = request.Registry switch
+            List<RegistrySearchAsset> records = request.Registry switch
             {
                 "registry-a" => [
-                    CreateRecord("zeta/asset", "1.0.0", "oci://zeta@sha256:a"),
-                    CreateRecord("alpha/asset", "1.0.0", "oci://alpha@sha256:a")
+                    new RegistrySearchAsset(CreateRecord("zeta/asset", "1.0.0", "oci://zeta@sha256:a"), RegistryGovernanceStates.Governed),
+                    new RegistrySearchAsset(CreateRecord("alpha/asset", "1.0.0", "oci://alpha@sha256:a"), RegistryGovernanceStates.Governed)
                 ],
                 "registry-b" => [
-                    CreateRecord("alpha/asset", "1.0.0", "oci://alpha@sha256:a"),
-                    CreateRecord("beta/asset", "2.0.0", "oci://beta@sha256:b")
+                    new RegistrySearchAsset(CreateRecord("alpha/asset", "1.0.0", "oci://alpha@sha256:a"), RegistryGovernanceStates.Ungoverned),
+                    new RegistrySearchAsset(CreateRecord("beta/asset", "2.0.0", "oci://beta@sha256:b"), RegistryGovernanceStates.Ungoverned)
                 ],
                 _ => []
             };
@@ -66,6 +66,57 @@ public sealed class OciRegistryServiceSearchIntegrationTests
         Assert.Equal(
             first.Records.Select(r => $"{r.Name}:{r.Version}"),
             second.Records.Select(r => $"{r.Name}:{r.Version}"));
+    }
+
+    [Fact]
+    public async Task SearchDetailedAsync_DuplicateAcrossRegistries_SelectsHighestPrioritySource()
+    {
+        var service = new OciRegistryService((request, _) =>
+        {
+            List<RegistrySearchAsset> assets =
+            [
+                new RegistrySearchAsset(CreateRecord("alpha/asset", "1.0.0", "oci://alpha@sha256:a"), RegistryGovernanceStates.Governed)
+            ];
+            return Task.FromResult(new RegistrySearchResponse(request.Registry, assets, null));
+        });
+
+        var result = await service.SearchDetailedAsync(
+            registries: ["registry-low", "registry-high"],
+            registryPolicies: new Dictionary<string, RegistrySourcePolicyConfig>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["registry-low"] = new() { Priority = 5, TrustTier = "public_curated" },
+                ["registry-high"] = new() { Priority = 50, TrustTier = "internal_governed" }
+            });
+
+        var selected = Assert.Single(result.SelectedAssets);
+        Assert.Equal("registry-high", selected.Registry);
+        Assert.False(selected.IsAmbiguous);
+        Assert.Equal("governed", selected.GovernanceState);
+    }
+
+    [Fact]
+    public async Task SearchDetailedAsync_DuplicatePriorityTie_MarksSelectionAsAmbiguous()
+    {
+        var service = new OciRegistryService((request, _) =>
+        {
+            List<RegistrySearchAsset> assets =
+            [
+                new RegistrySearchAsset(CreateRecord("alpha/asset", "1.0.0", "oci://alpha@sha256:a"), RegistryGovernanceStates.Ungoverned)
+            ];
+            return Task.FromResult(new RegistrySearchResponse(request.Registry, assets, null));
+        });
+
+        var result = await service.SearchDetailedAsync(
+            registries: ["registry-a", "registry-b"],
+            registryPolicies: new Dictionary<string, RegistrySourcePolicyConfig>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["registry-a"] = new() { Priority = 10 },
+                ["registry-b"] = new() { Priority = 10 }
+            });
+
+        var selected = Assert.Single(result.SelectedAssets);
+        Assert.True(selected.IsAmbiguous);
+        Assert.Contains("Explicit source selection required", selected.ResolutionReason);
     }
 
     [Fact]
@@ -92,13 +143,32 @@ public sealed class OciRegistryServiceSearchIntegrationTests
     }
 
     [Fact]
+    public async Task SearchDetailedAsync_PropagatesGovernanceUnreachableState()
+    {
+        var service = new OciRegistryService((request, _) =>
+        {
+            var assets = new List<RegistrySearchAsset>
+            {
+                new(CreateRecord("gamma/asset", "1.2.3", "oci://gamma@sha256:c"), RegistryGovernanceStates.GovernanceUnreachable, "timeout")
+            };
+            return Task.FromResult(new RegistrySearchResponse(request.Registry, assets, null));
+        });
+
+        var result = await service.SearchDetailedAsync(registries: ["registry-a"]);
+
+        var selected = Assert.Single(result.SelectedAssets);
+        Assert.Equal(RegistryGovernanceStates.GovernanceUnreachable, selected.GovernanceState);
+        Assert.Equal("timeout", selected.GovernanceError);
+    }
+
+    [Fact]
     public async Task SearchDetailedAsync_EmptyRegistryList_ReturnsNoResultsAndNoDiagnostics()
     {
         var queried = false;
         var service = new OciRegistryService((request, _) =>
         {
             queried = true;
-            return Task.FromResult(new RegistrySearchResponse(request.Registry, [], null));
+            return Task.FromResult(new RegistrySearchResponse(request.Registry, Array.Empty<RegistrySearchAsset>(), null));
         });
 
         var result = await service.SearchDetailedAsync(registries: []);
