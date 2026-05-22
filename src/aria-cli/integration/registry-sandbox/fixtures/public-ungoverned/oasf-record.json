@@ -1,0 +1,38 @@
+{
+  "name": "aria.dev/skills/public-web-search",
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "description": "Public MCP web search skill with no governance overlay",
+  "skills": [
+    {
+      "id": 40102,
+      "name": "tool_use/search"
+    }
+  ],
+  "domains": [
+    {
+      "name": "general"
+    }
+  ],
+  "modules": [
+    {
+      "type": "mcp_server",
+      "transport": "stdio",
+      "tools": [
+        "web_search"
+      ]
+    }
+  ],
+  "locators": [
+    {
+      "type": "oci",
+      "urls": [
+        "localhost:5501/aria-assets/public-web-search:1.0.0"
+      ]
+    }
+  ],
+  "authors": [
+    "Community Maintainer <community@example.com>"
+  ],
+  "created_at": "2026-01-01T00:00:00Z"
+}

@@ -1,0 +1,39 @@
+{
+  "name": "aria.dev/skills/policy-lookup",
+  "version": "1.0.0",
+  "schema_version": "1.0.0",
+  "description": "Governed MCP policy lookup skill from internal registry",
+  "skills": [
+    {
+      "id": 30101,
+      "name": "knowledge_retrieval/rag"
+    }
+  ],
+  "domains": [
+    {
+      "name": "human_resources"
+    }
+  ],
+  "modules": [
+    {
+      "type": "mcp_server",
+      "transport": "stdio",
+      "tools": [
+        "lookup_policy",
+        "list_policies"
+      ]
+    }
+  ],
+  "locators": [
+    {
+      "type": "oci",
+      "urls": [
+        "localhost:5500/aria-assets/policy-lookup-skill:1.0.0"
+      ]
+    }
+  ],
+  "authors": [
+    "ARIA Team <aria@example.com>"
+  ],
+  "created_at": "2026-01-01T00:00:00Z"
+}

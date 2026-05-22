@@ -1,0 +1,26 @@
+services:
+  registry-internal:
+    image: registry:2
+    container_name: aria-registry-internal
+    restart: unless-stopped
+    ports:
+      - "5500:5000"
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+    volumes:
+      - registry-internal-data:/var/lib/registry
+
+  registry-public:
+    image: registry:2
+    container_name: aria-registry-public
+    restart: unless-stopped
+    ports:
+      - "5501:5000"
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+    volumes:
+      - registry-public-data:/var/lib/registry
+
+volumes:
+  registry-internal-data:
+  registry-public-data:

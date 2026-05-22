@@ -1,0 +1,30 @@
+{
+  "governance": {
+    "sensitivity_tier": "confidential",
+    "data_classifications": [
+      "hr_policy",
+      "employee_data"
+    ],
+    "approval_chain": [
+      "ai-governance",
+      "hr-data-steward"
+    ],
+    "allowed_consumers": [
+      "hr-team",
+      "governance-team"
+    ],
+    "allowed_entra_groups": [
+      "entra-group-hr-readers"
+    ],
+    "allowed_entra_roles": [
+      "Governance.Admin"
+    ],
+    "max_data_retention_days": 90,
+    "audit_level": "strict",
+    "dependency_sensitivity_ceiling": "restricted",
+    "compliance_frameworks": [
+      "SOC2",
+      "GDPR"
+    ]
+  }
+}
