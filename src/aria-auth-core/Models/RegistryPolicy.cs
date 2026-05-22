@@ -86,8 +86,8 @@ public static class RegistryPolicyEvaluator
         }
 
         return new RegistryPolicyDecision(
-            Allowed: true,
-            Reason: $"Allowed by relaxed policy: governance state '{governanceState}' accepted for trust_tier='{policy.TrustTier}'.",
+            Allowed: false,
+            Reason: $"Blocked by registry policy: governance state '{governanceState}' is not allowed for trust_tier='{policy.TrustTier}' unless max_sensitivity_if_ungoverned is explicitly configured.",
             GovernanceState: governanceState);
     }
 }
