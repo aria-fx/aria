@@ -17,6 +17,13 @@ public sealed record AriaConfig
     [JsonPropertyName("registry_policies")]
     public Dictionary<string, RegistrySourcePolicyConfig> RegistryPolicies { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
+    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
+    [JsonPropertyName("registry_aliases")]
+    public Dictionary<string, string> RegistryAliases { get; init; } = new(StringComparer.OrdinalIgnoreCase);
+
+    [JsonPropertyName("default_registry")]
+    public string? DefaultRegistry { get; init; }
+
     [JsonPropertyName("targets")]
     public Dictionary<string, TargetConfig> Targets { get; init; } = new();
 

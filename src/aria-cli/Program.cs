@@ -20,7 +20,199 @@ AriaConfig LoadConfig()
 {
     if (File.Exists(configPath))
         return JsonSerializer.Deserialize<AriaConfig>(File.ReadAllText(configPath)) ?? new();
-    return new();
+    return new AriaConfig { Registries = [] };
+}
+
+async Task SaveConfigAsync(AriaConfig config)
+{
+    var dir = Path.GetDirectoryName(configPath)!;
+    Directory.CreateDirectory(dir);
+    var json = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
+    await File.WriteAllTextAsync(configPath, json);
+}
+
+bool TryNormalizeRegistry(string candidate, out string normalized, out string error)
+{
+    normalized = string.Empty;
+    error = string.Empty;
+
+    if (string.IsNullOrWhiteSpace(candidate))
+    {
+        error = "Registry value cannot be empty.";
+        return false;
+    }
+
+    var trimmed = candidate.Trim();
+
+    if (Uri.TryCreate(trimmed, UriKind.Absolute, out var absoluteUri))
+    {
+        if (absoluteUri.IsFile)
+        {
+            normalized = Path.GetFullPath(absoluteUri.LocalPath).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            return true;
+        }
+
+        if (string.Equals(absoluteUri.Scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(absoluteUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
+        {
+            var absolutePath = absoluteUri.AbsolutePath.TrimEnd('/');
+            var host = absoluteUri.Host.ToLowerInvariant();
+            var port = absoluteUri.IsDefaultPort ? "" : $":{absoluteUri.Port}";
+            normalized = $"{host}{port}{absolutePath}";
+            return true;
+        }
+
+        error = $"Unsupported registry URL scheme '{absoluteUri.Scheme}'.";
+        return false;
+    }
+
+    if (trimmed.Contains("://", StringComparison.Ordinal))
+    {
+        error = "Registry URL is invalid.";
+        return false;
+    }
+
+    if (trimmed.StartsWith("~", StringComparison.Ordinal) || Path.IsPathRooted(trimmed) || trimmed.StartsWith(".", StringComparison.Ordinal))
+    {
+        try
+        {
+            normalized = Path.GetFullPath(PathHelper.ExpandTildePath(trimmed))
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            return true;
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            error = $"Registry path is invalid: {ex.Message}";
+            return false;
+        }
+    }
+
+    if (trimmed.Contains(' '))
+    {
+        error = "Registry URL is invalid.";
+        return false;
+    }
+
+    if (!trimmed.Contains('/'))
+    {
+        error = "Registry URL is invalid. Expected host/path format.";
+        return false;
+    }
+
+    if (!Uri.TryCreate($"https://{trimmed}", UriKind.Absolute, out var inferred))
+    {
+        error = "Registry URL is invalid.";
+        return false;
+    }
+
+    var inferredHost = inferred.Host.ToLowerInvariant();
+    var inferredPort = inferred.IsDefaultPort ? "" : $":{inferred.Port}";
+    if (!inferredHost.Contains('.') && !inferredHost.Equals("localhost", StringComparison.OrdinalIgnoreCase))
+    {
+        error = "Registry URL is invalid. Host name is missing.";
+        return false;
+    }
+
+    normalized = $"{inferredHost}{inferredPort}{inferred.AbsolutePath}".TrimEnd('/');
+    return true;
+}
+
+AriaConfig NormalizeRegistryConfig(AriaConfig config)
+{
+    var registries = config.Registries
+        .Where(r => !string.IsNullOrWhiteSpace(r))
+        .Select(r => TryNormalizeRegistry(r, out var normalized, out _) ? normalized : r.Trim().TrimEnd('/'))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToList();
+
+    var registryPolicies = new Dictionary<string, RegistrySourcePolicyConfig>(StringComparer.OrdinalIgnoreCase);
+    foreach (var policy in config.RegistryPolicies)
+    {
+        var key = TryNormalizeRegistry(policy.Key, out var normalized, out _) ? normalized : policy.Key.Trim().TrimEnd('/');
+        if (registries.Contains(key, StringComparer.OrdinalIgnoreCase) && !registryPolicies.ContainsKey(key))
+            registryPolicies[key] = policy.Value;
+    }
+
+    var aliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+    foreach (var alias in config.RegistryAliases)
+    {
+        var aliasName = alias.Key.Trim();
+        if (string.IsNullOrWhiteSpace(aliasName))
+            continue;
+
+        if (!TryNormalizeRegistry(alias.Value, out var normalized, out _))
+            continue;
+
+        var matching = registries.FirstOrDefault(r => string.Equals(r, normalized, StringComparison.OrdinalIgnoreCase));
+        if (matching != null)
+            aliases[aliasName] = matching;
+    }
+
+    string? defaultRegistry = null;
+    if (!string.IsNullOrWhiteSpace(config.DefaultRegistry) &&
+        TryNormalizeRegistry(config.DefaultRegistry, out var defaultNormalized, out _) &&
+        registries.Any(r => string.Equals(r, defaultNormalized, StringComparison.OrdinalIgnoreCase)))
+    {
+        defaultRegistry = registries.First(r => string.Equals(r, defaultNormalized, StringComparison.OrdinalIgnoreCase));
+    }
+    else if (registries.Count > 0)
+    {
+        defaultRegistry = registries[0];
+    }
+
+    return config with
+    {
+        Registries = registries,
+        RegistryPolicies = registryPolicies,
+        RegistryAliases = aliases,
+        DefaultRegistry = defaultRegistry
+    };
+}
+
+bool TryResolveRegistryIdentifier(AriaConfig config, string identifier, out string registry, out string error)
+{
+    registry = string.Empty;
+    error = string.Empty;
+
+    if (config.RegistryAliases.TryGetValue(identifier.Trim(), out var aliased))
+    {
+        registry = aliased;
+        return true;
+    }
+
+    if (!TryNormalizeRegistry(identifier, out var normalized, out var normalizeError))
+    {
+        error = normalizeError;
+        return false;
+    }
+
+    var match = config.Registries.FirstOrDefault(r => string.Equals(r, normalized, StringComparison.OrdinalIgnoreCase));
+    if (match == null)
+    {
+        error = $"Registry '{identifier}' was not found.";
+        return false;
+    }
+
+    registry = match;
+    return true;
+}
+
+string? ResolveLocalRegistryPath(string registryValue)
+{
+    if (Uri.TryCreate(registryValue, UriKind.Absolute, out var uri) && uri.IsFile)
+        return uri.LocalPath;
+
+    if (Directory.Exists(registryValue))
+        return registryValue;
+
+    return null;
+}
+
+void FailRegistryCommand(string message, bool emitMessage = true)
+{
+    if (emitMessage && !string.IsNullOrWhiteSpace(message))
+        AnsiConsole.MarkupLine($"[red]{Markup.Escape(message)}[/]");
+    Environment.Exit(1);
 }
 
 var registry = new OciRegistryService();
@@ -74,7 +266,7 @@ searchCommand.AddOption(searchVerboseOption);
 
 searchCommand.SetHandler(async (string? skill, string? domain, string? keyword, bool verbose) =>
 {
-    var config = LoadConfig();
+    var config = NormalizeRegistryConfig(LoadConfig());
     if (!config.Registries.Any(r => !string.IsNullOrWhiteSpace(r)))
     {
         AnsiConsole.MarkupLine("[red]No registries configured. Run `aria init` or update ~/.aria/config.json with at least one registry.[/]");
@@ -227,7 +419,7 @@ var whoAmICommand = new Command("whoami", "Show resolved identity provider and e
 
 whoAmICommand.SetHandler(async () =>
 {
-    var config = LoadConfig();
+    var config = NormalizeRegistryConfig(LoadConfig());
     var access = await ResolveAccessAsync(config);
     if (access == null)
         return;
@@ -268,7 +460,7 @@ auditCommand.AddOption(ceilingOption);
 
 auditCommand.SetHandler(async (string reference, string? ceiling) =>
 {
-    var config = LoadConfig();
+    var config = NormalizeRegistryConfig(LoadConfig());
     if (ceiling != null)
         config = config with { SensitivityCeiling = ceiling };
 
@@ -352,7 +544,7 @@ installCommand.AddOption(targetOption);
 
 installCommand.SetHandler(async (string reference, string target) =>
 {
-    var config = LoadConfig();
+    var config = NormalizeRegistryConfig(LoadConfig());
     var access = await ResolveAccessAsync(config);
     if (access == null)
         return;
@@ -524,6 +716,11 @@ initCommand.SetHandler(async () =>
         ConsumerId = "my-team",
         SensitivityCeiling = "confidential",
         Registries = ["ghcr.io/my-org/aria-assets"],
+        DefaultRegistry = "ghcr.io/my-org/aria-assets",
+        RegistryAliases = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["primary"] = "ghcr.io/my-org/aria-assets"
+        },
         RegistryPolicies = new(StringComparer.OrdinalIgnoreCase)
         {
             ["ghcr.io/my-org/aria-assets"] = new()
@@ -619,6 +816,302 @@ initCommand.SetHandler(async () =>
 });
 
 rootCommand.AddCommand(initCommand);
+
+// ═══════════════════════════════════════════════════════════
+// REGISTRY
+// ═══════════════════════════════════════════════════════════
+
+var registryCommand = new Command("registry", "Manage configured registry sources");
+
+var registryListCommand = new Command("list", "List configured registries");
+var registryListJsonOption = new Option<bool>("--json", "Output machine-readable JSON");
+registryListCommand.AddOption(registryListJsonOption);
+registryListCommand.SetHandler(async (bool asJson) =>
+{
+    var config = NormalizeRegistryConfig(LoadConfig());
+    await SaveConfigAsync(config);
+
+    var aliasesByRegistry = config.RegistryAliases
+        .GroupBy(kvp => kvp.Value, StringComparer.OrdinalIgnoreCase)
+        .ToDictionary(
+            g => g.Key,
+            g => g.Select(kvp => kvp.Key).OrderBy(v => v, StringComparer.OrdinalIgnoreCase).ToList(),
+            StringComparer.OrdinalIgnoreCase);
+
+    var items = config.Registries
+        .OrderBy(r => r, StringComparer.OrdinalIgnoreCase)
+        .Select(r => new
+        {
+            name = aliasesByRegistry.TryGetValue(r, out var aliases) ? aliases.FirstOrDefault() : null,
+            url = r,
+            isDefault = string.Equals(config.DefaultRegistry, r, StringComparison.OrdinalIgnoreCase)
+        })
+        .ToList();
+
+    if (asJson)
+    {
+        var json = JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = true });
+        AnsiConsole.WriteLine(json);
+        return;
+    }
+
+    if (items.Count == 0)
+    {
+        AnsiConsole.MarkupLine("[yellow]No registries configured.[/]");
+        return;
+    }
+
+    foreach (var item in items)
+    {
+        var marker = item.isDefault ? "[green]*[/]" : " ";
+        var name = item.name is null ? "" : $"[cyan]{Markup.Escape(item.name)}[/] -> ";
+        AnsiConsole.MarkupLine($"{marker} {name}{Markup.Escape(item.url)}");
+    }
+}, registryListJsonOption);
+registryCommand.AddCommand(registryListCommand);
+
+var registryAddCommand = new Command("add", "Add a registry source");
+var registryAddUrlArg = new Argument<string>("url", "Registry URL/path");
+var registryAddNameOption = new Option<string?>("--name", "Optional registry alias");
+var registryAddDefaultOption = new Option<bool>("--default", "Set as the default registry");
+registryAddCommand.AddArgument(registryAddUrlArg);
+registryAddCommand.AddOption(registryAddNameOption);
+registryAddCommand.AddOption(registryAddDefaultOption);
+registryAddCommand.SetHandler(async (string url, string? name, bool setDefault) =>
+{
+    var config = NormalizeRegistryConfig(LoadConfig());
+    if (!TryNormalizeRegistry(url, out var normalizedUrl, out var normalizeError))
+    {
+        FailRegistryCommand(normalizeError);
+        return;
+    }
+
+    if (config.Registries.Any(r => string.Equals(r, normalizedUrl, StringComparison.OrdinalIgnoreCase)))
+    {
+        FailRegistryCommand($"Registry '{normalizedUrl}' is already configured.");
+        return;
+    }
+
+    var nextRegistries = config.Registries.Append(normalizedUrl)
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToList();
+    var nextAliases = new Dictionary<string, string>(config.RegistryAliases, StringComparer.OrdinalIgnoreCase);
+
+    if (!string.IsNullOrWhiteSpace(name))
+    {
+        var aliasName = name.Trim();
+        if (nextAliases.TryGetValue(aliasName, out var existingAliasUrl) &&
+            !string.Equals(existingAliasUrl, normalizedUrl, StringComparison.OrdinalIgnoreCase))
+        {
+            FailRegistryCommand($"Alias '{aliasName}' is already assigned to '{existingAliasUrl}'.");
+            return;
+        }
+
+        nextAliases[aliasName] = normalizedUrl;
+    }
+
+    var updated = config with
+    {
+        Registries = nextRegistries,
+        RegistryAliases = nextAliases,
+        DefaultRegistry = setDefault || string.IsNullOrWhiteSpace(config.DefaultRegistry)
+            ? normalizedUrl
+            : config.DefaultRegistry
+    };
+
+    await SaveConfigAsync(updated);
+    AnsiConsole.MarkupLine($"[green]Added registry[/] {Markup.Escape(normalizedUrl)}");
+}, registryAddUrlArg, registryAddNameOption, registryAddDefaultOption);
+registryCommand.AddCommand(registryAddCommand);
+
+var registryRemoveCommand = new Command("remove", "Remove a registry by alias or URL");
+var registryRemoveArg = new Argument<string>("name-or-url", "Registry alias or URL/path");
+registryRemoveCommand.AddArgument(registryRemoveArg);
+registryRemoveCommand.SetHandler(async (string nameOrUrl) =>
+{
+    var config = NormalizeRegistryConfig(LoadConfig());
+    if (!TryResolveRegistryIdentifier(config, nameOrUrl, out var existingRegistry, out var resolveError))
+    {
+        FailRegistryCommand(resolveError);
+        return;
+    }
+
+    var registries = config.Registries
+        .Where(r => !string.Equals(r, existingRegistry, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+    var policies = config.RegistryPolicies
+        .Where(kvp => !string.Equals(kvp.Key, existingRegistry, StringComparison.OrdinalIgnoreCase))
+        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.OrdinalIgnoreCase);
+    var aliases = config.RegistryAliases
+        .Where(kvp => !string.Equals(kvp.Value, existingRegistry, StringComparison.OrdinalIgnoreCase))
+        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.OrdinalIgnoreCase);
+    var defaultRegistry = string.Equals(config.DefaultRegistry, existingRegistry, StringComparison.OrdinalIgnoreCase)
+        ? registries.FirstOrDefault()
+        : config.DefaultRegistry;
+
+    await SaveConfigAsync(config with
+    {
+        Registries = registries,
+        RegistryPolicies = policies,
+        RegistryAliases = aliases,
+        DefaultRegistry = defaultRegistry
+    });
+    AnsiConsole.MarkupLine($"[green]Removed registry[/] {Markup.Escape(existingRegistry)}");
+}, registryRemoveArg);
+registryCommand.AddCommand(registryRemoveCommand);
+
+var registryUpdateCommand = new Command("update", "Update a registry URL by alias or current URL");
+var registryUpdateIdentifierArg = new Argument<string>("name-or-url", "Registry alias or URL/path");
+var registryUpdateUrlOption = new Option<string>("--url", "New registry URL/path") { IsRequired = true };
+registryUpdateCommand.AddArgument(registryUpdateIdentifierArg);
+registryUpdateCommand.AddOption(registryUpdateUrlOption);
+registryUpdateCommand.SetHandler(async (string nameOrUrl, string newUrl) =>
+{
+    var config = NormalizeRegistryConfig(LoadConfig());
+    if (!TryResolveRegistryIdentifier(config, nameOrUrl, out var existingRegistry, out var resolveError))
+    {
+        FailRegistryCommand(resolveError);
+        return;
+    }
+
+    if (!TryNormalizeRegistry(newUrl, out var normalizedUrl, out var normalizeError))
+    {
+        FailRegistryCommand(normalizeError);
+        return;
+    }
+
+    if (config.Registries.Any(r => !string.Equals(r, existingRegistry, StringComparison.OrdinalIgnoreCase) &&
+                                   string.Equals(r, normalizedUrl, StringComparison.OrdinalIgnoreCase)))
+    {
+        FailRegistryCommand($"Registry '{normalizedUrl}' is already configured.");
+        return;
+    }
+
+    var registries = config.Registries
+        .Select(r => string.Equals(r, existingRegistry, StringComparison.OrdinalIgnoreCase) ? normalizedUrl : r)
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToList();
+    var policies = new Dictionary<string, RegistrySourcePolicyConfig>(StringComparer.OrdinalIgnoreCase);
+    foreach (var entry in config.RegistryPolicies)
+    {
+        var key = string.Equals(entry.Key, existingRegistry, StringComparison.OrdinalIgnoreCase) ? normalizedUrl : entry.Key;
+        if (!policies.ContainsKey(key))
+            policies[key] = entry.Value;
+    }
+    var aliases = config.RegistryAliases.ToDictionary(
+        kvp => kvp.Key,
+        kvp => string.Equals(kvp.Value, existingRegistry, StringComparison.OrdinalIgnoreCase) ? normalizedUrl : kvp.Value,
+        StringComparer.OrdinalIgnoreCase);
+    var defaultRegistry = string.Equals(config.DefaultRegistry, existingRegistry, StringComparison.OrdinalIgnoreCase)
+        ? normalizedUrl
+        : config.DefaultRegistry;
+
+    await SaveConfigAsync(config with
+    {
+        Registries = registries,
+        RegistryPolicies = policies,
+        RegistryAliases = aliases,
+        DefaultRegistry = defaultRegistry
+    });
+
+    AnsiConsole.MarkupLine($"[green]Updated registry[/] {Markup.Escape(existingRegistry)} [dim]->[/] {Markup.Escape(normalizedUrl)}");
+}, registryUpdateIdentifierArg, registryUpdateUrlOption);
+registryCommand.AddCommand(registryUpdateCommand);
+
+var registrySetDefaultCommand = new Command("set-default", "Set default registry by alias or URL");
+var registrySetDefaultArg = new Argument<string>("name-or-url", "Registry alias or URL/path");
+registrySetDefaultCommand.AddArgument(registrySetDefaultArg);
+registrySetDefaultCommand.SetHandler(async (string nameOrUrl) =>
+{
+    var config = NormalizeRegistryConfig(LoadConfig());
+    if (!TryResolveRegistryIdentifier(config, nameOrUrl, out var registryToSet, out var resolveError))
+    {
+        FailRegistryCommand(resolveError);
+        return;
+    }
+
+    await SaveConfigAsync(config with { DefaultRegistry = registryToSet });
+    AnsiConsole.MarkupLine($"[green]Default registry set to[/] {Markup.Escape(registryToSet)}");
+}, registrySetDefaultArg);
+registryCommand.AddCommand(registrySetDefaultCommand);
+
+var registryValidateCommand = new Command("validate", "Validate configured registries");
+var registryValidateArg = new Argument<string?>("name-or-url", () => null, "Registry alias or URL/path (optional)");
+var registryValidateJsonOption = new Option<bool>("--json", "Output machine-readable JSON");
+registryValidateCommand.AddArgument(registryValidateArg);
+registryValidateCommand.AddOption(registryValidateJsonOption);
+registryValidateCommand.SetHandler(async (string? nameOrUrl, bool asJson) =>
+{
+    var config = NormalizeRegistryConfig(LoadConfig());
+    await SaveConfigAsync(config);
+
+    List<string> targets;
+    if (string.IsNullOrWhiteSpace(nameOrUrl))
+    {
+        targets = config.Registries.OrderBy(r => r, StringComparer.OrdinalIgnoreCase).ToList();
+    }
+    else
+    {
+        if (!TryResolveRegistryIdentifier(config, nameOrUrl, out var resolved, out var resolveError))
+        {
+            FailRegistryCommand(resolveError, emitMessage: !asJson);
+            return;
+        }
+        targets = [resolved];
+    }
+
+    var aliasLookup = config.RegistryAliases
+        .GroupBy(kvp => kvp.Value, StringComparer.OrdinalIgnoreCase)
+        .ToDictionary(
+            g => g.Key,
+            g => g.Select(kvp => kvp.Key).OrderBy(v => v, StringComparer.OrdinalIgnoreCase).FirstOrDefault(),
+            StringComparer.OrdinalIgnoreCase);
+
+    var results = targets.Select(target =>
+    {
+        var localPath = ResolveLocalRegistryPath(target);
+        if (localPath != null)
+        {
+            var exists = Directory.Exists(localPath);
+            return new
+            {
+                name = aliasLookup.GetValueOrDefault(target),
+                url = target,
+                ok = exists,
+                message = exists ? "Registry path is reachable." : "Registry path does not exist."
+            };
+        }
+
+        return new
+        {
+            name = aliasLookup.GetValueOrDefault(target),
+            url = target,
+            ok = true,
+            message = "Registry URL format is valid."
+        };
+    }).ToList();
+
+    if (asJson)
+    {
+        var json = JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true });
+        AnsiConsole.WriteLine(json);
+    }
+    else
+    {
+        foreach (var result in results)
+        {
+            var status = result.ok ? "[green]ok[/]" : "[red]error[/]";
+            var name = string.IsNullOrWhiteSpace(result.name) ? "" : $"{Markup.Escape(result.name)} -> ";
+            AnsiConsole.MarkupLine($"{status} {name}{Markup.Escape(result.url)} [dim]- {Markup.Escape(result.message)}[/]");
+        }
+    }
+
+    if (results.Any(r => !r.ok))
+        FailRegistryCommand("One or more registries failed validation.", emitMessage: !asJson);
+}, registryValidateArg, registryValidateJsonOption);
+registryCommand.AddCommand(registryValidateCommand);
+
+rootCommand.AddCommand(registryCommand);
 
 // ═══════════════════════════════════════════════════════════
 // RUN
