@@ -306,7 +306,13 @@ public sealed class OciRegistryService : IGovernanceOverlayResolver
                 try
                 {
                     var governanceJson = await File.ReadAllTextAsync(governancePath, cancellationToken);
-                    _ = JsonSerializer.Deserialize<OasfGovernanceOverlay>(governanceJson);
+                    var overlay = JsonSerializer.Deserialize<OasfGovernanceOverlay>(governanceJson);
+                    if (overlay == null)
+                    {
+                        results.Add(new RegistrySearchAsset(record, RegistryGovernanceStates.GovernanceUnreachable, "Governance overlay deserialized to null."));
+                        continue;
+                    }
+
                     results.Add(new RegistrySearchAsset(record, RegistryGovernanceStates.Governed));
                 }
                 catch (Exception ex)
