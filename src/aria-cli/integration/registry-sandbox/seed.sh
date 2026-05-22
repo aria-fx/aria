@@ -28,14 +28,14 @@ done
 echo "[seed] Seeding governed internal artifact: $INTERNAL_REF"
 docker run --rm --network host \
   -v "$ROOT_DIR/fixtures:/fixtures:ro" \
-  "$ORAS_IMAGE" push --plain-http "$INTERNAL_REF" \
+  "$ORAS_IMAGE" push --disable-path-validation --plain-http "$INTERNAL_REF" \
   "/fixtures/internal-governed/oasf-record.json:application/vnd.oasf.record.v1+json" \
   "/fixtures/internal-governed/oasf-governance.json:application/vnd.oasf.governance.v1+json"
 
 echo "[seed] Seeding ungoverned public artifact: $PUBLIC_REF"
 docker run --rm --network host \
   -v "$ROOT_DIR/fixtures:/fixtures:ro" \
-  "$ORAS_IMAGE" push --plain-http "$PUBLIC_REF" \
+  "$ORAS_IMAGE" push --disable-path-validation --plain-http "$PUBLIC_REF" \
   "/fixtures/public-ungoverned/oasf-record.json:application/vnd.oasf.record.v1+json"
 
 echo "[seed] Seed complete. Catalog snapshots:"
