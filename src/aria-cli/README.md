@@ -96,7 +96,7 @@ chain is displayed.
 {
   "consumer_id": "hr-team",
   "sensitivity_ceiling": "confidential",
-  "registries": ["ghcr.io/jgarverick/aria-assets"],
+  "registries": ["ghcr.io/jgarverick/aria-assets", "ghcr.io/public/aria-assets"],
   "registry_policies": {
     "ghcr.io/jgarverick/aria-assets": {
       "trust_tier": "internal_governed",
