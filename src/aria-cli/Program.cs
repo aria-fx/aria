@@ -56,7 +56,9 @@ bool TryNormalizeRegistry(string candidate, out string normalized, out string er
             string.Equals(absoluteUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
         {
             var absolutePath = absoluteUri.AbsolutePath.TrimEnd('/');
-            normalized = $"{absoluteUri.Host.ToLowerInvariant()}{absolutePath}";
+            var host = absoluteUri.Host.ToLowerInvariant();
+            var port = absoluteUri.IsDefaultPort ? "" : $":{absoluteUri.Port}";
+            normalized = $"{host}{port}{absolutePath}";
             return true;
         }
 
