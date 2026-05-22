@@ -35,9 +35,10 @@ docker run --rm --network host \
 
 echo "[seed] Seeding ungoverned public artifact: $PUBLIC_REF"
 docker run --rm --network host \
+  -w /fixtures \
   -v "$ROOT_DIR/fixtures:/fixtures:ro" \
-  "$ORAS_IMAGE" push --disable-path-validation --plain-http "$PUBLIC_REF" \
-  "/fixtures/public-ungoverned/oasf-record.json:application/vnd.oasf.record.v1+json"
+  "$ORAS_IMAGE" push --plain-http "$PUBLIC_REF" \
+  "public-ungoverned/oasf-record.json:application/vnd.oasf.record.v1+json"
 
 echo "[seed] Seed complete. Catalog snapshots:"
 curl -fsS "http://localhost:5500/v2/_catalog" && echo
