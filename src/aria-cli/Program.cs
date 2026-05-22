@@ -310,7 +310,9 @@ auditCommand.SetHandler(async (string reference, string? ceiling) =>
 
     if (passed)
     {
-        AnsiConsole.MarkupLine("[green]✓ All governance checks passed[/]");
+        AnsiConsole.MarkupLine(gov != null
+            ? "[green]✓ All governance checks passed[/]"
+            : "[yellow]✓ Registry policy check passed; governance overlay checks were skipped[/]");
         AnsiConsole.MarkupLine($"  Source: [cyan]{sourceRegistry}[/]");
         AnsiConsole.MarkupLine($"  Governance state: [cyan]{sourcePolicyDecision.GovernanceState}[/]");
         if (gov != null)
