@@ -404,7 +404,9 @@ installCommand.SetHandler(async (string reference, string target) =>
     {
         AnsiConsole.MarkupLine($"   [green]✓[/] Source: {sourceRegistry} ({sourcePolicy.TrustTier})");
         AnsiConsole.MarkupLine($"   [green]✓[/] Governance state: {sourcePolicyDecision.GovernanceState}");
-        AnsiConsole.MarkupLine($"   [green]✓[/] Policy reason: {Markup.Escape(sourcePolicyDecision.Reason)}");
+        AnsiConsole.MarkupLine($"   [yellow]⚠ Registry policy allowed install: {Markup.Escape(sourcePolicyDecision.Reason)}[/]");
+        AnsiConsole.MarkupLine("   [yellow]⚠ Governance overlay not available; overlay validation was skipped[/]");
+        AnsiConsole.MarkupLine("   [yellow]⚠ Sensitivity and consumer authorization checks were not performed[/]");
         if (!string.IsNullOrWhiteSpace(governanceFetch.Error))
             AnsiConsole.MarkupLine($"   [yellow]⚠ Governance fetch detail: {Markup.Escape(governanceFetch.Error)}[/]");
     }
