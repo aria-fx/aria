@@ -1,0 +1,218 @@
+name: Release Governance
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  SKILLS_OWNER: aria-fx
+  SKILLS_REPO: aria-skills
+  SKILLS_REF: main
+  GATEWAY_OWNER: aria-fx
+  GATEWAY_REPO: aria-gateway
+  GATEWAY_REF: main
+
+jobs:
+  validate-release-governance:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve framework tag version
+        id: tag
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TAG="${GITHUB_REF_NAME}"
+          if [[ ! "${TAG}" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "Tag '${TAG}' must follow vMAJOR.MINOR.PATCH SemVer." >&2
+            exit 1
+          fi
+
+          MAJOR="${BASH_REMATCH[1]}"
+          MINOR="${BASH_REMATCH[2]}"
+
+          echo "major_minor=${MAJOR}.${MINOR}" >> "${GITHUB_OUTPUT}"
+
+      - name: Resolve bundled OASF schema version
+        id: schema
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          SCHEMA_VERSION="$(python - <<'PY'
+import pathlib
+import re
+
+variables = pathlib.Path('src/terraform/variables.tf').read_text(encoding='utf-8')
+match = re.search(
+    r'variable\s+"oasf_schema_version"\s*\{.*?default\s*=\s*"([^"]+)"',
+    variables,
+    re.S,
+)
+if not match:
+    raise SystemExit('Unable to determine oasf_schema_version from src/terraform/variables.tf')
+print(match.group(1))
+PY
+)"
+
+          if [[ -z "${SCHEMA_VERSION}" ]]; then
+            echo "Bundled OASF schema version is empty." >&2
+            exit 1
+          fi
+
+          echo "required_schema_version=${SCHEMA_VERSION}" >> "${GITHUB_OUTPUT}"
+
+      # Required secret:
+      # - ARIA_CROSS_REPO_TOKEN (repo scope) for cross-repo reads in aria-skills and aria-gateway
+      - name: Validate skills schema compatibility and build model matrix
+        id: skills
+        env:
+          GH_TOKEN: ${{ secrets.ARIA_CROSS_REPO_TOKEN }}
+          REQUIRED_SCHEMA_VERSION: ${{ steps.schema.outputs.required_schema_version }}
+          SKILLS_OWNER: ${{ env.SKILLS_OWNER }}
+          SKILLS_REPO: ${{ env.SKILLS_REPO }}
+          SKILLS_REF: ${{ env.SKILLS_REF }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${GH_TOKEN:-}" ]]; then
+            echo "ARIA_CROSS_REPO_TOKEN is required." >&2
+            exit 1
+          fi
+
+          mkdir -p governance-check
+
+          gh api "/repos/${SKILLS_OWNER}/${SKILLS_REPO}/tarball/${SKILLS_REF}" > governance-check/aria-skills.tar.gz
+          tar -xzf governance-check/aria-skills.tar.gz -C governance-check
+
+          SKILLS_ROOT_PATTERN="${SKILLS_OWNER}-${SKILLS_REPO}-*"
+          SKILLS_ROOT="$(find governance-check -mindepth 1 -maxdepth 1 -type d -name "${SKILLS_ROOT_PATTERN}" | head -n1)"
+          if [[ -z "${SKILLS_ROOT}" ]]; then
+            echo "Unable to locate extracted aria-skills content." >&2
+            exit 1
+          fi
+
+          shopt -s nullglob
+          RECORD_FILES=("${SKILLS_ROOT}"/skills/*/oasf-record.json)
+          shopt -u nullglob
+
+          if [[ ${#RECORD_FILES[@]} -eq 0 ]]; then
+            echo "No skill OASF manifests found in aria-skills." >&2
+            exit 1
+          fi
+
+          MATRIX_FILE="governance-check/model-matrix.md"
+          {
+            echo "| Skill | Recommended model |"
+            echo "| --- | --- |"
+          } > "${MATRIX_FILE}"
+
+          FAILURES=0
+
+          for record_path in "${RECORD_FILES[@]}"; do
+            skill_dir="$(dirname "${record_path}")"
+            skill_name="$(basename "${skill_dir}")"
+            schema_version="$(jq -r '.schema_version // empty' "${record_path}")"
+
+            if [[ "${schema_version}" != "${REQUIRED_SCHEMA_VERSION}" ]]; then
+              echo "Schema mismatch for ${skill_name}: expected ${REQUIRED_SCHEMA_VERSION}, found ${schema_version:-<missing>}" >&2
+              FAILURES=$((FAILURES + 1))
+            fi
+
+            recommended_model="n/a"
+            affinity_path="${skill_dir}/model-affinity.json"
+            if [[ -f "${affinity_path}" ]]; then
+              recommended_model="$(jq -r '.optimalModel // "n/a"' "${affinity_path}")"
+            fi
+
+            echo "| ${skill_name} | ${recommended_model} |" >> "${MATRIX_FILE}"
+          done
+
+          if [[ ${FAILURES} -gt 0 ]]; then
+            echo "Found ${FAILURES} incompatible skill schema version checks." >&2
+            exit 1
+          fi
+
+          {
+            echo "recommended_model_matrix<<EOF"
+            cat "${MATRIX_FILE}"
+            echo "EOF"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Validate gateway policy contract version
+        env:
+          GH_TOKEN: ${{ secrets.ARIA_CROSS_REPO_TOKEN }}
+          GATEWAY_OWNER: ${{ env.GATEWAY_OWNER }}
+          GATEWAY_REPO: ${{ env.GATEWAY_REPO }}
+          GATEWAY_REF: ${{ env.GATEWAY_REF }}
+          EXPECTED_MAJOR_MINOR: ${{ steps.tag.outputs.major_minor }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${GH_TOKEN:-}" ]]; then
+            echo "ARIA_CROSS_REPO_TOKEN is required." >&2
+            exit 1
+          fi
+
+          DOC_JSON="$(gh api "/repos/${GATEWAY_OWNER}/${GATEWAY_REPO}/contents/api/docs/policy-contract.md?ref=${GATEWAY_REF}")"
+          DOC_CONTENT="$(echo "${DOC_JSON}" | jq -r '.content' | tr -d '\n' | base64 --decode)"
+
+          CONTRACT_VERSION="$(echo "${DOC_CONTENT}" | sed -nE 's/^> \*\*Version:\*\* `([0-9]+\.[0-9]+\.[0-9]+)`.*$/\1/p' | head -n1)"
+
+          if [[ -z "${CONTRACT_VERSION}" ]]; then
+            echo "Unable to read policy contract version header from aria-gateway." >&2
+            exit 1
+          fi
+
+          if [[ ! "${CONTRACT_VERSION}" =~ ^([0-9]+)\.([0-9]+)\.[0-9]+$ ]]; then
+            echo "Policy contract version '${CONTRACT_VERSION}' is not SemVer." >&2
+            exit 1
+          fi
+
+          CONTRACT_MAJOR_MINOR="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
+          if [[ "${CONTRACT_MAJOR_MINOR}" != "${EXPECTED_MAJOR_MINOR}" ]]; then
+            echo "Gateway policy contract major.minor (${CONTRACT_MAJOR_MINOR}) does not match framework tag major.minor (${EXPECTED_MAJOR_MINOR})." >&2
+            exit 1
+          fi
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REQUIRED_SCHEMA_VERSION: ${{ steps.schema.outputs.required_schema_version }}
+          EXPECTED_MAJOR_MINOR: ${{ steps.tag.outputs.major_minor }}
+          MODEL_MATRIX: ${{ steps.skills.outputs.recommended_model_matrix }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          BODY_FILE="governance-check/release-body.md"
+          {
+            echo "## Release Governance Validation"
+            echo
+            echo "- OASF schema version validated: \\`${REQUIRED_SCHEMA_VERSION}\\`"
+            echo "- Gateway policy contract major.minor validated: \\`${EXPECTED_MAJOR_MINOR}\\`"
+            echo
+            echo "## Recommended Model Matrix"
+            echo
+            echo "${MODEL_MATRIX}"
+          } > "${BODY_FILE}"
+
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release edit "${GITHUB_REF_NAME}" \
+              --title "ARIA Framework ${GITHUB_REF_NAME}" \
+              --notes-file "${BODY_FILE}"
+          else
+            gh release create "${GITHUB_REF_NAME}" \
+              --title "ARIA Framework ${GITHUB_REF_NAME}" \
+              --notes-file "${BODY_FILE}"
+          fi
