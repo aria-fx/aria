@@ -166,6 +166,14 @@ Organization-level Actions secrets (`ACR_LOGIN_SERVER`, `PURVIEW_ACCOUNT`,
 `AZURE_SUBSCRIPTION_ID`) are created and scoped to the template and sample
 repos so the CI/CD workflows can authenticate to Azure.
 
+For skill lifecycle orchestration, create `ARIA_CROSS_REPO_TOKEN` as an
+organization secret scoped to `aria`, `aria-skills`, and `aria-gateway` with
+these minimum fine-grained repository permissions:
+
+- Actions: Read and write (dispatch workflows, inspect runs, download artifacts)
+- Contents: Read
+- Issues: Read and write
+
 ### oasf-validation
 
 This module provisions the Azure Container Registry where published AI

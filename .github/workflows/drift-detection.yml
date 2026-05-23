@@ -1,0 +1,201 @@
+name: Cross-Repo Drift Detection Orchestration
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  drift-detection:
+    runs-on: ubuntu-latest
+    env:
+      SKILLS_OWNER: aria-fx
+      SKILLS_REPO: aria-skills
+      SKILLS_WORKFLOW: skill-lifecycle.yml
+      SKILLS_REF: main
+
+    steps:
+      # Validation comment for aria-fx/aria#23:
+      # This job runs Mondays at 06:00 UTC, dispatches aria-skills skill-lifecycle.yml
+      # with all_skills=true, waits for completion, downloads the drift artifact,
+      # and gates issue creation on detected affinity drift.
+      - name: Dispatch aria-skills multi-model eval
+        id: dispatch
+        env:
+          GH_TOKEN: ${{ secrets.ARIA_CROSS_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${GH_TOKEN:-}" ]]; then
+            echo "ARIA_CROSS_REPO_TOKEN is required." >&2
+            exit 1
+          fi
+
+          DISPATCH_TS="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          echo "dispatch_ts=${DISPATCH_TS}" >> "${GITHUB_OUTPUT}"
+
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${SKILLS_OWNER}/${SKILLS_REPO}/actions/workflows/${SKILLS_WORKFLOW}/dispatches" \
+            -f ref="${SKILLS_REF}" \
+            -f inputs[all_skills]='true'
+
+      - name: Wait for skill lifecycle completion
+        id: wait
+        env:
+          GH_TOKEN: ${{ secrets.ARIA_CROSS_REPO_TOKEN }}
+          DISPATCH_TS: ${{ steps.dispatch.outputs.dispatch_ts }}
+        run: |
+          set -euo pipefail
+
+          RUN_ID=""
+          for attempt in $(seq 1 30); do
+            RUN_ID="$(
+              gh api \
+                "/repos/${SKILLS_OWNER}/${SKILLS_REPO}/actions/workflows/${SKILLS_WORKFLOW}/runs?event=workflow_dispatch&branch=${SKILLS_REF}&per_page=20" \
+                --jq '.workflow_runs | map(select(.created_at >= "'"${DISPATCH_TS}"'")) | sort_by(.created_at) | last | .id // empty'
+            )"
+
+            if [[ -n "${RUN_ID}" ]]; then
+              break
+            fi
+
+            sleep 10
+          done
+
+          if [[ -z "${RUN_ID}" ]]; then
+            echo "Unable to find dispatched skill lifecycle run." >&2
+            exit 1
+          fi
+
+          echo "run_id=${RUN_ID}" >> "${GITHUB_OUTPUT}"
+          echo "run_url=https://github.com/${SKILLS_OWNER}/${SKILLS_REPO}/actions/runs/${RUN_ID}" >> "${GITHUB_OUTPUT}"
+
+          for attempt in $(seq 1 90); do
+            STATUS="$(gh api "/repos/${SKILLS_OWNER}/${SKILLS_REPO}/actions/runs/${RUN_ID}" --jq '.status')"
+            CONCLUSION="$(gh api "/repos/${SKILLS_OWNER}/${SKILLS_REPO}/actions/runs/${RUN_ID}" --jq '.conclusion // ""')"
+
+            if [[ "${STATUS}" == "completed" ]]; then
+              if [[ "${CONCLUSION}" != "success" ]]; then
+                echo "aria-skills workflow failed with conclusion=${CONCLUSION}" >&2
+                exit 1
+              fi
+              break
+            fi
+
+            sleep 20
+          done
+
+          FINAL_STATUS="$(gh api "/repos/${SKILLS_OWNER}/${SKILLS_REPO}/actions/runs/${RUN_ID}" --jq '.status')"
+          if [[ "${FINAL_STATUS}" != "completed" ]]; then
+            echo "Timed out waiting for run ${RUN_ID}." >&2
+            exit 1
+          fi
+
+      - name: Download and parse consolidated drift report
+        id: report
+        env:
+          GH_TOKEN: ${{ secrets.ARIA_CROSS_REPO_TOKEN }}
+          RUN_ID: ${{ steps.wait.outputs.run_id }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p drift-report
+          ARTIFACT_ID="$(
+            gh api "/repos/${SKILLS_OWNER}/${SKILLS_REPO}/actions/runs/${RUN_ID}/artifacts?per_page=100" \
+              --jq '.artifacts | map(select((.name | ascii_downcase | contains("drift")) or (.name | ascii_downcase | contains("consolidated")) or (.name | ascii_downcase | contains("affinity")))) | sort_by(.created_at) | last | .id // empty'
+          )"
+
+          if [[ -z "${ARTIFACT_ID}" ]]; then
+            echo "No drift artifact found for run ${RUN_ID}." >&2
+            exit 1
+          fi
+
+          curl -fsSL \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${SKILLS_OWNER}/${SKILLS_REPO}/actions/artifacts/${ARTIFACT_ID}/zip" \
+            -o drift-report/artifact.zip
+
+          unzip -o drift-report/artifact.zip -d drift-report/extracted >/dev/null
+
+          REPORT_FILE="$(find drift-report/extracted -type f -name '*.json' | head -n1 || true)"
+          if [[ -z "${REPORT_FILE}" ]]; then
+            echo "No JSON report found in downloaded artifact." >&2
+            exit 1
+          fi
+
+          DRIFTED_SKILLS_JSON="$(
+            jq -c '
+              def names_from_array(a):
+                [a[]? | if type == "string" then . elif type == "object" then (.skill // .skill_name // .name // .id // .slug // empty) else empty end]
+                | map(select(length > 0));
+              def names_from_flagged_skills:
+                [(.skills // [])[]?
+                  | select((.affinity_changed // .affinityChanged // .drifted // .has_drift // false) == true)
+                  | (.skill // .skill_name // .name // .id // .slug // empty)]
+                | map(select(length > 0));
+              (
+                names_from_array(.drifted_skills // [])
+                + names_from_array(.driftedSkills // [])
+                + names_from_array(.skills_with_drift // [])
+                + names_from_array(.skillsWithDrift // [])
+                + names_from_array(.affinity_drift.skills // [])
+                + names_from_array(.affinityDrift.skills // [])
+                + names_from_flagged_skills
+              ) | unique
+            ' "${REPORT_FILE}"
+          )"
+
+          DRIFT_COUNT="$(echo "${DRIFTED_SKILLS_JSON}" | jq 'length')"
+          echo "drift_count=${DRIFT_COUNT}" >> "${GITHUB_OUTPUT}"
+          echo "drifted_skills=${DRIFTED_SKILLS_JSON}" >> "${GITHUB_OUTPUT}"
+
+          if [[ "${DRIFT_COUNT}" -gt 0 ]]; then
+            echo "has_drift=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "has_drift=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+      # Validation comment for aria-fx/aria#24:
+      # ARIA_CROSS_REPO_TOKEN must support repo + actions:write (dispatch) and
+      # actions:read (run/artifact polling). This step prevents duplicate open alerts.
+      - name: Create drift alert issue if needed
+        if: ${{ steps.report.outputs.has_drift == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRIFTED_SKILLS: ${{ steps.report.outputs.drifted_skills }}
+          SKILLS_RUN_URL: ${{ steps.wait.outputs.run_url }}
+        run: |
+          set -euo pipefail
+
+          EXISTING_ISSUE="$(
+            gh issue list \
+              --repo "${GITHUB_REPOSITORY}" \
+              --state open \
+              --search 'in:title "[Drift Alert] Skill affinity drift detected"' \
+              --json number \
+              --jq '.[0].number // empty'
+          )"
+
+          if [[ -n "${EXISTING_ISSUE}" ]]; then
+            echo "Open drift alert issue already exists: #${EXISTING_ISSUE}"
+            exit 0
+          fi
+
+          DRIFTED_LIST="$(echo "${DRIFTED_SKILLS}" | jq -r '.[]' | sed 's/^/- /')"
+          TITLE="[Drift Alert] Skill affinity drift detected"
+          BODY=$'A weekly cross-repo drift check detected skill affinity changes.\n\n'
+          BODY+="Detected drifted skills:"$'\n'"${DRIFTED_LIST}"$'\n\n'
+          BODY+="Source run: ${SKILLS_RUN_URL}"$'\n\n'
+          BODY+="<!-- drift-alert-skill-affinity -->"
+
+          gh issue create \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "${TITLE}" \
+            --body "${BODY}"
