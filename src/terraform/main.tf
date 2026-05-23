@@ -50,6 +50,17 @@ module "github_marketplace" {
   purview_account_name   = module.azure_governance.purview_account_name
   purview_endpoint       = module.azure_governance.purview_catalog_endpoint
   key_vault_name         = module.azure_governance.key_vault_name
+
+  # Skill lifecycle — cross-repo token and provider API keys
+  aria_cross_repo_token  = var.aria_cross_repo_token
+  openai_api_key         = var.openai_api_key
+  anthropic_api_key      = var.anthropic_api_key
+  azure_openai_api_key   = var.azure_openai_api_key
+  azure_openai_endpoint  = var.azure_openai_endpoint
+
+  # Skill lifecycle — eval quality-gate thresholds
+  eval_pass_threshold    = var.eval_pass_threshold
+  drift_threshold        = var.drift_threshold
 }
 
 # ─────────────────────────────────────────────────────────────
