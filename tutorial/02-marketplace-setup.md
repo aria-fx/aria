@@ -167,7 +167,7 @@ Organization-level Actions secrets (`ACR_LOGIN_SERVER`, `PURVIEW_ACCOUNT`,
 repos so the CI/CD workflows can authenticate to Azure.
 
 For skill lifecycle orchestration, create `ARIA_CROSS_REPO_TOKEN` as an
-organization secret scoped to `aria`, `aria-skills`, and `aria-gateway` with
+organization secret scoped to `aria` and `aria-skills` with
 these minimum fine-grained repository permissions:
 
 - Actions: Read and write (dispatch workflows, inspect runs, download artifacts)
