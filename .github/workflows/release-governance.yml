@@ -31,7 +31,7 @@ jobs:
           set -euo pipefail
 
           TAG="${GITHUB_REF_NAME}"
-          if [[ ! "${TAG}" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)([-+][0-9A-Za-z.-]+)?$ ]]; then
+          if [[ ! "${TAG}" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
             echo "Tag '${TAG}' must follow vMAJOR.MINOR.PATCH SemVer." >&2
             exit 1
           fi
@@ -94,7 +94,8 @@ PY
           gh api "/repos/${SKILLS_OWNER}/${SKILLS_REPO}/tarball/${SKILLS_REF}" > governance-check/aria-skills.tar.gz
           tar -xzf governance-check/aria-skills.tar.gz -C governance-check
 
-          SKILLS_ROOT="$(find governance-check -mindepth 1 -maxdepth 1 -type d -name 'aria-fx-aria-skills-*' | head -n1)"
+          SKILLS_ROOT_PATTERN="${SKILLS_OWNER}-${SKILLS_REPO}-*"
+          SKILLS_ROOT="$(find governance-check -mindepth 1 -maxdepth 1 -type d -name "${SKILLS_ROOT_PATTERN}" | head -n1)"
           if [[ -z "${SKILLS_ROOT}" ]]; then
             echo "Unable to locate extracted aria-skills content." >&2
             exit 1
