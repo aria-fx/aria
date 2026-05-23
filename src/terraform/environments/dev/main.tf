@@ -18,6 +18,15 @@ module "aria_asset_management" {
   sensitivity_tiers        = var.sensitivity_tiers
   enable_private_endpoints = var.enable_private_endpoints
   enable_sample_asset_repo = var.enable_sample_asset_repo
+
+  # Skill lifecycle secrets and thresholds
+  aria_cross_repo_token    = var.aria_cross_repo_token
+  openai_api_key           = var.openai_api_key
+  anthropic_api_key        = var.anthropic_api_key
+  azure_openai_api_key     = var.azure_openai_api_key
+  azure_openai_endpoint    = var.azure_openai_endpoint
+  eval_pass_threshold      = var.eval_pass_threshold
+  drift_threshold          = var.drift_threshold
 }
 
 # Re-export key outputs
@@ -51,3 +60,12 @@ variable "oasf_schema_version" { type = string }
 variable "sensitivity_tiers" { type = list(string) }
 variable "enable_private_endpoints" { type = bool }
 variable "enable_sample_asset_repo" { type = bool }
+
+# Skill lifecycle secrets and thresholds
+variable "aria_cross_repo_token" { type = string; sensitive = true }
+variable "openai_api_key" { type = string; sensitive = true; default = "" }
+variable "anthropic_api_key" { type = string; sensitive = true; default = "" }
+variable "azure_openai_api_key" { type = string; sensitive = true; default = "" }
+variable "azure_openai_endpoint" { type = string; sensitive = true; default = "" }
+variable "eval_pass_threshold" { type = number; default = 80 }
+variable "drift_threshold" { type = number; default = 3 }

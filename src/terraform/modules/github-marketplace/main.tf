@@ -323,3 +323,86 @@ resource "github_actions_organization_secret" "azure_subscription_id" {
     var.enable_sample_asset ? github_repository.sample_agent[0].repo_id : "",
   ])
 }
+
+# ── Skill Lifecycle: Cross-Repo Data Sources ───────────────
+
+data "github_repository" "aria" {
+  name = var.aria_repo_name
+}
+
+data "github_repository" "aria_skills" {
+  name = var.skills_repo_name
+}
+
+data "github_repository" "aria_gateway" {
+  name = var.gateway_repo_name
+}
+
+# ── Skill Lifecycle: Cross-Repo Token (Issue #31) ──────────
+# Allows drift-detection and orchestration workflows to open
+# issues and dispatch workflows across the three ARIA repos.
+
+resource "github_actions_organization_secret" "aria_cross_repo_token" {
+  secret_name     = "ARIA_CROSS_REPO_TOKEN"
+  visibility      = "selected"
+  plaintext_value = var.aria_cross_repo_token
+
+  selected_repository_ids = [
+    data.github_repository.aria.repo_id,
+    data.github_repository.aria_skills.repo_id,
+    data.github_repository.aria_gateway.repo_id,
+  ]
+}
+
+# ── Skill Lifecycle: Provider API Key Secrets (Issue #32) ──
+# API keys for the promptfoo-based multi-model eval pipeline
+# (gpt-4o / gpt-4o-mini, claude-sonnet-4 / claude-haiku-4-5,
+#  azure-gpt-4o) running inside aria-skills workflows.
+
+resource "github_actions_organization_secret" "openai_api_key" {
+  secret_name     = "OPENAI_API_KEY"
+  visibility      = "selected"
+  plaintext_value = var.openai_api_key
+
+  selected_repository_ids = [data.github_repository.aria_skills.repo_id]
+}
+
+resource "github_actions_organization_secret" "anthropic_api_key" {
+  secret_name     = "ANTHROPIC_API_KEY"
+  visibility      = "selected"
+  plaintext_value = var.anthropic_api_key
+
+  selected_repository_ids = [data.github_repository.aria_skills.repo_id]
+}
+
+resource "github_actions_organization_secret" "azure_openai_api_key" {
+  secret_name     = "AZURE_OPENAI_API_KEY"
+  visibility      = "selected"
+  plaintext_value = var.azure_openai_api_key
+
+  selected_repository_ids = [data.github_repository.aria_skills.repo_id]
+}
+
+resource "github_actions_organization_secret" "azure_openai_endpoint" {
+  secret_name     = "AZURE_OPENAI_ENDPOINT"
+  visibility      = "selected"
+  plaintext_value = var.azure_openai_endpoint
+
+  selected_repository_ids = [data.github_repository.aria_skills.repo_id]
+}
+
+# ── Skill Lifecycle: Eval Threshold Variables (Issue #33) ──
+# Repository variables consumed by eval quality-gate jobs and
+# the scheduled drift-detection workflow in aria-skills.
+
+resource "github_actions_variable" "eval_pass_threshold" {
+  repository    = data.github_repository.aria_skills.name
+  variable_name = "EVAL_PASS_THRESHOLD"
+  value         = tostring(var.eval_pass_threshold)
+}
+
+resource "github_actions_variable" "drift_threshold" {
+  repository    = data.github_repository.aria_skills.name
+  variable_name = "DRIFT_THRESHOLD"
+  value         = tostring(var.drift_threshold)
+}
