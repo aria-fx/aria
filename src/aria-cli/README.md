@@ -20,6 +20,7 @@ agent runtime and governed by policy."
 | `aria inspect <ref>` | Display [OASF](https://schema.oasf.outshift.com/) Record and governance overlay without installing                    |
 | `aria audit <ref>`   | Validate governance (ceiling, consumer, dependencies) before install             |
 | `aria install <ref>` | Pull OCI artifact, enforce governance, install to target runtime                 |
+| `aria scaffold`      | Install a curated preset bundle of assets (`--preset`), reusing the install flow |
 | `aria whoami`        | Resolve Entra identity and show effective sensitivity/Purview access             |
 | `aria list`          | List installed assets with version, sensitivity, and target                      |
 | `aria registry ...`  | Manage registry sources (`list/add/remove/update/set-default/validate`)          |
@@ -94,6 +95,40 @@ dotnet pack src/aria-cli/Aria.Cli.csproj -o ./nupkg
 dotnet tool install --global --add-source ./nupkg aria
 aria search --skill "knowledge_retrieval/rag"
 ```
+
+## Scaffold Presets
+
+`aria scaffold` installs a curated bundle of related assets in one command,
+running the exact same governance-enforced install flow as `aria install`
+for each asset.
+
+| Preset       | Alias                      | Contents                                                                   |
+| ------------ | -------------------------- | -------------------------------------------------------------------------- |
+| `usage-eval` | `provider-usage-evaluator` | Provider/cloud usage evaluation bundle: 4 MCP skills (`usage-ingest-normalize`, `usage-eval-metrics`, `usage-conformance`, `usage-reporting` @ 1.0.1) + `provider-usage-evaluator` agent @ 1.0.0 |
+
+```bash
+# Install the full usage-eval bundle (4 skills + 1 agent) into Claude Desktop
+aria scaffold --preset usage-eval --target claude-desktop
+
+# Same bundle by alias, skills only (agent skipped)
+aria scaffold --preset provider-usage-evaluator --target vscode --skills-only
+```
+
+Behavior:
+
+- **Idempotent** — re-running a scaffold re-pulls and overwrites cached
+  artifacts; no duplicate state is created.
+- **Governed** — each asset goes through registry source policy and
+  governance overlay validation (sensitivity ceiling, consumer allow-list).
+  The usage-eval bundle is `confidential` tier, so your effective ceiling
+  must be `confidential` or higher.
+- **Continues through failures** — all assets are attempted; a summary
+  table shows per-asset status, and the command exits non-zero if any
+  asset failed.
+- **Pinned versions** — presets reference exact published tags.
+- Requires the source registries (`ghcr.io/aria-fx/aria-skills`,
+  `ghcr.io/aria-fx/agents`) to be present in `registries` in
+  `~/.aria/config.json` (add via `aria registry add`).
 
 ## Governance Enforcement
 

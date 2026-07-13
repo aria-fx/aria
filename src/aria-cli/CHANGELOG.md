@@ -6,6 +6,9 @@ The format follows Keep a Changelog categories and SemVer intent.
 
 ## Unreleased
 
+### Added
+- `aria scaffold` command for installing curated preset bundles via `--preset`, with `--skills-only` to skip agent assets. First preset: `usage-eval` (alias `provider-usage-evaluator`) — 4 usage-evaluation MCP skills @ 1.0.1 plus the `provider-usage-evaluator` agent @ 1.0.0. Each asset runs the standard governance-enforced install flow; failures are summarized per asset and produce a non-zero exit code.
+
 ## 0.0.1-22 - 2026-05-03
 
 ### Changed

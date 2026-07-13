@@ -134,7 +134,7 @@ Working C# application on Microsoft Agent Framework 1.0 demonstrating:
 
 ### ARIA CLI (`src/aria-cli/`)
 
-ARIA Package Manager prototype: `search`, `inspect`, `audit`, `install`, `list`
+ARIA Package Manager prototype: `search`, `inspect`, `audit`, `install`, `scaffold`, `list`
 with pluggable install targets (Claude Desktop, VS Code, Agent Framework) and
 governance enforcement at install time.
 
