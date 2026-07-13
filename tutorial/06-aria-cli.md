@@ -10,6 +10,7 @@ runtimes using the ARIA Package Manager.
 - Inspect an asset's [OASF](https://schema.oasf.outshift.com/) Record and governance overlay
 - Audit governance compliance before installing
 - Install an MCP skill into Claude Desktop
+- Scaffold a curated preset bundle with one command
 - See governance blocking an over-classified install
 
 ## Step 1: Build the CLI
@@ -40,6 +41,7 @@ Commands:
   inspect    Display [OASF](https://schema.oasf.outshift.com/) Record and governance overlay for an asset
   audit      Validate governance compliance before install
   install    Pull and install an AI asset into a target runtime
+  scaffold   Install a curated preset bundle of AI assets
   list       List installed AI assets
 ```
 
@@ -201,7 +203,42 @@ dotnet run -- install ghcr.io/jgarverick/aria-assets/onboarding-assistant:2.1.0 
 This registers the agent as a remote A2A endpoint instead of modifying
 a Claude Desktop config file.
 
-## Step 7: List installed assets
+## Step 7: Scaffold a preset bundle
+
+Some workflows need several related assets. `aria scaffold` installs a
+curated bundle in one command, running the same governance-enforced
+install flow for each asset:
+
+```bash
+dotnet run -- scaffold --preset usage-eval --target claude-desktop
+```
+
+The `usage-eval` preset (alias `provider-usage-evaluator`) installs the
+provider/cloud usage evaluation bundle — four MCP skills
+(`usage-ingest-normalize`, `usage-eval-metrics`, `usage-conformance`,
+`usage-reporting`) plus the `provider-usage-evaluator` agent. Each asset
+is fetched, governance-validated, pulled, and installed individually,
+then a summary table shows per-asset status:
+
+```
+✓ Scaffold complete: 5/5 assets installed
+```
+
+Useful variations:
+
+```bash
+# Skills only — skip the agent asset
+dotnet run -- scaffold --preset usage-eval --target claude-desktop --skills-only
+
+# Re-running is idempotent: cached artifacts are overwritten in place
+dotnet run -- scaffold --preset usage-eval --target claude-desktop
+```
+
+If any asset is blocked by governance (e.g. your ceiling is below
+`confidential`), the scaffold continues through the remaining assets,
+reports every failure in the summary table, and exits non-zero.
+
+## Step 8: List installed assets
 
 ```bash
 dotnet run -- list

@@ -5,9 +5,11 @@
 // ─────────────────────────────────────────────────────────────
 
 using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.Text.Json;
 using Aria.Auth.Core.Models;
 using Aria.Auth.Core.Services;
+using Aria.Cli.Presets;
 using Aria.Cli.Services;
 using Aria.Cli.Targets;
 using Spectre.Console;
@@ -240,6 +242,92 @@ async Task<EffectiveAccessContext?> ResolveAccessAsync(AriaConfig config)
 
 RegistrySourcePolicyConfig ResolveSourcePolicy(AriaConfig config, string registry) =>
     RegistryPolicyEvaluator.ResolvePolicy(config, registry);
+
+async Task<AssetInstallOutcome> InstallAssetAsync(string reference, string target, AriaConfig config, EffectiveAccessContext access)
+{
+    // Step 1: Fetch metadata
+    AnsiConsole.MarkupLine("[dim]1. Fetching OASF metadata...[/]");
+    var record = await registry.FetchRecordAsync(reference);
+    var sourceRegistry = RegistryPolicyEvaluator.ResolveRegistryFromReference(reference, config.Registries) ?? "<unspecified>";
+    var sourcePolicy = ResolveSourcePolicy(config, sourceRegistry);
+    var governanceFetch = await registry.FetchGovernanceWithStateAsync(reference);
+    var gov = governanceFetch.Overlay;
+
+    if (record == null)
+    {
+        AnsiConsole.MarkupLine("[red]Could not fetch OASF Record.[/]");
+        return new AssetInstallOutcome(reference, false, "fetch", "Could not fetch OASF Record.", null);
+    }
+
+    AnsiConsole.MarkupLine($"   Asset: [cyan]{record.Name}[/] v{record.Version}");
+
+    // Step 2: Governance check
+    AnsiConsole.MarkupLine("[dim]2. Validating governance...[/]");
+    var sourcePolicyDecision = RegistryPolicyEvaluator.EvaluateInstallPolicy(
+        sourcePolicy,
+        governanceFetch.GovernanceState,
+        access.SensitivityCeiling);
+    if (!sourcePolicyDecision.Allowed)
+    {
+        AnsiConsole.MarkupLine($"[red]   ✗ {sourcePolicyDecision.Reason}[/]");
+        AnsiConsole.MarkupLine($"   [dim]Source: {sourceRegistry} | governance: {sourcePolicyDecision.GovernanceState}[/]");
+        return new AssetInstallOutcome(reference, false, "registry-policy", sourcePolicyDecision.Reason, record);
+    }
+
+    if (gov != null)
+    {
+        var result = governance.ValidateInstall(config, gov, access);
+        if (!result.Allowed)
+        {
+            AnsiConsole.MarkupLine($"[red]   ✗ {result.Reason}[/]");
+            return new AssetInstallOutcome(reference, false, "governance", result.Reason, record);
+        }
+        AnsiConsole.MarkupLine($"   [green]✓[/] Source: {sourceRegistry} ({sourcePolicy.TrustTier})");
+        AnsiConsole.MarkupLine($"   [green]✓[/] Governance state: {sourcePolicyDecision.GovernanceState}");
+        AnsiConsole.MarkupLine($"   [green]✓[/] Policy reason: {Markup.Escape(sourcePolicyDecision.Reason)}");
+        AnsiConsole.MarkupLine($"   [green]✓[/] Sensitivity: {gov.Governance.SensitivityTier} ≤ {access.SensitivityCeiling}");
+        AnsiConsole.MarkupLine($"   [green]✓[/] Consumer '{access.ConsumerId}' is authorized");
+    }
+    else
+    {
+        AnsiConsole.MarkupLine($"   [green]✓[/] Source: {sourceRegistry} ({sourcePolicy.TrustTier})");
+        AnsiConsole.MarkupLine($"   [green]✓[/] Governance state: {sourcePolicyDecision.GovernanceState}");
+        AnsiConsole.MarkupLine($"   [yellow]⚠ Registry policy allowed install: {Markup.Escape(sourcePolicyDecision.Reason)}[/]");
+        AnsiConsole.MarkupLine("   [yellow]⚠ Governance overlay not available; overlay validation was skipped[/]");
+        AnsiConsole.MarkupLine("   [yellow]⚠ Sensitivity and consumer authorization checks were not performed[/]");
+        if (!string.IsNullOrWhiteSpace(governanceFetch.Error))
+            AnsiConsole.MarkupLine($"   [yellow]⚠ Governance fetch detail: {Markup.Escape(governanceFetch.Error)}[/]");
+    }
+
+    // Step 3: Pull artifact
+    AnsiConsole.MarkupLine("[dim]3. Pulling OCI artifact...[/]");
+    var outputDir = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+        ".aria", "cache", record.Name.Replace('/', '-'));
+    var pulled = await registry.PullArtifactAsync(reference, outputDir);
+    AnsiConsole.MarkupLine($"   Cached to: {outputDir}");
+
+    // Step 4: Install to target
+    AnsiConsole.MarkupLine($"[dim]4. Installing to {target}...[/]");
+    var installTarget = TargetRegistry.Get(target);
+    if (installTarget == null)
+    {
+        AnsiConsole.MarkupLine($"[red]Unknown target '{target}'. Available: {string.Join(", ", TargetRegistry.Available)}[/]");
+        return new AssetInstallOutcome(reference, false, "target", $"Unknown target '{target}'.", record);
+    }
+
+    var targetConfig = config.Targets.GetValueOrDefault(target) ?? new();
+    var success = await installTarget.InstallAsync(pulled ?? outputDir, record, targetConfig);
+
+    if (success)
+    {
+        AnsiConsole.MarkupLine($"\n[green]✓ Successfully installed {record.Name} v{record.Version} → {target}[/]");
+        return new AssetInstallOutcome(reference, true, "installed", null, record);
+    }
+
+    AnsiConsole.MarkupLine($"\n[red]✗ Installation failed[/]");
+    return new AssetInstallOutcome(reference, false, "target", "Installation failed", record);
+}
 
 // ═══════════════════════════════════════════════════════════
 // ROOT COMMAND
@@ -551,91 +639,101 @@ installCommand.SetHandler(async (string reference, string target) =>
 
     AnsiConsole.MarkupLine($"[bold]aria install[/] {reference} → {target}\n");
 
-    // Step 1: Fetch metadata
-    AnsiConsole.MarkupLine("[dim]1. Fetching OASF metadata...[/]");
-    var record = await registry.FetchRecordAsync(reference);
-    var sourceRegistry = RegistryPolicyEvaluator.ResolveRegistryFromReference(reference, config.Registries) ?? "<unspecified>";
-    var sourcePolicy = ResolveSourcePolicy(config, sourceRegistry);
-    var governanceFetch = await registry.FetchGovernanceWithStateAsync(reference);
-    var gov = governanceFetch.Overlay;
-
-    if (record == null)
-    {
-        AnsiConsole.MarkupLine("[red]Could not fetch OASF Record.[/]");
-        return;
-    }
-
-    AnsiConsole.MarkupLine($"   Asset: [cyan]{record.Name}[/] v{record.Version}");
-
-    // Step 2: Governance check
-    AnsiConsole.MarkupLine("[dim]2. Validating governance...[/]");
-    var sourcePolicyDecision = RegistryPolicyEvaluator.EvaluateInstallPolicy(
-        sourcePolicy,
-        governanceFetch.GovernanceState,
-        access.SensitivityCeiling);
-    if (!sourcePolicyDecision.Allowed)
-    {
-        AnsiConsole.MarkupLine($"[red]   ✗ {sourcePolicyDecision.Reason}[/]");
-        AnsiConsole.MarkupLine($"   [dim]Source: {sourceRegistry} | governance: {sourcePolicyDecision.GovernanceState}[/]");
-        return;
-    }
-
-    if (gov != null)
-    {
-        var result = governance.ValidateInstall(config, gov, access);
-        if (!result.Allowed)
-        {
-            AnsiConsole.MarkupLine($"[red]   ✗ {result.Reason}[/]");
-            return;
-        }
-        AnsiConsole.MarkupLine($"   [green]✓[/] Source: {sourceRegistry} ({sourcePolicy.TrustTier})");
-        AnsiConsole.MarkupLine($"   [green]✓[/] Governance state: {sourcePolicyDecision.GovernanceState}");
-        AnsiConsole.MarkupLine($"   [green]✓[/] Policy reason: {Markup.Escape(sourcePolicyDecision.Reason)}");
-        AnsiConsole.MarkupLine($"   [green]✓[/] Sensitivity: {gov.Governance.SensitivityTier} ≤ {access.SensitivityCeiling}");
-        AnsiConsole.MarkupLine($"   [green]✓[/] Consumer '{access.ConsumerId}' is authorized");
-    }
-    else
-    {
-        AnsiConsole.MarkupLine($"   [green]✓[/] Source: {sourceRegistry} ({sourcePolicy.TrustTier})");
-        AnsiConsole.MarkupLine($"   [green]✓[/] Governance state: {sourcePolicyDecision.GovernanceState}");
-        AnsiConsole.MarkupLine($"   [yellow]⚠ Registry policy allowed install: {Markup.Escape(sourcePolicyDecision.Reason)}[/]");
-        AnsiConsole.MarkupLine("   [yellow]⚠ Governance overlay not available; overlay validation was skipped[/]");
-        AnsiConsole.MarkupLine("   [yellow]⚠ Sensitivity and consumer authorization checks were not performed[/]");
-        if (!string.IsNullOrWhiteSpace(governanceFetch.Error))
-            AnsiConsole.MarkupLine($"   [yellow]⚠ Governance fetch detail: {Markup.Escape(governanceFetch.Error)}[/]");
-    }
-
-    // Step 3: Pull artifact
-    AnsiConsole.MarkupLine("[dim]3. Pulling OCI artifact...[/]");
-    var outputDir = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-        ".aria", "cache", record.Name.Replace('/', '-'));
-    var pulled = await registry.PullArtifactAsync(reference, outputDir);
-    AnsiConsole.MarkupLine($"   Cached to: {outputDir}");
-
-    // Step 4: Install to target
-    AnsiConsole.MarkupLine($"[dim]4. Installing to {target}...[/]");
-    var installTarget = TargetRegistry.Get(target);
-    if (installTarget == null)
-    {
-        AnsiConsole.MarkupLine($"[red]Unknown target '{target}'. Available: {string.Join(", ", TargetRegistry.Available)}[/]");
-        return;
-    }
-
-    var targetConfig = config.Targets.GetValueOrDefault(target) ?? new();
-    var success = await installTarget.InstallAsync(pulled ?? outputDir, record, targetConfig);
-
-    if (success)
-    {
-        AnsiConsole.MarkupLine($"\n[green]✓ Successfully installed {record.Name} v{record.Version} → {target}[/]");
-    }
-    else
-    {
-        AnsiConsole.MarkupLine($"\n[red]✗ Installation failed[/]");
-    }
+    await InstallAssetAsync(reference, target, config, access);
 }, installRefArg, targetOption);
 
 rootCommand.AddCommand(installCommand);
+
+// ═══════════════════════════════════════════════════════════
+// SCAFFOLD
+// ═══════════════════════════════════════════════════════════
+
+var scaffoldCommand = new Command("scaffold", "Install a curated preset bundle of AI assets");
+var presetOption = new Option<string>("--preset", "Preset bundle to install") { IsRequired = true };
+presetOption.AddCompletions(ScaffoldPresets.AvailableNames.ToArray());
+var scaffoldTargetOption = new Option<string>("--target", "Install target runtime") { IsRequired = true };
+scaffoldTargetOption.AddCompletions(TargetRegistry.Available.ToArray());
+var skillsOnlyOption = new Option<bool>("--skills-only", "Install only the preset's skills, skipping agents");
+scaffoldCommand.AddOption(presetOption);
+scaffoldCommand.AddOption(scaffoldTargetOption);
+scaffoldCommand.AddOption(skillsOnlyOption);
+
+scaffoldCommand.SetHandler(async (InvocationContext ctx) =>
+{
+    var presetName = ctx.ParseResult.GetValueForOption(presetOption)!;
+    var target = ctx.ParseResult.GetValueForOption(scaffoldTargetOption)!;
+    var skillsOnly = ctx.ParseResult.GetValueForOption(skillsOnlyOption);
+
+    if (!ScaffoldPresets.TryResolve(presetName, out var preset) || preset == null)
+    {
+        AnsiConsole.MarkupLine($"[red]Unknown preset '{Markup.Escape(presetName)}'.[/]");
+        AnsiConsole.MarkupLine($"Available presets: {Markup.Escape(ScaffoldPresets.DescribeAvailable())}");
+        ctx.ExitCode = 1;
+        return;
+    }
+
+    if (TargetRegistry.Get(target) == null)
+    {
+        AnsiConsole.MarkupLine($"[red]Unknown target '{Markup.Escape(target)}'. Available: {string.Join(", ", TargetRegistry.Available)}[/]");
+        ctx.ExitCode = 1;
+        return;
+    }
+
+    var config = NormalizeRegistryConfig(LoadConfig());
+    var access = await ResolveAccessAsync(config);
+    if (access == null)
+    {
+        ctx.ExitCode = 1;
+        return;
+    }
+
+    var assets = skillsOnly
+        ? preset.Assets.Where(a => a.Kind == ScaffoldPresets.SkillKind).ToList()
+        : preset.Assets.ToList();
+    var skippedAgents = preset.Assets.Count - assets.Count;
+
+    AnsiConsole.MarkupLine($"[bold]aria scaffold[/] --preset {preset.Name} → {target}");
+    AnsiConsole.MarkupLine($"{Markup.Escape(preset.Description)}");
+    AnsiConsole.MarkupLine($"Installing {assets.Count} asset(s)...");
+    if (skippedAgents > 0)
+        AnsiConsole.MarkupLine($"[yellow]--skills-only: skipping {skippedAgents} agent asset(s)[/]");
+
+    var outcomes = new List<AssetInstallOutcome>();
+    for (var i = 0; i < assets.Count; i++)
+    {
+        AnsiConsole.MarkupLine($"\n[bold][[{i + 1}/{assets.Count}]] {Markup.Escape(assets[i].Reference)} ({assets[i].Kind})[/]");
+        outcomes.Add(await InstallAssetAsync(assets[i].Reference, target, config, access));
+    }
+
+    var table = new Table();
+    table.AddColumn("Asset");
+    table.AddColumn("Kind");
+    table.AddColumn("Status");
+    table.AddColumn("Reason");
+    for (var i = 0; i < assets.Count; i++)
+    {
+        table.AddRow(
+            Markup.Escape(assets[i].Reference),
+            assets[i].Kind,
+            outcomes[i].Success ? "[green]✓[/]" : "[red]✗[/]",
+            Markup.Escape(outcomes[i].FailureReason ?? ""));
+    }
+    AnsiConsole.WriteLine();
+    AnsiConsole.Write(table);
+
+    var okCount = outcomes.Count(o => o.Success);
+    if (okCount == outcomes.Count)
+    {
+        AnsiConsole.MarkupLine($"\n[green]✓ Scaffold complete: {okCount}/{outcomes.Count} assets installed[/]");
+    }
+    else
+    {
+        AnsiConsole.MarkupLine($"\n[red]✗ Scaffold finished with failures: {okCount}/{outcomes.Count} assets installed[/]");
+        ctx.ExitCode = 1;
+    }
+});
+
+rootCommand.AddCommand(scaffoldCommand);
 
 // ═══════════════════════════════════════════════════════════
 // LIST
@@ -1118,3 +1216,5 @@ rootCommand.AddCommand(registryCommand);
 // ═══════════════════════════════════════════════════════════
 
 return await rootCommand.InvokeAsync(args);
+
+internal sealed record AssetInstallOutcome(string Reference, bool Success, string Stage, string? FailureReason, OasfRecord? Record);

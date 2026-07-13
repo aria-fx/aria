@@ -12,6 +12,7 @@ npm install -g @aria-fx/aria-cli --registry=https://npm.pkg.github.com
 
 ```bash
 aria search --keyword policy
+aria scaffold --preset usage-eval --target claude-desktop
 ```
 
 ## Runtime Requirement
