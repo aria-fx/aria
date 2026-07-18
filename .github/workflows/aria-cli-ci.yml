@@ -87,6 +87,14 @@ jobs:
       - name: Build npm runtime payload
         run: dotnet publish src/aria-cli/Aria.Cli.csproj -c Release -o src/aria-cli/npm/dist/aria
 
+      - name: Install npm wrapper build dependencies
+        working-directory: src/aria-cli/npm
+        run: npm ci
+
+      - name: Build npm launcher
+        working-directory: src/aria-cli/npm
+        run: npm run build:wrapper
+
       - name: Validate npm package contents
         run: make aria-npm-pack-dry-run
 

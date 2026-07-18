@@ -9,8 +9,6 @@ obj/
 artifacts/
 dist/
 
-# npm shim source (tracked despite bin/ ignore above)
-!src/aria-cli/npm/bin/
 # Terraform
 *.tfstate
 *.tfstate.backup

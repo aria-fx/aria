@@ -228,12 +228,12 @@ test:
 
 aria-npm-pack:
 	@echo "Packing aria CLI npm package from src/aria-cli/npm..."
-	cd src/aria-cli/npm && npm pack
+	cd src/aria-cli/npm && npm ci && npm pack
 	@echo "npm pack complete"
 
 aria-npm-pack-dry-run:
 	@echo "Validating aria CLI npm package from src/aria-cli/npm..."
-	cd src/aria-cli/npm && npm run check:dist && npm pack --dry-run
+	cd src/aria-cli/npm && npm ci && npm run check:dist && npm pack --dry-run
 	@echo "npm dry-run pack complete"
 
 # ── Clean ──────────────────────────────────────────────────

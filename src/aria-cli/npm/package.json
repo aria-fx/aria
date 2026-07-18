@@ -29,12 +29,23 @@
         "node": ">=18"
     },
     "scripts": {
-        "check:dist": "test -f dist/aria/aria.dll && test -f bin/aria.js"
+        "build:wrapper": "tsc -p tsconfig.json && chmod +x bin/aria.js",
+        "check:dist": "test -f dist/aria/aria.dll",
+        "check:wrapper": "test -x bin/aria.js",
+        "prepack": "npm run build:wrapper && npm run check:dist && npm run check:wrapper"
+    },
+    "devDependencies": {
+        "@types/node": "26.1.1",
+        "typescript": "7.0.2"
     },
     "keywords": [
         "aria",
         "cli",
         "oasf",
         "governance"
-    ]
+    ],
+    "devDependencies": {
+        "@types/node": "26.1.1",
+        "typescript": "7.0.2"
+    }
 }

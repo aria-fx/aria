@@ -201,10 +201,18 @@ jobs:
             -o src/aria-cli/npm/dist/aria \
             /p:Version=${{ steps.version.outputs.version }}
 
+      - name: Install npm wrapper build dependencies
+        working-directory: src/aria-cli/npm
+        run: npm ci
+
       - name: Set npm package version
         working-directory: src/aria-cli/npm
         run: |
           npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+
+      - name: Build npm launcher
+        working-directory: src/aria-cli/npm
+        run: npm run build:wrapper
 
       - name: Validate npm payload
         run: |
