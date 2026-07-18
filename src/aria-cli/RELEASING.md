@@ -30,7 +30,29 @@ This guide describes how to publish the `Aria.Cli` NuGet tool package and the `@
 
 ## Required Permissions
 
-- `contents: read`
+- `contents: write` (needed to commit back updated CHANGELOG, `.csproj`, and `package.json` on manual dispatch)
 - `packages: write`
 
 Publishing uses the repository `GITHUB_TOKEN`; no additional secrets are required for GitHub Packages in this repository.
+
+## Consumer Authentication
+
+GitHub Packages requires authentication to download packages, even from public repositories.
+
+**NuGet (dotnet tool):** Configure a source with a PAT (`read:packages` scope):
+
+```bash
+dotnet nuget add source https://nuget.pkg.github.com/aria-fx/index.json \
+  --name github-aria-fx \
+  --username YOUR_GITHUB_USERNAME \
+  --password YOUR_GITHUB_TOKEN \
+  --store-password-in-clear-text
+dotnet tool install --global Aria.Cli
+```
+
+**npm:** Add to `~/.npmrc`:
+
+```
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
+@aria-fx:registry=https://npm.pkg.github.com
+```

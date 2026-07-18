@@ -90,10 +90,44 @@ aria registry validate --json
 
 ## Install as Global Tool
 
+**From GitHub Packages (NuGet):**
+
+GitHub Packages always requires authentication, even for public packages.
+Obtain a [GitHub personal access token](https://github.com/settings/tokens) with `read:packages` scope, then:
+
+```bash
+dotnet nuget add source https://nuget.pkg.github.com/aria-fx/index.json \
+  --name github-aria-fx \
+  --username YOUR_GITHUB_USERNAME \
+  --password YOUR_GITHUB_TOKEN \
+  --store-password-in-clear-text
+
+dotnet tool install --global Aria.Cli --add-source https://nuget.pkg.github.com/aria-fx/index.json
+aria --help
+```
+
+**From a local build:**
+
 ```bash
 dotnet pack src/aria-cli/Aria.Cli.csproj -o ./nupkg
-dotnet tool install --global --add-source ./nupkg aria
+dotnet tool install --global Aria.Cli --add-source ./nupkg
 aria search --skill "knowledge_retrieval/rag"
+```
+
+**Via npm (requires .NET 9 runtime):**
+
+GitHub Packages npm also requires authentication. Configure `.npmrc`:
+
+```
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
+@aria-fx:registry=https://npm.pkg.github.com
+```
+
+Then install:
+
+```bash
+npm install -g @aria-fx/aria-cli
+aria --help
 ```
 
 ## Scaffold Presets

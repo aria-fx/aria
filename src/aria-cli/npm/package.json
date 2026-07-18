@@ -29,7 +29,7 @@
         "node": ">=18"
     },
     "scripts": {
-        "check:dist": "test -f dist/aria/aria.dll"
+        "check:dist": "test -f dist/aria/aria.dll && test -f bin/aria.js"
     },
     "keywords": [
         "aria",
