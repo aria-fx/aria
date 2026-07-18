@@ -61,7 +61,7 @@ jobs:
           echo "✓ NuGet package is a dotnet tool with command name 'aria'"
 
       - name: Install dotnet tool from local package
-        run: dotnet tool install -g Aria.Cli --add-source artifacts/nuget
+        run: dotnet tool install -g Aria.Cli --add-source artifacts/nuget --prerelease
 
       - name: Verify installed tool runs
         run: |
