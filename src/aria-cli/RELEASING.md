@@ -26,11 +26,12 @@ This guide describes how to publish the `Aria.Cli` NuGet tool package and the `@
 - Computes SemVer with GitVersion and validates SemVer format.
 - Validates no duplicate version exists in GitHub Packages for NuGet and npm.
 - Fails if `src/aria-cli/CHANGELOG.md` does not contain the release version heading.
+- For manual releases, prepares changelog/version metadata in the runner for packaging only; persisted metadata updates must still be made through a pull request.
 - Supports `dry_run=true` to validate packaging without publishing.
 
 ## Required Permissions
 
-- `contents: write` (needed to commit back updated CHANGELOG, `.csproj`, and `package.json` on manual dispatch)
+- `contents: read`
 - `packages: write`
 
 Publishing uses the repository `GITHUB_TOKEN`; no additional secrets are required for GitHub Packages in this repository.

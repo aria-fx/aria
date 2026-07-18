@@ -40,6 +40,7 @@ The publish workflow fails if the target version heading is missing.
 - Verifies there are actual changes under `src/aria-auth-core/`.
 - Fails on duplicate package version in GitHub Packages.
 - Fails if changelog does not contain the release version.
+- For manual releases, prepares changelog/version metadata in the runner for packaging only; persisted metadata updates must still be made through a pull request.
 
 ## Dry Run
 
