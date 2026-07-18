@@ -13,6 +13,9 @@ on:
       - 'src/aria-auth-core/**'
       - '.github/workflows/aria-cli-*.yml'
 
+permissions:
+  contents: read
+
 env:
   NODE_VERSION: '20'
 
