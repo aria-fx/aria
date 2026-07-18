@@ -15,12 +15,13 @@ on:
 permissions:
   contents: read
 
-env:
-  DOTNET_VERSION: "9.0.x"
-
 jobs:
   build-and-test:
+    name: Build and test (.NET ${{ matrix.dotnet-version }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: ["8.0.x", "9.0.x", "10.0.x"]
 
     steps:
       - name: Checkout
@@ -29,7 +30,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: Restore and build auth core
         run: |

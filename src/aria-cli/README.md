@@ -114,7 +114,7 @@ dotnet tool install --global Aria.Cli --add-source ./nupkg
 aria search --skill "knowledge_retrieval/rag"
 ```
 
-**Via npm (requires .NET 9 runtime):**
+**Via npm (requires .NET 8, 9, or 10 runtime):**
 
 GitHub Packages npm also requires authentication. Configure `.npmrc`:
 

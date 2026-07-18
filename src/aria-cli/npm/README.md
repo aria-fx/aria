@@ -17,9 +17,8 @@ aria scaffold --preset usage-eval --target claude-desktop
 
 ## Runtime Requirement
 
-This package executes the .NET-based `aria` CLI and requires .NET 9 runtime on the host machine.
+This package executes the .NET-based `aria` CLI and requires a .NET 8, 9, or 10 runtime on the host machine.
 
 ## Release Notes
 
 See `src/aria-cli/CHANGELOG.md` in the source repository for release notes.
-

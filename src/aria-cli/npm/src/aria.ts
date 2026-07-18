@@ -9,7 +9,7 @@ const result = spawnSync('dotnet', [dll, ...process.argv.slice(2)], { stdio: 'in
 if (result.error) {
     const error = result.error as NodeJS.ErrnoException;
     const msg = error.code === 'ENOENT'
-        ? 'aria: .NET runtime not found. Install .NET 9 SDK or Runtime from https://dot.net\n'
+        ? 'aria: .NET runtime not found. Install .NET 8, 9, or 10 SDK or Runtime from https://dot.net\n'
         : `aria: failed to launch: ${error.message}\n`;
     process.stderr.write(msg);
     process.exit(1);
