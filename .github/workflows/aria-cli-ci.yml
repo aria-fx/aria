@@ -57,7 +57,7 @@ jobs:
           pkg=$(ls artifacts/nuget/Aria.Cli.*.nupkg | grep -v symbols | head -1)
           echo "Package: $pkg"
           unzip -p "$pkg" "tools/net9.0/any/DotnetToolSettings.xml" \
-            | grep -q 'CommandName="aria"'
+            | grep -q 'Name="aria"'
           echo "✓ NuGet package is a dotnet tool with command name 'aria'"
 
       - name: Install dotnet tool from local package
