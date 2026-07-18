@@ -48,27 +48,27 @@ jobs:
           set -euo pipefail
 
           SCHEMA_VERSION="$(python - <<'PY'
-import pathlib
-import re
-
-variables = pathlib.Path('src/terraform/variables.tf').read_text(encoding='utf-8')
-match = re.search(
-    r'variable\s+"oasf_schema_version"\s*\{.*?default\s*=\s*"([^"]+)"',
-    variables,
-    re.S,
-)
-if not match:
-    raise SystemExit('Unable to determine oasf_schema_version from src/terraform/variables.tf')
-print(match.group(1))
-PY
-)"
-
-          if [[ -z "${SCHEMA_VERSION}" ]]; then
-            echo "Bundled OASF schema version is empty." >&2
-            exit 1
-          fi
-
-          echo "required_schema_version=${SCHEMA_VERSION}" >> "${GITHUB_OUTPUT}"
+          import pathlib
+          import re
+          
+          variables = pathlib.Path('src/terraform/variables.tf').read_text(encoding='utf-8')
+          match = re.search(
+              r'variable\s+"oasf_schema_version"\s*\{.*?default\s*=\s*"([^"]+)"',
+              variables,
+              re.S,
+          )
+          if not match:
+              raise SystemExit('Unable to determine oasf_schema_version from src/terraform/variables.tf')
+          print(match.group(1))
+          PY
+          )"
+          
+                    if [[ -z "${SCHEMA_VERSION}" ]]; then
+                      echo "Bundled OASF schema version is empty." >&2
+                      exit 1
+                    fi
+          
+                    echo "required_schema_version=${SCHEMA_VERSION}" >> "${GITHUB_OUTPUT}"
 
       # Required secret:
       # - ARIA_CROSS_REPO_TOKEN (repo scope) for cross-repo reads in aria-skills and aria-gateway
