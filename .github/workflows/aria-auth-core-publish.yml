@@ -29,7 +29,7 @@ permissions:
 # - GitVersion config: GitVersion.yml
 
 env:
-  DOTNET_VERSION: "9.0.x"
+  DOTNET_VERSION: "10.0.x"
   NUGET_SOURCE_URL: "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
   NUGET_PACKAGE_ID: "Aria.Auth.Core"
 

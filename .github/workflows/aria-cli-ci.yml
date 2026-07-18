@@ -1,0 +1,133 @@
+name: aria CLI CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/aria-cli/**'
+      - 'src/aria-auth-core/**'
+      - '.github/workflows/aria-cli-*.yml'
+  pull_request:
+    paths:
+      - 'src/aria-cli/**'
+      - 'src/aria-auth-core/**'
+      - '.github/workflows/aria-cli-*.yml'
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  test:
+    name: Build and test (.NET ${{ matrix.dotnet-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: ['8.0.x', '9.0.x', '10.0.x']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore
+        run: dotnet restore src/aria-cli/Aria.Cli.Tests/Aria.Cli.Tests.csproj
+
+      - name: Test
+        run: dotnet test src/aria-cli/Aria.Cli.Tests/Aria.Cli.Tests.csproj -c Release --no-restore
+
+  package-nuget:
+    name: NuGet package — create, install, verify (.NET ${{ matrix.dotnet-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: ['8.0.x', '9.0.x', '10.0.x']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Build
+        run: dotnet build src/aria-cli/Aria.Cli.csproj -c Release
+
+      - name: Pack NuGet tool
+        run: dotnet pack src/aria-cli/Aria.Cli.csproj -c Release --no-build -o artifacts/nuget
+
+      - name: Verify package is a dotnet tool
+        run: |
+          pkg=$(ls artifacts/nuget/Aria.Cli.*.nupkg | grep -v symbols | head -1)
+          echo "Package: $pkg"
+          unzip -p "$pkg" "tools/net8.0/any/DotnetToolSettings.xml" \
+            | grep -q 'Name="aria"'
+          echo "✓ NuGet package is a dotnet tool with command name 'aria'"
+
+      - name: Install dotnet tool from local package
+        run: dotnet tool install -g Aria.Cli --add-source artifacts/nuget --prerelease
+
+      - name: Verify installed tool runs
+        run: |
+          export PATH="$HOME/.dotnet/tools:$PATH"
+          aria --help
+
+  package-npm:
+    name: npm package — create, install, verify (.NET ${{ matrix.dotnet-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: ['8.0.x', '9.0.x', '10.0.x']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Build npm runtime payload
+        run: dotnet publish src/aria-cli/Aria.Cli.csproj -c Release -o src/aria-cli/npm/dist/aria
+
+      - name: Install npm wrapper build dependencies
+        working-directory: src/aria-cli/npm
+        run: npm ci
+
+      - name: Build npm launcher
+        working-directory: src/aria-cli/npm
+        run: npm run build:wrapper
+
+      - name: Validate npm package contents
+        run: make aria-npm-pack-dry-run
+
+      - name: Pack npm tarball
+        id: npm-pack
+        working-directory: src/aria-cli/npm
+        run: |
+          tarball=$(npm pack --json | jq -r '.[0].filename')
+          echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
+
+      - name: Verify tarball contains bin/aria.js and dist/aria/aria.dll
+        working-directory: src/aria-cli/npm
+        run: |
+          tarball="${{ steps.npm-pack.outputs.tarball }}"
+          tar tf "$tarball" | grep -q "package/bin/aria.js"
+          echo "✓ bin/aria.js present in tarball"
+          tar tf "$tarball" | grep -q "package/dist/aria/aria.dll"
+          echo "✓ dist/aria/aria.dll present in tarball"
+
+      - name: Install npm package globally from tarball
+        working-directory: src/aria-cli/npm
+        run: npm install -g "${{ steps.npm-pack.outputs.tarball }}"
+
+      - name: Verify installed npm package runs
+        run: aria --help

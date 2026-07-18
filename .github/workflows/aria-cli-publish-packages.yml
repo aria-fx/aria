@@ -30,7 +30,7 @@ permissions:
 # - GitVersion config: GitVersion.yml
 
 env:
-  DOTNET_VERSION: "9.0.x"
+  DOTNET_VERSION: "10.0.x"
   NODE_VERSION: "20"
   NUGET_SOURCE_URL: "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
   NPM_REGISTRY_URL: "https://npm.pkg.github.com"
@@ -201,10 +201,18 @@ jobs:
             -o src/aria-cli/npm/dist/aria \
             /p:Version=${{ steps.version.outputs.version }}
 
+      - name: Install npm wrapper build dependencies
+        working-directory: src/aria-cli/npm
+        run: npm ci
+
       - name: Set npm package version
         working-directory: src/aria-cli/npm
         run: |
           npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+
+      - name: Build npm launcher
+        working-directory: src/aria-cli/npm
+        run: npm run build:wrapper
 
       - name: Validate npm payload
         run: |
